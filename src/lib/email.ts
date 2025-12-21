@@ -57,11 +57,11 @@ function emailTemplate({
         <tr>
             <td align="center" style="padding: 60px 0;">
                 <table role="presentation" class="email-container" width="560" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);">
-                    <!-- Brand Section -->
+                    <!-- Brand Section (Text Only) -->
                     <tr>
                         <td align="center" style="padding: 48px 48px 0 48px;">
-                            <a href="https://rentvault.ai" target="_blank" style="text-decoration: none;">
-                                <img src="https://rentvault.ai/logo.png" alt="RentVault" width="150" style="display: block; width: 150px; height: auto; border: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #011246; letter-spacing: -0.02em;">
+                            <a href="https://rentvault.ai" target="_blank" style="text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 800; color: #011246; letter-spacing: -0.02em;">
+                                RentVault
                             </a>
                         </td>
                     </tr>
@@ -69,7 +69,7 @@ function emailTemplate({
                     <!-- Main Body -->
                     <tr>
                         <td class="content-padding" style="padding: 48px;">
-                            <h1 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 800; color: #011246; line-height: 1.25; letter-spacing: -0.02em;">
+                            <h1 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 700; color: #011246; line-height: 1.25; letter-spacing: -0.01em;">
                                 ${title}
                             </h1>
                             <div style="font-size: 16px; color: #475569; line-height: 1.6; letter-spacing: 0.01em;">
@@ -121,7 +121,7 @@ function emailTemplate({
                                 <tr>
                                     <td>
                                         <p style="margin: 0; font-size: 12px; font-weight: 600; color: #475569; line-height: 1.6; text-transform: uppercase; letter-spacing: 0.05em;">
-                                            Privacy-first rental evidence
+                                            Privacy-first housing
                                         </p>
                                         <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8; line-height: 1.6;">
                                             RentVault securely stores and organises your rental data. Not legal advice.
