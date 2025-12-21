@@ -35,50 +35,42 @@ function emailTemplate({
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>${title}</title>
-    <!--[if mso]>
-    <style type="text/css">
-        table { border-collapse: collapse; }
-        td { padding: 0; }
+    <style>
+        @media only screen and (max-width: 600px) {
+            .email-container { width: 100% !important; border-radius: 0 !important; }
+            .content-padding { padding: 32px 20px !important; }
+        }
     </style>
-    <![endif]-->
 </head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-    <!-- Preview text -->
-    <div style="display: none; max-height: 0; overflow: hidden;">
-        ${previewText}
-    </div>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <div style="display: none; max-height: 0; overflow: hidden; opacity: 0;">${previewText}</div>
     
-    <!-- Main container -->
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc;">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
-                
-                <!-- Email card -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 480px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    
-                    <!-- Header -->
+            <td align="center" style="padding: 40px 0;">
+                <table role="presentation" class="email-container" width="500" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);">
+                    <!-- Header with Logo -->
                     <tr>
-                        <td style="padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #e5e7eb;">
-                            <span style="font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px;">RentVault</span>
+                        <td align="center" style="padding: 40px 40px 0 40px;">
+                            <img src="https://rentvault.ai/logo.png" alt="RentVault" width="140" style="display: block; width: 140px; height: auto; border: 0;">
                         </td>
                     </tr>
                     
-                    <!-- Body -->
+                    <!-- Content -->
                     <tr>
-                        <td style="padding: 32px;">
-                            <h1 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: #0f172a; line-height: 1.4;">
+                        <td class="content-padding" style="padding: 40px;">
+                            <h1 style="margin: 0 0 24px 0; font-size: 20px; font-weight: 700; color: #011246; line-height: 1.3; letter-spacing: -0.01em;">
                                 ${title}
                             </h1>
-                            <div style="font-size: 14px; color: #475569; line-height: 1.6;">
+                            <div style="font-size: 15px; color: #475569; line-height: 1.6; letter-spacing: 0.01em;">
                                 ${bodyContent}
                             </div>
                             
                             ${ctaText && ctaUrl ? `
-                            <!-- CTA Button -->
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top: 24px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top: 32px;">
                                 <tr>
                                     <td>
-                                        <a href="${ctaUrl}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #0f172a; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 8px;">
+                                        <a href="${ctaUrl}" target="_blank" style="display: inline-block; padding: 14px 28px; background-color: #011246; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 10px; transition: all 0.2s ease;">
                                             ${ctaText}
                                         </a>
                                     </td>
@@ -90,15 +82,25 @@ function emailTemplate({
                     
                     <!-- Footer -->
                     <tr>
-                        <td style="padding: 24px 32px; border-top: 1px solid #e5e7eb; background-color: #f9fafb; border-radius: 0 0 12px 12px;">
-                            <p style="margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5;">
-                                RentVault securely stores and organises your rental documents. Not legal advice.
+                        <td style="padding: 32px 40px; border-top: 1px solid #f1f5f9; background-color: #fbcfde05; border-radius: 0 0 16px 16px;">
+                            <p style="margin: 0; font-size: 12px; font-weight: 500; color: #94a3b8; line-height: 1.6;">
+                                RentVault securely stores and organises your rental documents.
+                                <br>
+                                <span style="opacity: 0.7;">Not legal advice.</span>
                             </p>
                         </td>
                     </tr>
-                    
                 </table>
                 
+                <table role="presentation" width="500" cellpadding="0" cellspacing="0" style="margin-top: 24px;">
+                    <tr>
+                        <td align="center">
+                            <p style="margin: 0; font-size: 11px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.05em;">
+                                &copy; ${new Date().getFullYear()} RentVault.ai
+                            </p>
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
     </table>
