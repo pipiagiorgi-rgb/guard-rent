@@ -274,11 +274,10 @@ export default function Home() {
             {/* Footer */}
             <footer className="py-10 border-t border-slate-100 mt-auto bg-slate-50">
                 <div className="max-w-[1120px] mx-auto px-4 md:px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex flex-col md:flex-row items-center gap-4">
+                    <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-6">
+                        <div className="flex flex-col items-center md:items-start gap-2">
                             <span className="text-lg font-bold text-slate-900">RentVault</span>
-                            <span className="hidden md:block text-slate-300">·</span>
-                            <span className="text-slate-500 text-sm text-center md:text-left">
+                            <span className="text-slate-500 text-sm text-center md:text-left max-w-md">
                                 Securely stores and organises your rental documents. Not legal advice.
                             </span>
                         </div>

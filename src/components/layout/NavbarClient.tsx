@@ -12,6 +12,8 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
 
     // Don't show navbar on app routes (they have their own layout)
     if (pathname?.startsWith('/app')) return null;
+    // Don't show navbar on guides pages (they have their own custom header)
+    if (pathname?.startsWith('/guides')) return null;
     // Don't show navbar on login page
     if (pathname === '/login') return null;
 
