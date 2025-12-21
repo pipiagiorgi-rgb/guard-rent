@@ -20,10 +20,11 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
     return (
         <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
             <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-                <div className="h-16 md:h-[72px] flex items-center justify-between">
-                    {/* Logo - left aligned, vertically centered */}
-                    <Link href="/" className="flex-shrink-0">
-                        <Logo size="md" />
+                <div className="h-16 md:h-[76px] flex items-center justify-between">
+                    {/* Logo - responsive sizing */}
+                    <Link href="/" className="flex-shrink-0 flex items-center">
+                        <Logo size="sm" className="md:hidden" />
+                        <Logo size="md" className="hidden md:block" />
                     </Link>
 
                     {/* Desktop Nav - right aligned, vertically centered */}
