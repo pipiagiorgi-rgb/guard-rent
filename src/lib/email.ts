@@ -550,3 +550,37 @@ RentVault securely stores and organises your rental documents. Not legal advice.
         tags: [{ name: 'type', value: 'reminder' }]
     })
 }
+
+// ============================================================
+// MAGIC LINK EMAIL
+// ============================================================
+export async function sendMagicLinkEmail(to: string, magicLink: string): Promise<{ success: boolean; error?: string }> {
+    const subject = 'Your RentVault login link'
+
+    const bodyContent = `
+        \u003cp style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6;\u003e
+            Click the button below to securely sign in to your RentVault account. This link will expire in 1 hour.
+        \u003c/p\u003e
+        \u003cp style="margin: 24px 0 0 0; font-size: 14px; color: #64748b; line-height: 1.6;\u003e
+            If you didn't request this email, you can safely ignore it.
+        \u003c/p\u003e
+    `
+
+    const text = `Sign in to RentVault\n\nClick this link to securely sign in to your account:\n${magicLink}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this email, you can safely ignore it.`
+
+    const html = emailTemplate({
+        title: 'Sign in to RentVault',
+        previewText: 'Your secure login link is ready',
+        bodyContent,
+        ctaText: 'Sign in to RentVault',
+        ctaUrl: magicLink
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'magic-link' }]
+    })
+}
