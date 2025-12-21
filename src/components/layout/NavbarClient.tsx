@@ -19,18 +19,18 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
 
     return (
         <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
-            <div className="max-w-[1120px] mx-auto px-6 md:px-8">
-                <div className="h-20 flex items-center justify-between">
-                    <Link href="/" className="flex items-center -my-1">
-                        <Logo size="sm" className="md:hidden" />
-                        <Logo size="lg" className="hidden md:block" />
+            <div className="max-w-[1120px] mx-auto px-5 md:px-8">
+                <div className="h-16 md:h-[72px] flex items-center justify-between">
+                    {/* Logo - left aligned, vertically centered */}
+                    <Link href="/" className="flex-shrink-0">
+                        <Logo size="md" />
                     </Link>
 
-                    {/* Desktop Nav */}
-                    <nav className="hidden md:flex items-center gap-8">
+                    {/* Desktop Nav - right aligned, vertically centered */}
+                    <nav className="hidden md:flex items-center gap-6">
                         <Link
                             href="/pricing"
-                            className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                            className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
                         >
                             Pricing
                         </Link>
@@ -38,7 +38,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                         {isLoggedIn ? (
                             <Link
                                 href="/app"
-                                className="text-[15px] font-medium bg-slate-900 text-white px-6 py-2.5 rounded-lg hover:bg-slate-800 transition-colors"
+                                className="text-[15px] font-medium bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors leading-none"
                             >
                                 Go to app
                             </Link>
@@ -46,13 +46,13 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                             <>
                                 <Link
                                     href="/login"
-                                    className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                                    className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
                                 >
                                     Log in
                                 </Link>
                                 <Link
                                     href="/login"
-                                    className="text-[15px] font-medium bg-slate-900 text-white px-6 py-2.5 rounded-lg hover:bg-slate-800 transition-colors"
+                                    className="text-[15px] font-medium bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors leading-none"
                                 >
                                     Get started
                                 </Link>
@@ -60,9 +60,9 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                         )}
                     </nav>
 
-                    {/* Mobile Menu Button */}
+                    {/* Mobile Menu Button - vertically centered */}
                     <button
-                        className="md:hidden p-2 -mr-2 text-slate-600"
+                        className="md:hidden flex items-center justify-center w-10 h-10 -mr-2 text-slate-600"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         aria-label="Toggle menu"
                     >

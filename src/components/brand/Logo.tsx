@@ -11,9 +11,9 @@ interface LogoProps {
 // Image-based logo with stylized RV
 export function Logo({ className = '', size = 'md' }: LogoProps) {
     const sizes = {
-        sm: { width: 100, height: 33 },   // Mobile - balanced
-        md: { width: 120, height: 40 },   // Standard
-        lg: { width: 136, height: 45 }    // Desktop - prominent but not overwhelming
+        sm: { width: 120, height: 36 },   // Mobile
+        md: { width: 140, height: 42 },   // Standard - prominent
+        lg: { width: 160, height: 48 }    // Large
     }
 
     const { width, height } = sizes[size]
