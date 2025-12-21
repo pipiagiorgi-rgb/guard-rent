@@ -26,7 +26,7 @@ export function Logo({ className = '', size = 'md' }: LogoProps) {
             height={height}
             className={className}
             priority
-            style={{ objectFit: 'contain' }}
+            style={{ objectFit: 'contain', mixBlendMode: 'multiply' }}
         />
     )
 }
