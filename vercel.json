@@ -1,0 +1,30 @@
+{
+    "functions": {
+        "src/app/api/ai/contract-scan/route.ts": {
+            "maxDuration": 60
+        },
+        "src/app/api/ai/translate/route.ts": {
+            "maxDuration": 60
+        },
+        "src/app/api/pdf/checkin-report/route.ts": {
+            "maxDuration": 60
+        },
+        "src/app/api/pdf/deposit-pack/route.ts": {
+            "maxDuration": 60
+        }
+    },
+    "crons": [
+        {
+            "path": "/api/cron/retention",
+            "schedule": "0 3 * * *"
+        },
+        {
+            "path": "/api/cron/retention-notices",
+            "schedule": "0 9 * * *"
+        },
+        {
+            "path": "/api/cron/deadline-reminders",
+            "schedule": "0 8 * * *"
+        }
+    ]
+}
