@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Camera, Plus, Check, Loader2, Upload, Trash2, AlertCircle, Gauge, ChevronDown, ChevronUp, X, ImageIcon, Eye } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
+import { canUploadPreviewPhoto, getPhotosRemaining, recordPreviewPhoto, isPurchased } from '@/lib/preview-limits'
+import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 
 interface Room {
     room_id: string
@@ -40,6 +42,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     const [addingRoom, setAddingRoom] = useState(false)
     const [newRoomName, setNewRoomName] = useState('')
     const [error, setError] = useState<string | null>(null)
+    const [hasPack, setHasPack] = useState(false)
 
     // Meter readings state
     const [meterReadings, setMeterReadings] = useState<MeterReadings>({})
@@ -67,12 +70,17 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
         try {
             const supabase = createClient()
 
-            // Fetch case data (meter readings)
+            // Fetch case data (meter readings and purchase status)
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('checkin_meter_readings')
+                .select('checkin_meter_readings, purchase_type')
                 .eq('case_id', id)
                 .single()
+
+            // Check if user has purchased a pack
+            if (caseData) {
+                setHasPack(isPurchased(caseData.purchase_type))
+            }
 
             if (caseData?.checkin_meter_readings) {
                 const raw = caseData.checkin_meter_readings
@@ -292,6 +300,13 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
         const files = e.target.files
         if (!files || files.length === 0) return
 
+        // Check photo limits for preview mode
+        if (!hasPack && !canUploadPreviewPhoto(caseId)) {
+            setError(`Preview mode allows 3 photos total. Unlock a pack for unlimited photos.`)
+            e.target.value = ''
+            return
+        }
+
         setUploading(roomId)
         setError(null)
 
@@ -301,6 +316,12 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             if (!user) throw new Error('Not authenticated')
 
             for (const file of Array.from(files)) {
+                // Check limit before each file if in preview mode
+                if (!hasPack && !canUploadPreviewPhoto(caseId)) {
+                    setError(`Photo limit reached. Unlock a pack for unlimited uploads.`)
+                    break
+                }
+
                 const res = await fetch('/api/assets/upload-url', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -328,6 +349,11 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                     .from('assets')
                     .update({ room_id: roomId })
                     .eq('asset_id', assetId)
+
+                // Record usage in preview mode
+                if (!hasPack) {
+                    recordPreviewPhoto(caseId)
+                }
             }
 
             await loadData(caseId)
@@ -407,6 +433,19 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 </p>
             </div>
 
+            {/* Upgrade Banner */}
+            {!hasPack && <UpgradeBanner caseId={caseId} currentPack={null} />}
+
+            {/* Photo limit warning for preview mode */}
+            {!hasPack && totalPhotos > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <p className="text-sm text-amber-800">
+                        <strong>{getPhotosRemaining(caseId)} preview photo{getPhotosRemaining(caseId) !== 1 ? 's' : ''} remaining.</strong>
+                        {' '}Photos are not saved in preview mode. Unlock a pack to save everything permanently.
+                    </p>
+                </div>
+            )}
+
             {/* Status banner */}
             {isComplete ? (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
@@ -450,22 +489,29 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                                 {room.checkin_photos > 0 && (
                                     <span className="text-sm text-slate-500">{room.checkin_photos} photos</span>
                                 )}
-                                <label className={`flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-medium cursor-pointer hover:bg-slate-50 transition-colors ${uploading === room.room_id ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        multiple
-                                        onChange={(e) => handlePhotoUpload(room.room_id, e)}
-                                        disabled={uploading === room.room_id}
-                                        className="hidden"
-                                    />
-                                    {uploading === room.room_id ? (
-                                        <Loader2 size={14} className="animate-spin" />
-                                    ) : (
-                                        <Plus size={14} />
-                                    )}
-                                    Add photo
-                                </label>
+                                {(() => {
+                                    const canUpload = hasPack || canUploadPreviewPhoto(caseId)
+                                    const isUploading = uploading === room.room_id
+                                    return (
+                                        <label className={`flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-medium transition-colors ${!canUpload || isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'
+                                            }`}>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                multiple
+                                                onChange={(e) => handlePhotoUpload(room.room_id, e)}
+                                                disabled={!canUpload || isUploading}
+                                                className="hidden"
+                                            />
+                                            {isUploading ? (
+                                                <Loader2 size={14} className="animate-spin" />
+                                            ) : (
+                                                <Plus size={14} />
+                                            )}
+                                            {!canUpload && !hasPack ? 'Limit reached' : isUploading ? 'Uploading...' : 'Add photo'}
+                                        </label>
+                                    )
+                                })()}
                             </div>
                         </div>
 
