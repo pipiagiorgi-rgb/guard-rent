@@ -1,0 +1,155 @@
+import { Metadata } from 'next'
+import Link from 'next/link'
+import { Globe, ArrowRight, Languages } from 'lucide-react'
+
+export const metadata: Metadata = {
+    title: 'Tips for Tenants Renting Abroad | RentVault',
+    description: 'A guide for expats and international tenants on renting in a foreign country. Tips on contracts, language barriers, deposits, and documentation.',
+    openGraph: {
+        title: 'Tips for Tenants Renting Abroad',
+        description: 'Essential advice for expats and international students renting in a foreign country.',
+    },
+}
+
+export default function RentingAbroadGuide() {
+    return (
+        <main className="max-w-[800px] mx-auto px-4 md:px-6 py-12 md:py-16">
+            <article className="prose prose-slate max-w-none">
+                <header className="mb-10">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
+                        <Link href="/guides" className="hover:text-slate-900">Guides</Link>
+                        <span>/</span>
+                        <span>Renting Abroad</span>
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                        Tips for tenants renting abroad
+                    </h1>
+                    <p className="text-lg text-slate-600">
+                        Renting in a foreign country comes with unique challenges. Here's how to protect yourself.
+                    </p>
+                </header>
+
+                <section className="mb-10">
+                    <h2 className="text-xl font-semibold mb-4">The challenges of renting abroad</h2>
+                    <p className="text-slate-600 mb-4">
+                        When you rent in a new country, you're often navigating unfamiliar laws, a different language,
+                        and local practices you don't fully understand. This puts you at a disadvantage if disputes arise.
+                    </p>
+                    <p className="text-slate-600">
+                        Many expats and international students have lost deposits or faced unexpected costs because
+                        they didn't understand their rights or document their rental properly.
+                    </p>
+                </section>
+
+                <section className="mb-10">
+                    <h2 className="text-xl font-semibold mb-4">Common issues for international tenants</h2>
+                    <ul className="space-y-3 text-slate-600">
+                        <li>
+                            <strong>Language barriers.</strong> Leases are often in the local language only,
+                            making it hard to understand your obligations and rights.
+                        </li>
+                        <li>
+                            <strong>Different deposit rules.</strong> Some countries require deposits to be held
+                            in protected schemes; others don't. Know the local rules.
+                        </li>
+                        <li>
+                            <strong>Unfamiliar notice periods.</strong> A 3-month notice period in Germany works
+                            differently than a month-to-month lease in the US.
+                        </li>
+                        <li>
+                            <strong>Verbal agreements.</strong> In some cultures, verbal agreements are common —
+                            but harder to enforce if things go wrong.
+                        </li>
+                        <li>
+                            <strong>Difficult to pursue disputes.</strong> If you've already left the country,
+                            getting your deposit back becomes much harder.
+                        </li>
+                    </ul>
+                </section>
+
+                <section className="mb-10">
+                    <h2 className="text-xl font-semibold mb-4">How to protect yourself</h2>
+                    <div className="space-y-6">
+                        <div className="bg-slate-50 rounded-xl p-5">
+                            <h3 className="font-medium mb-2">1. Get everything in writing</h3>
+                            <p className="text-slate-600 text-sm">
+                                Even if verbal agreements are common locally, insist on written documentation.
+                                Email confirmations, signed contracts, and receipts all count.
+                            </p>
+                        </div>
+                        <div className="bg-slate-50 rounded-xl p-5">
+                            <h3 className="font-medium mb-2">2. Translate your lease</h3>
+                            <p className="text-slate-600 text-sm">
+                                Use a professional translator or translation tool to understand your contract fully.
+                                Don't sign anything you don't understand.
+                            </p>
+                        </div>
+                        <div className="bg-slate-50 rounded-xl p-5">
+                            <h3 className="font-medium mb-2">3. Document the apartment thoroughly</h3>
+                            <p className="text-slate-600 text-sm">
+                                Take photos of every room on move-in day. This is even more important when renting abroad,
+                                as you may not be there to dispute claims later.
+                            </p>
+                        </div>
+                        <div className="bg-slate-50 rounded-xl p-5">
+                            <h3 className="font-medium mb-2">4. Know the local tenant rights</h3>
+                            <p className="text-slate-600 text-sm">
+                                Research tenant protection laws in your country. Some places have strong protections;
+                                others favour landlords. Adjust your documentation accordingly.
+                            </p>
+                        </div>
+                        <div className="bg-slate-50 rounded-xl p-5">
+                            <h3 className="font-medium mb-2">5. Keep records accessible</h3>
+                            <p className="text-slate-600 text-sm">
+                                Store your lease, photos, and correspondence somewhere you can access from anywhere.
+                                Cloud storage or a dedicated app works well.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="bg-slate-50 rounded-xl p-6 mb-10">
+                    <div className="flex items-center gap-3 mb-4">
+                        <Globe className="text-slate-700" size={24} />
+                        <h2 className="text-xl font-semibold">How RentVault helps expats</h2>
+                    </div>
+                    <p className="text-slate-600 mb-4">
+                        RentVault is designed with international tenants in mind. Upload your lease in any language,
+                        request translations, and keep all your documentation accessible from anywhere.
+                    </p>
+                    <div className="flex items-center gap-2 text-slate-600 mb-4">
+                        <Languages size={18} />
+                        <span className="text-sm">Contract translation and key date extraction included.</span>
+                    </div>
+                    <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 text-slate-900 font-medium hover:underline"
+                    >
+                        Get started for free <ArrowRight size={16} />
+                    </Link>
+                </section>
+
+                <section>
+                    <h2 className="text-xl font-semibold mb-4">Related guides</h2>
+                    <ul className="space-y-2">
+                        <li>
+                            <Link href="/guides/deposit-protection" className="text-slate-600 hover:text-slate-900">
+                                → How to protect your rental deposit
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/guides/notice-periods" className="text-slate-600 hover:text-slate-900">
+                                → Understanding rental notice periods
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/guides/move-in-photos" className="text-slate-600 hover:text-slate-900">
+                                → Why move-in photos matter
+                            </Link>
+                        </li>
+                    </ul>
+                </section>
+            </article>
+        </main>
+    )
+}

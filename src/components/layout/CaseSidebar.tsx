@@ -28,7 +28,7 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
         { href: `/app/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
         { href: `/app/case/${caseId}/handover`, label: 'Handover', icon: KeyRound },
         { href: `/app/case/${caseId}/exports`, label: 'Exports', icon: Download },
-        { href: `/app/case/${caseId}/settings`, label: 'Data & retention', icon: Database },
+        { href: `/app/case/${caseId}/settings`, label: 'Data', icon: Database },
     ]
 
     const isActive = (href: string) => {
@@ -39,20 +39,21 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
     }
 
     return (
-        <aside className="w-full md:w-56 flex-shrink-0">
-            {/* Mobile: Back link */}
-            <div className="md:hidden mb-4">
+        <aside className="w-full lg:w-auto flex-shrink-0 mb-6 lg:mb-0">
+            {/* Mobile: Back link and title */}
+            <div className="lg:hidden mb-4 flex items-center justify-between">
                 <Link
                     href="/app"
-                    className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors py-2"
                 >
                     <ChevronLeft size={16} />
                     All rentals
                 </Link>
+                <span className="font-semibold text-slate-900 truncate max-w-[180px]">{caseLabel}</span>
             </div>
 
-            {/* Case title */}
-            <div className="mb-4 hidden md:block">
+            {/* Desktop: Back and Title */}
+            <div className="mb-4 hidden lg:block">
                 <Link
                     href="/app"
                     className="text-xs text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1 mb-2"
@@ -63,8 +64,29 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
                 <h2 className="font-semibold text-slate-900 truncate">{caseLabel}</h2>
             </div>
 
-            {/* Navigation */}
-            <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+            {/* Mobile Navigation: Grid that wraps */}
+            <nav className="lg:hidden grid grid-cols-4 gap-2 mb-2">
+                {navItems.map(item => {
+                    const Icon = item.icon
+                    const active = isActive(item.href)
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-medium transition-colors min-h-[64px] justify-center ${active
+                                ? 'bg-slate-900 text-white'
+                                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                }`}
+                        >
+                            <Icon size={20} />
+                            <span className="text-center leading-tight">{item.label}</span>
+                        </Link>
+                    )
+                })}
+            </nav>
+
+            {/* Desktop Navigation: Vertical list */}
+            <nav className="hidden lg:flex lg:flex-col gap-1">
                 {navItems.map(item => {
                     const Icon = item.icon
                     const active = isActive(item.href)
@@ -86,3 +108,4 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
         </aside>
     )
 }
+

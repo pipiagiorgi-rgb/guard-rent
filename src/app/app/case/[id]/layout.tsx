@@ -23,7 +23,7 @@ export default async function CaseLayout({
     }
 
     return (
-        <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-6">
+        <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-8">
             <CaseSidebar caseId={rentalCase.case_id} caseLabel={rentalCase.label} />
             <div className="min-w-0">
                 {children}

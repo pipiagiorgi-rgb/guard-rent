@@ -123,7 +123,7 @@ export default function NewCasePage() {
                         </div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="lease_start" className="block text-sm font-medium text-slate-700 mb-2">
                                 Lease start <span className="text-slate-400">(optional)</span>
