@@ -36,41 +36,52 @@ function emailTemplate({
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>${title}</title>
     <style>
+        /* Base styles */
+        body { margin: 0; padding: 0; min-width: 100%; width: 100% !important; height: 100% !important; background-color: #f8fafc; }
+        table { border-spacing: 0; border-collapse: collapse; }
+        img { border: 0; line-height: 100%; outline: none; text-decoration: none; }
+        
+        /* Interactive button hover (some clients support this) */
+        .cta-button:hover { background-color: #0c1c4e !important; }
+        
         @media only screen and (max-width: 600px) {
             .email-container { width: 100% !important; border-radius: 0 !important; }
-            .content-padding { padding: 32px 20px !important; }
+            .content-padding { padding: 40px 24px !important; }
+            .footer-padding { padding: 32px 24px !important; }
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
     <div style="display: none; max-height: 0; overflow: hidden; opacity: 0;">${previewText}</div>
     
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc;">
         <tr>
-            <td align="center" style="padding: 40px 0;">
-                <table role="presentation" class="email-container" width="500" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);">
-                    <!-- Header with Logo -->
+            <td align="center" style="padding: 60px 0;">
+                <table role="presentation" class="email-container" width="560" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);">
+                    <!-- Brand Section -->
                     <tr>
-                        <td align="center" style="padding: 40px 40px 0 40px;">
-                            <img src="https://rentvault.ai/logo.png" alt="RentVault" width="140" style="display: block; width: 140px; height: auto; border: 0;">
+                        <td align="center" style="padding: 48px 48px 0 48px;">
+                            <a href="https://rentvault.ai" target="_blank" style="text-decoration: none;">
+                                <img src="https://rentvault.ai/logo.png" alt="RentVault" width="150" style="display: block; width: 150px; height: auto; border: 0;">
+                            </a>
                         </td>
                     </tr>
                     
-                    <!-- Content -->
+                    <!-- Main Body -->
                     <tr>
-                        <td class="content-padding" style="padding: 40px;">
-                            <h1 style="margin: 0 0 24px 0; font-size: 20px; font-weight: 700; color: #011246; line-height: 1.3; letter-spacing: -0.01em;">
+                        <td class="content-padding" style="padding: 48px;">
+                            <h1 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 800; color: #011246; line-height: 1.25; letter-spacing: -0.02em;">
                                 ${title}
                             </h1>
-                            <div style="font-size: 15px; color: #475569; line-height: 1.6; letter-spacing: 0.01em;">
+                            <div style="font-size: 16px; color: #475569; line-height: 1.6; letter-spacing: 0.01em;">
                                 ${bodyContent}
                             </div>
                             
                             ${ctaText && ctaUrl ? `
-                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top: 32px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
                                 <tr>
                                     <td>
-                                        <a href="${ctaUrl}" target="_blank" style="display: inline-block; padding: 14px 28px; background-color: #011246; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 10px; transition: all 0.2s ease;">
+                                        <a href="${ctaUrl}" class="cta-button" target="_blank" style="display: inline-block; padding: 16px 36px; background-color: #011246; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(1, 18, 70, 0.1), 0 2px 4px -1px rgba(1, 18, 70, 0.06);">
                                             ${ctaText}
                                         </a>
                                     </td>
@@ -80,23 +91,53 @@ function emailTemplate({
                         </td>
                     </tr>
                     
-                    <!-- Footer -->
+                    <!-- Features/Benefits Section (Subtle reinforcement) -->
                     <tr>
-                        <td style="padding: 32px 40px; border-top: 1px solid #f1f5f9; background-color: #fbcfde05; border-radius: 0 0 16px 16px;">
-                            <p style="margin: 0; font-size: 12px; font-weight: 500; color: #94a3b8; line-height: 1.6;">
-                                RentVault securely stores and organises your rental documents.
-                                <br>
-                                <span style="opacity: 0.7;">Not legal advice.</span>
-                            </p>
+                        <td style="padding: 0 48px 40px 48px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #f1f5f9;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <div style="font-size: 13px; color: #64748b; line-height: 1.5;">
+                                            <strong style="color: #475569;">Security Tip:</strong> RentVault will never ask for your password or bank details via email.
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Professional Footer -->
+                    <tr>
+                        <td class="footer-padding" style="padding: 40px 48px; border-top: 1px solid #f1f5f9; background-color: #fafbfc; border-radius: 0 0 20px 20px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <p style="margin: 0; font-size: 12px; font-weight: 600; color: #94a3b8; line-height: 1.6; text-transform: uppercase; letter-spacing: 0.05em;">
+                                            Privacy-first housing
+                                        </p>
+                                        <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8; line-height: 1.6;">
+                                            RentVault securely stores and organises your rental evidence. Not legal advice.
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 24px;">
+                                        <p style="margin: 0; font-size: 11px; color: #cbd5e1; letter-spacing: 0.02em;">
+                                            &copy; ${new Date().getFullYear()} RentVault.ai. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
                 
-                <table role="presentation" width="500" cellpadding="0" cellspacing="0" style="margin-top: 24px;">
+                <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="margin-top: 24px;">
                     <tr>
                         <td align="center">
-                            <p style="margin: 0; font-size: 11px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.05em;">
-                                &copy; ${new Date().getFullYear()} RentVault.ai
+                            <p style="margin: 0; font-size: 11px; color: #94a3b8;">
+                                <a href="https://rentvault.ai/privacy" style="color: #94a3b8; text-decoration: underline;">Privacy Policy</a> &nbsp;&bull;&nbsp; 
+                                <a href="https://rentvault.ai/terms" style="color: #94a3b8; text-decoration: underline;">Terms of Service</a>
                             </p>
                         </td>
                     </tr>
