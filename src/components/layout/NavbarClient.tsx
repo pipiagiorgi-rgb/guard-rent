@@ -22,7 +22,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
             <div className="max-w-[1120px] mx-auto px-5 md:px-8">
                 <div className="h-16 md:h-[76px] flex items-center justify-between">
                     {/* Logo - responsive sizing */}
-                    <Link href="/" className="flex-shrink-0 flex items-center h-8 md:h-10">
+                    <Link href="/" className="flex-shrink-0 flex items-center h-10 md:h-12">
                         <Logo size="sm" className="md:hidden" />
                         <Logo size="md" className="hidden md:block" />
                     </Link>
@@ -61,13 +61,13 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                         )}
                     </nav>
 
-                    {/* Mobile Menu Button - same height as logo for alignment */}
+                    {/* Mobile Menu Button - symmetrical with logo */}
                     <button
-                        className="md:hidden flex items-center justify-center h-8 w-10 -mr-2 text-slate-700"
+                        className="md:hidden flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         aria-label="Toggle menu"
                     >
-                        {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+                        {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
                     </button>
                 </div>
             </div>
