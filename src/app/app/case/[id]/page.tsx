@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Calendar, MapPin, Clock, ChevronRight } from 'lucide-react'
 import { formatCountryWithCode } from '@/lib/countries'
+import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 
 // Helper to format country for display (handles custom countries)
 function formatCountry(code: string | null): string {
@@ -38,6 +39,9 @@ export default async function CaseOverviewPage({ params }: { params: { id: strin
                 <h1 className="text-2xl font-bold mb-1">{rental.label}</h1>
                 <p className="text-slate-500 text-sm">Overview</p>
             </div>
+
+            {/* Upgrade Banner */}
+            <UpgradeBanner caseId={params.id} currentPack={rental.purchase_type} />
 
             {/* Info Cards */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

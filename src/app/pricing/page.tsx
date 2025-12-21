@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import { Check, FileText, Shield, Clock, Eye } from 'lucide-react'
 import { FAQAccordion } from '@/components/ui/FAQAccordion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 const faqItems = [
     {
@@ -49,27 +51,26 @@ const faqItems = [
 ]
 
 export default function PricingPage() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [loading, setLoading] = useState<string | null>(null)
+    const router = useRouter()
 
-    const handleCheckout = async (packType: 'checkin' | 'bundle' | 'moveout') => {
-        setLoading(packType)
-        try {
-            const res = await fetch('/api/checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ packType })
-            })
-            const data = await res.json()
-            if (data.url) {
-                window.location.href = data.url
-            } else {
-                alert('Checkout failed. Please try again.')
-                setLoading(null)
-            }
-        } catch (error) {
-            console.error('Checkout error:', error)
-            alert('Something went wrong. Please try again.')
-            setLoading(null)
+    useEffect(() => {
+        const checkAuth = async () => {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
+            setIsLoggedIn(!!user)
+        }
+        checkAuth()
+    }, [])
+
+    const handleGetStarted = (packType: 'checkin' | 'bundle' | 'moveout') => {
+        if (!isLoggedIn) {
+            // Not logged in - send to login
+            router.push('/login')
+        } else {
+            // Logged in - send to app to select rental
+            router.push('/app')
         }
     }
 
@@ -133,11 +134,10 @@ export default function PricingPage() {
                             </li>
                         </ul>
                         <button
-                            onClick={() => handleCheckout('checkin')}
-                            disabled={loading === 'checkin'}
-                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleGetStarted('checkin')}
+                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
                         >
-                            {loading === 'checkin' ? 'Loading...' : 'Get started'}
+                            Get started
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
@@ -182,11 +182,10 @@ export default function PricingPage() {
                             </li>
                         </ul>
                         <button
-                            onClick={() => handleCheckout('bundle')}
-                            disabled={loading === 'bundle'}
-                            className="w-full py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleGetStarted('bundle')}
+                            className="w-full py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all"
                         >
-                            {loading === 'bundle' ? 'Loading...' : 'Get full protection'}
+                            Get full protection
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
@@ -224,11 +223,10 @@ export default function PricingPage() {
                             </li>
                         </ul>
                         <button
-                            onClick={() => handleCheckout('moveout')}
-                            disabled={loading === 'moveout'}
-                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleGetStarted('moveout')}
+                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
                         >
-                            {loading === 'moveout' ? 'Loading...' : 'Get started'}
+                            Get started
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
