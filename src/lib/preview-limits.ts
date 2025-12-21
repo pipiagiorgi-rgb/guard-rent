@@ -3,7 +3,7 @@
  * 
  * Tracks preview usage limits per rental (caseId) using localStorage.
  * - 3 free questions per rental
- * - 3 translation requests per rental
+ * - 1 translation request per rental
  * 
  * Limits are cleared when a pack is purchased, or user can have unlimited access.
  */
@@ -12,7 +12,7 @@ const STORAGE_KEY_PREFIX = 'rentvault_preview_'
 
 // Limits
 export const PREVIEW_QUESTION_LIMIT = 3
-export const PREVIEW_TRANSLATION_LIMIT = 3
+export const PREVIEW_TRANSLATION_LIMIT = 1
 
 interface PreviewUsage {
     questionsUsed: number
