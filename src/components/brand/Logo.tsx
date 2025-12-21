@@ -1,28 +1,33 @@
 // RentVault Logo Components
 // Usage: <Logo /> for standard logo, <Logo size="lg" /> for larger
 
+import Image from 'next/image'
+
 interface LogoProps {
     className?: string
     size?: 'sm' | 'md' | 'lg'
 }
 
-// Two-tone elegant logo with stylized R and V
-// R and V: #0F172A (Deep Slate/Navy)
-// e, n, t, a, u, l, t: #475569 (Blue-Grey)
+// Image-based logo with stylized RV
 export function Logo({ className = '', size = 'md' }: LogoProps) {
     const sizes = {
-        sm: 'text-lg',
-        md: 'text-xl',
-        lg: 'text-2xl'
+        sm: { width: 100, height: 28 },
+        md: { width: 130, height: 36 },
+        lg: { width: 160, height: 44 }
     }
 
+    const { width, height } = sizes[size]
+
     return (
-        <span className={`font-bold tracking-tight ${sizes[size]} ${className}`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-            <span style={{ color: '#0F172A' }}>R</span>
-            <span style={{ color: '#475569' }}>ent</span>
-            <span style={{ color: '#0F172A' }}>V</span>
-            <span style={{ color: '#475569' }}>ault</span>
-        </span>
+        <Image
+            src="/logo.png"
+            alt="RentVault"
+            width={width}
+            height={height}
+            className={className}
+            priority
+            style={{ objectFit: 'contain' }}
+        />
     )
 }
 
