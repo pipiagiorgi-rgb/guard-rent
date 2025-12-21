@@ -4,6 +4,7 @@
  * Tracks preview usage limits per rental (caseId) using localStorage.
  * - 3 free questions per rental
  * - 1 translation request per rental
+ * - 3 total photos (across all rooms)
  * 
  * Limits are cleared when a pack is purchased, or user can have unlimited access.
  */
@@ -13,16 +14,18 @@ const STORAGE_KEY_PREFIX = 'rentvault_preview_'
 // Limits
 export const PREVIEW_QUESTION_LIMIT = 3
 export const PREVIEW_TRANSLATION_LIMIT = 1
+export const PREVIEW_PHOTO_LIMIT = 3
 
 interface PreviewUsage {
     questionsUsed: number
     translationsUsed: number
+    photosUsed: number
 }
 
 // Get usage for a specific rental
 function getUsage(caseId: string): PreviewUsage {
     if (typeof window === 'undefined') {
-        return { questionsUsed: 0, translationsUsed: 0 }
+        return { questionsUsed: 0, translationsUsed: 0, photosUsed: 0 }
     }
 
     try {
@@ -34,7 +37,7 @@ function getUsage(caseId: string): PreviewUsage {
         console.error('Failed to read preview usage:', e)
     }
 
-    return { questionsUsed: 0, translationsUsed: 0 }
+    return { questionsUsed: 0, translationsUsed: 0, photosUsed: 0 }
 }
 
 // Save usage for a specific rental
@@ -85,6 +88,26 @@ export function canTranslatePreview(caseId: string): boolean {
 export function recordPreviewTranslation(caseId: string): void {
     const usage = getUsage(caseId)
     usage.translationsUsed += 1
+    setUsage(caseId, usage)
+}
+
+// === Photo Limits ===
+
+export function getPhotosUsed(caseId: string): number {
+    return getUsage(caseId).photosUsed
+}
+
+export function getPhotosRemaining(caseId: string): number {
+    return Math.max(0, PREVIEW_PHOTO_LIMIT - getPhotosUsed(caseId))
+}
+
+export function canUploadPreviewPhoto(caseId: string): boolean {
+    return getPhotosRemaining(caseId) > 0
+}
+
+export function recordPreviewPhoto(caseId: string): void {
+    const usage = getUsage(caseId)
+    usage.photosUsed += 1
     setUsage(caseId, usage)
 }
 

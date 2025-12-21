@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation'
 const faqItems = [
     {
         question: "Can I try RentVault before paying?",
-        answer: "Yes. You can explore preview features for free — including 3 contract questions and 1 translation per rental. Preview results are temporary and cleared on refresh. Purchasing a pack unlocks unlimited access and saves everything permanently."
+        answer: "Yes. You can explore preview features for free — including 3 contract questions, 1 translation, and 3 photos per rental. Preview results are temporary and cleared on refresh. Purchasing a pack unlocks unlimited access and saves everything permanently."
     },
     {
         question: "Is RentVault a subscription?",
@@ -22,7 +22,7 @@ const faqItems = [
     },
     {
         question: "What's included in Preview mode?",
-        answer: "Preview mode lets you upload contracts, scan for key dates, ask up to 3 questions, and request 1 translation per rental. Preview results are not saved — they're cleared when you refresh. Unlocking a pack saves everything permanently and removes limits."
+        answer: "Preview mode lets you upload contracts, scan for key dates, ask up to 3 questions, request 1 translation, and upload up to 3 photos per rental. Preview results are not saved — they're cleared when you refresh. Unlocking a pack saves everything permanently and removes limits."
     },
     {
         question: "Can I delete my data at any time?",
@@ -250,6 +250,7 @@ export default function PricingPage() {
                                 <li>• Upload and scan contracts</li>
                                 <li>• 3 contract questions per rental</li>
                                 <li>• 1 translation per rental</li>
+                                <li>• 3 photos (not saved)</li>
                                 <li>• Results cleared on refresh</li>
                             </ul>
                         </div>
