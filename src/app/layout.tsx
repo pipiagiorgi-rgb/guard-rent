@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     },
     openGraph: {
         title: 'RentVault | Rental Documentation & Protection',
-        description: 'Protect your rental deposit. Never miss an important deadline.',
+        description: 'A privacy-first vault for tenants to store rental documents, photos, and key dates.',
         url: 'https://rentvault.ai',
         siteName: 'RentVault',
         images: [
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     twitter: {
         card: 'summary_large_image',
         title: 'RentVault | Rental Documentation & Protection',
-        description: 'Protect your rental deposit. Never miss an important deadline.',
+        description: 'A privacy-first vault for tenants to store rental documents, photos, and key dates.',
         images: ['https://rentvault.ai/og-image.jpg'],
     },
 };
