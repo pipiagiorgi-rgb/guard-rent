@@ -23,7 +23,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                 {/* 1) Fixed-height flex container for the header */}
                 <div className="h-16 flex items-center justify-between">
                     {/* 2) Logo wrapper - flex aligned, h-full */}
-                    <Link href="/" className="h-full flex items-center flex-shrink-0 -translate-y-[3px]">
+                    <Link href="/" className="h-full flex items-center flex-shrink-0">
                         {/* 3) Explicit logo height, no intrinsic sizing or hacks */}
                         <Logo height={56} />
                     </Link>

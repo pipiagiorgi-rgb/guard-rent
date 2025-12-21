@@ -12,20 +12,31 @@ export function Logo({ className = '', height = 32 }: LogoProps) {
     // Standardize height as a string for CSS
     const h = typeof height === 'number' ? `${height}px` : height
 
+    /**
+     * PRECISION ALIGNMENT LOGIC:
+     * To achieve perfect visual centering without CSS hacks (margins/transforms),
+     * we wrap the logo in an SVG and "correct the viewBox".
+     * 
+     * Content: 192x71
+     * Corrected ViewBox: 192x90 (Adds 19px of "optical padding" at the bottom)
+     * When flexbox centers this 90px-relative box, the 71px content sits slightly higher,
+     * perfectly matching the visual midline of the navigation text.
+     */
     return (
-        <div
-            className={`relative inline-block ${className}`}
-            style={{ height: h, aspectRatio: '192/71' }}
+        <svg
+            viewBox="0 0 192 90"
+            style={{ height: h, width: 'auto' }}
+            className={`inline-block fill-none ${className}`}
+            xmlns="http://www.w3.org/2000/svg"
         >
-            <Image
-                src="/logo.png"
-                alt="RentVault"
-                fill
-                priority
-                className="object-contain"
-                sizes="(max-width: 768px) 140px, 150px"
+            <image
+                href="/logo.png"
+                x="0"
+                y="0"
+                width="192"
+                height="71"
             />
-        </div>
+        </svg>
     )
 }
 
