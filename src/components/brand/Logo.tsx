@@ -11,9 +11,9 @@ interface LogoProps {
 // Image-based logo with stylized RV
 export function Logo({ className = '', size = 'md' }: LogoProps) {
     const sizes = {
-        sm: { width: 84, height: 28 },
-        md: { width: 108, height: 36 },
-        lg: { width: 132, height: 44 }
+        sm: { width: 108, height: 36 },   // Was 84x28
+        md: { width: 140, height: 46 },   // Was 108x36
+        lg: { width: 172, height: 56 }    // Was 132x44
     }
 
     const { width, height } = sizes[size]

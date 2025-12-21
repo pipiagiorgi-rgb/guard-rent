@@ -22,7 +22,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
             <div className="max-w-[1120px] mx-auto px-6 md:px-8">
                 <div className="h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center">
-                        <Logo size="md" />
+                        <Logo size="lg" />
                     </Link>
 
                     {/* Desktop Nav */}
