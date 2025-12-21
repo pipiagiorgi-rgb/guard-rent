@@ -20,15 +20,16 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
     return (
         <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
             <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-                <div className="h-16 md:h-[76px] flex items-center justify-between">
-                    {/* Logo - responsive sizing. Note: -translate-y-px for optical alignment with nav links */}
-                    <Link href="/" className="flex-shrink-0 flex items-center h-10 md:h-12 -translate-y-px">
-                        <Logo size="sm" className="md:hidden" />
-                        <Logo size="md" className="hidden md:block" />
+                {/* 1) Fixed-height flex container for the header */}
+                <div className="h-16 flex items-center justify-between">
+                    {/* 2) Logo wrapper - flex aligned, h-full */}
+                    <Link href="/" className="h-full flex items-center flex-shrink-0">
+                        {/* 3) Explicit logo height, no intrinsic sizing or hacks */}
+                        <Logo height={28} />
                     </Link>
 
                     {/* Desktop Nav - right aligned, vertically centered */}
-                    <nav className="hidden md:flex items-center gap-6">
+                    <nav className="hidden md:flex items-center gap-6 h-full">
                         <Link
                             href="/pricing"
                             className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
@@ -61,14 +62,16 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                         )}
                     </nav>
 
-                    {/* Mobile Menu Button - symmetrical with logo */}
-                    <button
-                        className="md:hidden flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        aria-label="Toggle menu"
-                    >
-                        {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
-                    </button>
+                    {/* Mobile Menu Button - centered using flex */}
+                    <div className="md:hidden flex items-center h-full">
+                        <button
+                            className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            aria-label="Toggle menu"
+                        >
+                            {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+                        </button>
+                    </div>
                 </div>
             </div>
 

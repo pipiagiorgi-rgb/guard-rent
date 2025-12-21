@@ -1,33 +1,31 @@
 // RentVault Logo Components
-// Usage: <Logo /> for standard logo, <Logo size="lg" /> for larger
+// Usage: <Logo /> for standard logo, <Logo height={28} /> for explicit control
 
 import Image from 'next/image'
 
 interface LogoProps {
     className?: string
-    size?: 'sm' | 'md' | 'lg'
+    height?: number | string
 }
 
-// Image-based logo with stylized RV
-export function Logo({ className = '', size = 'md' }: LogoProps) {
-    const sizes = {
-        sm: { width: 140, height: 42 },   // Mobile - symmetrical with hamburger
-        md: { width: 150, height: 45 },   // Desktop - prominent
-        lg: { width: 170, height: 51 }    // Large contexts
-    }
-
-    const { width, height } = sizes[size]
+export function Logo({ className = '', height = 32 }: LogoProps) {
+    // Standardize height as a string for CSS
+    const h = typeof height === 'number' ? `${height}px` : height
 
     return (
-        <Image
-            src="/logo.png"
-            alt="RentVault"
-            width={width}
-            height={height}
-            className={`block ${className}`}
-            priority
-            style={{ objectFit: 'contain' }}
-        />
+        <div
+            className={`relative inline-block ${className}`}
+            style={{ height: h, aspectRatio: '192/71' }}
+        >
+            <Image
+                src="/logo.png"
+                alt="RentVault"
+                fill
+                priority
+                className="object-contain"
+                sizes="(max-width: 768px) 140px, 150px"
+            />
+        </div>
     )
 }
 
