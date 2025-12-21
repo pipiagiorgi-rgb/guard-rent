@@ -10,16 +10,16 @@ export const metadata: Metadata = {
         icon: '/icon.svg',
     },
     openGraph: {
-        title: 'RentVault',
+        title: 'RentVault | Rental Documentation & Protection',
         description: 'Protect your rental deposit. Never miss an important deadline.',
         url: 'https://rentvault.ai',
-        siteName: 'rentvault.ai',
+        siteName: 'RentVault',
         images: [
             {
-                url: 'https://rentvault.ai/og-image.png',
+                url: 'https://rentvault.ai/og-image.jpg',
                 width: 1200,
                 height: 630,
-                alt: 'RentVault — A privacy-first vault for tenants',
+                alt: 'RentVault — Protect your rental deposit',
             },
         ],
         locale: 'en_GB',
@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'RentVault',
+        title: 'RentVault | Rental Documentation & Protection',
         description: 'Protect your rental deposit. Never miss an important deadline.',
-        images: ['https://rentvault.ai/og-image.png'],
+        images: ['https://rentvault.ai/og-image.jpg'],
     },
 };
 
