@@ -5,9 +5,11 @@ import { createClient } from '@/lib/supabase/client'
 import {
     Camera, Check, Loader2, Upload, FileText,
     Key, Gauge, ChevronDown, ChevronUp, AlertCircle,
-    X, ImageIcon, Eye
+    X, ImageIcon, Eye, Lock, CheckCircle2
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
+import { isPurchased } from '@/lib/preview-limits'
+import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 
 interface Room {
     room_id: string
@@ -56,6 +58,9 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     const [uploading, setUploading] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['photos', 'meters']))
+    const [hasPack, setHasPack] = useState(false)
+    const [showEditWarning, setShowEditWarning] = useState(false)
+    const [allowEdit, setAllowEdit] = useState(false)
 
     // Lightbox State
     const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -75,14 +80,16 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
         try {
             const supabase = createClient()
 
-            // Fetch case handover data
+            // Fetch case handover data and purchase status
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('handover_notes, handover_completed_at, keys_returned_at, meter_readings')
+                .select('handover_notes, handover_completed_at, keys_returned_at, meter_readings, purchase_type')
                 .eq('case_id', id)
                 .single()
 
             if (caseData) {
+                // Check if user has purchased a pack
+                setHasPack(isPurchased(caseData.purchase_type))
                 // Parse legacy string data for meters
                 const rawMeters = caseData.meter_readings || {}
                 const normalizedMeters: HandoverState['meterReadings'] = {}
@@ -401,7 +408,70 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-slate-400" /></div>
 
-    // If handover is complete, show summary
+    // Lock handover for preview mode
+    if (!hasPack) {
+        return (
+            <div className="space-y-6">
+                <div>
+                    <h1 className="text-2xl font-bold mb-1">Handover</h1>
+                    <p className="text-slate-500">
+                        Document the move-out condition and confirm key return.
+                    </p>
+                </div>
+
+                <UpgradeBanner caseId={caseId} currentPack={null} />
+
+                <div className="bg-white rounded-xl border-2 border-slate-200 p-12 text-center">
+                    <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Lock className="text-slate-400" size={40} />
+                    </div>
+                    <h3 className="font-semibold text-xl mb-3">Handover requires a pack</h3>
+                    <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                        Purchase the <strong>Move-Out Pack</strong> or <strong>Full Bundle</strong> to record your handover evidence and protect your deposit.
+                    </p>
+                    <div className="text-sm text-slate-500  space-y-1">
+                        <p>✓ Unlimited handover photos</p>
+                        <p>✓ Meter readings with photo proof</p>
+                        <p>✓ Keys return confirmation</p>
+                        <p>✓ Generate official Deposit Recovery Pack</p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Edit warning modal
+    const EditWarningModal = () => (
+        showEditWarning && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl p-6 max-w-md w-full">
+                    <h3 className="font-semibold text-lg mb-2">Edit completed handover?</h3>
+                    <p className="text-slate-600 mb-6">
+                        This handover was already marked complete on {new Date(handover.completedAt!).toLocaleDateString()}. Are you sure you want to make changes?
+                    </p>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => setShowEditWarning(false)}
+                            className="flex-1 px-4 py-2 border-2 border-slate-200 rounded-lg font-medium hover:bg-slate-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                setShowEditWarning(false)
+                                setAllowEdit(true)
+                            }}
+                            className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800"
+                        >
+                            Yes, edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    )
+
+    // If handover is complete, show summary or allow edit
     if (handover.completedAt) {
         return (
             <div className="space-y-6">
@@ -445,6 +515,8 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
 
     return (
         <div className="space-y-6">
+            <EditWarningModal />
+
             <Lightbox
                 isOpen={lightboxOpen}
                 onClose={() => setLightboxOpen(false)}
@@ -457,6 +529,29 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     Document the move-out condition and confirm key return.
                 </p>
             </div>
+
+            {/* Completion protection banner */}
+            {handover.completedAt && !allowEdit && (
+                <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <CheckCircle2 className="text-green-600" size={24} />
+                            <div>
+                                <p className="font-semibold text-green-900">Handover completed</p>
+                                <p className="text-sm text-green-700">
+                                    Completed on {new Date(handover.completedAt).toLocaleDateString()}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setShowEditWarning(true)}
+                            className="text-sm text-green-700 underline hover:text-green-800 font-medium"
+                        >
+                            Edit anyway
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 text-red-700">
