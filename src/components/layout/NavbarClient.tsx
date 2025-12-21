@@ -21,8 +21,8 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
             <div className="max-w-[1120px] mx-auto px-5 md:px-8">
                 <div className="h-16 md:h-[76px] flex items-center justify-between">
-                    {/* Logo - responsive sizing */}
-                    <Link href="/" className="flex-shrink-0 flex items-center h-10 md:h-12">
+                    {/* Logo - responsive sizing. Note: -translate-y-px for optical alignment with nav links */}
+                    <Link href="/" className="flex-shrink-0 flex items-center h-10 md:h-12 -translate-y-px">
                         <Logo size="sm" className="md:hidden" />
                         <Logo size="md" className="hidden md:block" />
                     </Link>
