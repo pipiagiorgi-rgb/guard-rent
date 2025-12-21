@@ -10,6 +10,7 @@ import {
 import { Lightbox } from '@/components/ui/Lightbox'
 import Link from 'next/link'
 import { PhotoComparison } from '@/components/features/PhotoComparison'
+import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 
 interface EvidenceState {
     checkinPhotos: number
@@ -306,6 +307,12 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                     Access your photos and documentation anytime.
                 </p>
             </div>
+
+            {/* Upgrade Banner */}
+            <UpgradeBanner
+                caseId={caseId}
+                currentPack={evidence.purchasedPacks.length > 0 ? evidence.purchasedPacks[0] : null}
+            />
 
             {/* Email me a copy panel - shows after PDF generation for paid packs */}
             {lastGeneratedPdf && (

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import ContractScanClient from '@/components/features/ContractScanClient'
 import Link from 'next/link'
 import { Lock, Info } from 'lucide-react'
+import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 
 export default async function ContractPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
@@ -24,6 +25,9 @@ export default async function ContractPage({ params }: { params: { id: string } 
                     Upload your rental contract. We'll extract key dates and terms to help you review it faster.
                 </p>
             </div>
+
+            {/* Upgrade Banner */}
+            <UpgradeBanner caseId={params.id} currentPack={rentalCase?.purchase_type} />
 
             {/* Preview mode banner - only show when not purchased */}
             {!hasPurchasedPack && (

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Plus, ChevronRight } from 'lucide-react'
 import { formatCountryWithCode } from '@/lib/countries'
+import { UnpaidRentalBanner } from '@/components/upgrade/UnpaidRentalBanner'
 
 // Helper to format country for display (handles custom countries)
 function formatCountry(code: string | null): string {
@@ -22,6 +23,12 @@ export default async function MyRentalsPage() {
         .select('*')
         .order('created_at', { ascending: false })
 
+    // Filter unpaid rentals
+    const unpaidRentals = rentals?.filter(r => !r.purchase_type).map(r => ({
+        case_id: r.case_id,
+        label: r.label
+    })) || []
+
     return (
         <div>
             {/* Header */}
@@ -38,6 +45,9 @@ export default async function MyRentalsPage() {
                     New rental
                 </Link>
             </div>
+
+            {/* Unpaid Rentals Banner */}
+            <UnpaidRentalBanner unpaidRentals={unpaidRentals} />
 
             {/* Rentals List */}
             {!rentals || rentals.length === 0 ? (
