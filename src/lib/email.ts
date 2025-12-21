@@ -36,13 +36,12 @@ function emailTemplate({
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>${title}</title>
     <style>
-        /* Base styles */
         body { margin: 0; padding: 0; min-width: 100%; width: 100% !important; height: 100% !important; background-color: #f8fafc; }
         table { border-spacing: 0; border-collapse: collapse; }
         img { border: 0; line-height: 100%; outline: none; text-decoration: none; }
         
-        /* Interactive button hover (some clients support this) */
-        .cta-button:hover { background-color: #0c1c4e !important; }
+        /* Interactive button hover */
+        .cta-button:hover { background-color: #0c1c4e !important; transform: translateY(-1px); box-shadow: 0 6px 12px rgba(1, 18, 70, 0.15) !important; }
         
         @media only screen and (max-width: 600px) {
             .email-container { width: 100% !important; border-radius: 0 !important; }
@@ -62,7 +61,7 @@ function emailTemplate({
                     <tr>
                         <td align="center" style="padding: 48px 48px 0 48px;">
                             <a href="https://rentvault.ai" target="_blank" style="text-decoration: none;">
-                                <img src="https://rentvault.ai/logo.png" alt="RentVault" width="150" style="display: block; width: 150px; height: auto; border: 0;">
+                                <img src="https://rentvault.ai/logo.png" alt="RentVault" width="150" style="display: block; width: 150px; height: auto; border: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #011246; letter-spacing: -0.02em;">
                             </a>
                         </td>
                     </tr>
@@ -81,9 +80,18 @@ function emailTemplate({
                             <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
                                 <tr>
                                     <td>
-                                        <a href="${ctaUrl}" class="cta-button" target="_blank" style="display: inline-block; padding: 16px 36px; background-color: #011246; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(1, 18, 70, 0.1), 0 2px 4px -1px rgba(1, 18, 70, 0.06);">
+                                        <!--[if mso]>
+                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${ctaUrl}" style="height:52px;v-text-anchor:middle;width:200px;" arcsize="24%" stroke="f" fillcolor="#011246">
+                                            <w:anchorlock/>
+                                            <center>
+                                        <![endif]-->
+                                        <a href="${ctaUrl}" class="cta-button" target="_blank" style="display: inline-block; padding: 16px 36px; background-color: #011246; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(1, 18, 70, 0.1); transition: all 0.2s ease;">
                                             ${ctaText}
                                         </a>
+                                        <!--[if mso]>
+                                            </center>
+                                        </v:roundrect>
+                                        <![endif]-->
                                     </td>
                                 </tr>
                             </table>
@@ -91,14 +99,14 @@ function emailTemplate({
                         </td>
                     </tr>
                     
-                    <!-- Features/Benefits Section (Subtle reinforcement) -->
+                    <!-- Safety & Tip Section -->
                     <tr>
                         <td style="padding: 0 48px 40px 48px;">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #f1f5f9;">
                                 <tr>
                                     <td style="padding: 20px;">
                                         <div style="font-size: 13px; color: #64748b; line-height: 1.5;">
-                                            <strong style="color: #475569;">Security Tip:</strong> RentVault will never ask for your password or bank details via email.
+                                            <strong style="color: #475569;">Security Tip:</strong> RentVault will never ask for your password or bank details via email. If you have questions, reply to this email or visit our <a href="https://rentvault.ai/guides" style="color: #011246; text-decoration: underline;">Help Center</a>.
                                         </div>
                                     </td>
                                 </tr>
@@ -112,11 +120,11 @@ function emailTemplate({
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>
-                                        <p style="margin: 0; font-size: 12px; font-weight: 600; color: #94a3b8; line-height: 1.6; text-transform: uppercase; letter-spacing: 0.05em;">
-                                            Privacy-first housing
+                                        <p style="margin: 0; font-size: 12px; font-weight: 600; color: #475569; line-height: 1.6; text-transform: uppercase; letter-spacing: 0.05em;">
+                                            Privacy-first rental evidence
                                         </p>
                                         <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8; line-height: 1.6;">
-                                            RentVault securely stores and organises your rental evidence. Not legal advice.
+                                            RentVault securely stores and organises your rental data. Not legal advice.
                                         </p>
                                     </td>
                                 </tr>
@@ -137,7 +145,8 @@ function emailTemplate({
                         <td align="center">
                             <p style="margin: 0; font-size: 11px; color: #94a3b8;">
                                 <a href="https://rentvault.ai/privacy" style="color: #94a3b8; text-decoration: underline;">Privacy Policy</a> &nbsp;&bull;&nbsp; 
-                                <a href="https://rentvault.ai/terms" style="color: #94a3b8; text-decoration: underline;">Terms of Service</a>
+                                <a href="https://rentvault.ai/terms" style="color: #94a3b8; text-decoration: underline;">Terms of Service</a> &nbsp;&bull;&nbsp;
+                                <a href="https://rentvault.ai/app" style="color: #94a3b8; text-decoration: underline;">Dashboard</a>
                             </p>
                         </td>
                     </tr>
