@@ -395,3 +395,79 @@ function getOrdinalSuffix(n: number): string {
     const v = n % 100
     return s[(v - 20) % 10] || s[v] || s[0]
 }
+
+// ============================================================
+// RETENTION WARNING EMAIL (30 days before data expiry)
+// ============================================================
+export async function sendRetentionWarningEmail({
+    to,
+    rentalLabel,
+    caseId,
+    expiryDate,
+    daysUntil
+}: {
+    to: string
+    rentalLabel: string
+    caseId: string
+    expiryDate: string
+    daysUntil: number
+}): Promise<{ success: boolean; error?: string }> {
+    const formattedDate = new Date(expiryDate).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    })
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+    const settingsUrl = `${siteUrl}/app/case/${caseId}/settings`
+
+    const subject = `Your rental data expires ${daysUntil <= 7 ? 'soon' : `in ${daysUntil} days`}`
+    const title = 'Storage expiry reminder'
+
+    const bodyContent = `
+        <p style="margin: 0 0 16px 0;">Your documents for <strong>"${rentalLabel}"</strong> will be permanently deleted on <strong>${formattedDate}</strong>.</p>
+        
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; margin-bottom: 16px;">
+            <tr>
+                <td style="padding: 16px;">
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Data expires</p>
+                    <p style="margin: 0; font-weight: 700; color: #92400e; font-size: 16px;">${formattedDate}</p>
+                </td>
+            </tr>
+        </table>
+
+        <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">You have two options:</p>
+        
+        <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #475569; font-size: 14px;">
+            <li style="margin-bottom: 8px;"><strong>Extend storage</strong> for another 12 months for €9</li>
+            <li><strong>Download your files</strong> and let the data expire</li>
+        </ul>
+        
+        <p style="margin: 0; font-size: 13px; color: #64748b;">After the expiry date, all photos, documents, and data for this rental will be permanently deleted and cannot be recovered.</p>
+    `
+
+    const text = `Storage expiry reminder
+
+Your documents for "${rentalLabel}" will be permanently deleted on ${formattedDate}.
+
+You have two options:
+- Extend storage for another 12 months for €9
+- Download your files and let the data expire
+
+After the expiry date, all photos, documents, and data for this rental will be permanently deleted and cannot be recovered.
+
+Manage your rental: ${settingsUrl}
+
+---
+RentVault securely stores and organises your rental documents. Not legal advice.`
+
+    const html = emailTemplate({
+        title,
+        previewText: `Your rental data expires ${formattedDate}`,
+        bodyContent,
+        ctaText: 'Manage storage',
+        ctaUrl: settingsUrl
+    })
+
+    return sendEmail({ to, subject, text, html })
+}
