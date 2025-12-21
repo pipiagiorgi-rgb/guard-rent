@@ -7,7 +7,8 @@ export const metadata: Metadata = {
     title: 'RentVault',
     description: 'A privacy-first vault for tenants to store rental documents, photos, and key dates — securely in one place.',
     icons: {
-        icon: '/icon.svg',
+        icon: '/favicon.png',
+        apple: '/apple-icon.png',
     },
     openGraph: {
         title: 'RentVault | Rental Documentation & Protection',
