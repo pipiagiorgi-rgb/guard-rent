@@ -17,7 +17,7 @@ export const metadata: Metadata = {
         siteName: 'RentVault',
         images: [
             {
-                url: 'https://rentvault.ai/og-image.jpg',
+                url: 'https://rentvault.ai/og-image.png',
                 width: 1200,
                 height: 630,
                 alt: 'RentVault — Protect your rental deposit',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'RentVault | Rental Documentation & Protection',
         description: 'A privacy-first vault for tenants to store rental documents, photos, and key dates.',
-        images: ['https://rentvault.ai/og-image.jpg'],
+        images: ['https://rentvault.ai/og-image.png'],
     },
 };
 

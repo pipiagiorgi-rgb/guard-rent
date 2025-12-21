@@ -1,4 +1,13 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+    title: 'Privacy Policy | RentVault',
+    description: 'Learn how RentVault protects your data. Privacy-first, no tracking, secure storage. Full transparency on data collection, retention, and your rights.',
+    alternates: {
+        canonical: 'https://rentvault.ai/privacy'
+    }
+}
 
 export default function PrivacyPage() {
     return (

@@ -167,9 +167,10 @@ interface SendEmailOptions {
     subject: string
     text: string
     html?: string
+    tags?: { name: string; value: string }[]
 }
 
-export async function sendEmail({ to, subject, text, html }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
+export async function sendEmail({ to, subject, text, html, tags }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
     const resend = getResendClient()
 
     // If no API key, log to console (development mode)
@@ -177,6 +178,7 @@ export async function sendEmail({ to, subject, text, html }: SendEmailOptions): 
         console.log('========== EMAIL (dev mode) ==========')
         console.log('To:', to)
         console.log('Subject:', subject)
+        console.log('Tags:', tags)
         console.log('Body:', text)
         console.log('======================================')
         return { success: true }
@@ -188,7 +190,8 @@ export async function sendEmail({ to, subject, text, html }: SendEmailOptions): 
             to,
             subject,
             text,
-            html
+            html,
+            tags
         })
 
         if (error) {
@@ -223,7 +226,7 @@ export async function sendPdfEmail({
         year: 'numeric'
     })
 
-    const subject = `Your ${packName} is ready`
+    const subject = `[PDF] Your ${packName} is ready`
 
     const text = `
 Your ${packName} for "${rentalLabel}" is ready.
@@ -250,7 +253,13 @@ RentVault securely stores and organises your rental documents. Not legal advice.
         ctaUrl: downloadUrl
     })
 
-    return sendEmail({ to, subject, text, html })
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'pdf' }]
+    })
 }
 
 // ============================================================
@@ -290,7 +299,7 @@ export async function sendReminderConfirmationEmail({
     let text: string
 
     if (type === 'termination_notice') {
-        subject = 'Termination reminder scheduled'
+        subject = '[Reminder] Termination reminder scheduled'
         title = 'You\'re all set'
         bodyContent = `
             <p style="margin: 0 0 16px 0;">We'll remind you if action is needed to terminate your rental contract.</p>
@@ -314,7 +323,7 @@ export async function sendReminderConfirmationEmail({
         `
         text = `You're all set.\n\nWe'll remind you if action is needed to terminate your rental contract.\n\nContract: ${rentalLabel}\nNotice deadline: ${formattedDate}\nYou'll be notified: ${offsetText}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else {
-        subject = 'Rent payment reminder scheduled'
+        subject = '[Reminder] Rent payment reminder scheduled'
         title = 'Reminder active'
         const dueDateText = dueDay ? `${dueDay}${getOrdinalSuffix(parseInt(dueDay))} of each month` : formattedDate
         bodyContent = `
@@ -342,7 +351,13 @@ export async function sendReminderConfirmationEmail({
         bodyContent
     })
 
-    return sendEmail({ to, subject, text, html })
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'reminder' }]
+    })
 }
 
 // ============================================================
@@ -381,7 +396,7 @@ export async function sendDeadlineReminderEmail({
     let text: string
 
     if (type === 'termination_notice') {
-        subject = `Notice deadline ${urgency}`
+        subject = `[Reminder] Notice deadline ${urgency}`
         title = `Notice deadline ${urgency}`
         bodyContent = `
             <p style="margin: 0 0 16px 0;">Your termination notice deadline is approaching.</p>
@@ -409,7 +424,7 @@ export async function sendDeadlineReminderEmail({
         `
         text = `Notice deadline ${urgency}\n\nYour termination notice deadline is approaching.\n\nDeadline: ${formattedDate}\nContract: ${rentalLabel}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\nIf you wish to terminate the contract, make sure to send your notice before this date.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else {
-        subject = `Rent due ${urgency}`
+        subject = `[Reminder] Rent due ${urgency}`
         title = `Rent due ${urgency}`
         bodyContent = `
             <p style="margin: 0 0 16px 0;">Your rent payment is due soon.</p>
@@ -439,7 +454,13 @@ export async function sendDeadlineReminderEmail({
         bodyContent
     })
 
-    return sendEmail({ to, subject, text, html })
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'reminder' }]
+    })
 }
 
 function getOrdinalSuffix(n: number): string {
@@ -521,5 +542,11 @@ RentVault securely stores and organises your rental documents. Not legal advice.
         ctaUrl: settingsUrl
     })
 
-    return sendEmail({ to, subject, text, html })
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'reminder' }]
+    })
 }

@@ -1,5 +1,14 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FileText, Clock, Lock, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, Sparkles } from 'lucide-react'
+
+export const metadata: Metadata = {
+    title: 'RentVault | Protect Your Rental Deposit',
+    description: 'A privacy-first vault for tenants to store rental documents, move-in photos, and key notice dates — securely in one place.',
+    alternates: {
+        canonical: 'https://rentvault.ai'
+    }
+}
 
 export default function Home() {
     return (

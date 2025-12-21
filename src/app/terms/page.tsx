@@ -1,4 +1,13 @@
+import type { Metadata } from 'next'
 import Link from "next/link";
+
+export const metadata: Metadata = {
+    title: 'Terms of Service | RentVault',
+    description: 'Terms of Service for RentVault. Understand your rights, responsibilities, pricing, refunds, and limitation of liability.',
+    alternates: {
+        canonical: 'https://rentvault.ai/terms'
+    }
+}
 
 export default function TermsPage() {
     return (
@@ -8,7 +17,7 @@ export default function TermsPage() {
 
                 <div className="prose prose-slate max-w-none">
                     <p className="text-lg text-slate-600 mb-8">
-                        Last updated: December 2024
+                        Last updated: December 2025
                     </p>
 
                     <section className="mb-10">

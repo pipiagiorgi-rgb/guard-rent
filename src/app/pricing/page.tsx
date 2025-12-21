@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Check, FileText, Shield, Clock, Eye } from 'lucide-react'
 import { FAQAccordion } from '@/components/ui/FAQAccordion'
+import { useState } from 'react'
 
 const faqItems = [
     {
@@ -48,6 +49,30 @@ const faqItems = [
 ]
 
 export default function PricingPage() {
+    const [loading, setLoading] = useState<string | null>(null)
+
+    const handleCheckout = async (packType: 'checkin' | 'bundle' | 'moveout') => {
+        setLoading(packType)
+        try {
+            const res = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ packType })
+            })
+            const data = await res.json()
+            if (data.url) {
+                window.location.href = data.url
+            } else {
+                alert('Checkout failed. Please try again.')
+                setLoading(null)
+            }
+        } catch (error) {
+            console.error('Checkout error:', error)
+            alert('Something went wrong. Please try again.')
+            setLoading(null)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-white">
             <main className="max-w-[1120px] mx-auto px-4 md:px-6 py-12 md:py-20">
@@ -107,12 +132,13 @@ export default function PricingPage() {
                                 <span>Data saved for 12 months</span>
                             </li>
                         </ul>
-                        <Link
-                            href="/login"
-                            className="block w-full text-center py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
+                        <button
+                            onClick={() => handleCheckout('checkin')}
+                            disabled={loading === 'checkin'}
+                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Get started
-                        </Link>
+                            {loading === 'checkin' ? 'Loading...' : 'Get started'}
+                        </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
                         </p>
@@ -155,12 +181,13 @@ export default function PricingPage() {
                                 <span>Data saved for 12 months</span>
                             </li>
                         </ul>
-                        <Link
-                            href="/login"
-                            className="block w-full text-center py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all"
+                        <button
+                            onClick={() => handleCheckout('bundle')}
+                            disabled={loading === 'bundle'}
+                            className="w-full py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Get full protection
-                        </Link>
+                            {loading === 'bundle' ? 'Loading...' : 'Get full protection'}
+                        </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
                         </p>
@@ -196,12 +223,13 @@ export default function PricingPage() {
                                 <span>Data saved for 12 months</span>
                             </li>
                         </ul>
-                        <Link
-                            href="/login"
-                            className="block w-full text-center py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
+                        <button
+                            onClick={() => handleCheckout('moveout')}
+                            disabled={loading === 'moveout'}
+                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Get started
-                        </Link>
+                            {loading === 'moveout' ? 'Loading...' : 'Get started'}
+                        </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
                         </p>
