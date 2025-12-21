@@ -5,8 +5,9 @@ import { sendRetentionWarningEmail } from '@/lib/email'
 /**
  * RETENTION NOTICES CRON JOB
  * 
- * Sends advance warning emails to users whose rental data is expiring within 30 days.
- * Users are notified once (tracked via expiry_notified_at column).
+ * Sends warning emails to users whose rental data is expiring:
+ * - First warning: 30 days before (tracked via expiry_notified_at)
+ * - Final warning: 1 day before (tracked via final_expiry_notified_at)
  * 
  * Schedule: Daily at 9:00 AM UTC
  * Vercel Cron: 0 9 * * *
@@ -25,86 +26,123 @@ export async function GET(req: Request) {
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
+    const today = new Date()
+    let totalSent = 0
+    let totalErrors = 0
+
     try {
-        // Find cases expiring in 30 days that haven't been notified
+        // ============================================
+        // 1. FIRST WARNING: 30 days before expiry
+        // ============================================
         const thirtyDaysFromNow = new Date()
         thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
 
-        const today = new Date()
-
-        // Query cases with user email from profiles table
-        const { data: expiringCases, error } = await supabaseAdmin
+        const { data: expiringCases30, error: error30 } = await supabaseAdmin
             .from('cases')
             .select(`
                 case_id,
                 label,
                 retention_until,
                 user_id,
-                expiry_notified_at,
                 profiles!inner(email)
             `)
             .gt('retention_until', today.toISOString())
             .lt('retention_until', thirtyDaysFromNow.toISOString())
             .is('expiry_notified_at', null)
 
-        if (error) {
-            console.error('[Retention Notices] Error fetching expiring cases:', error)
-            return NextResponse.json({ error: 'Database error' }, { status: 500 })
+        if (error30) {
+            console.error('[Retention Notices] Error fetching 30-day cases:', error30)
         }
 
-        if (!expiringCases || expiringCases.length === 0) {
-            return NextResponse.json({ message: 'No cases expiring soon', count: 0 })
-        }
-
-        let processedCount = 0
-        let errorCount = 0
-
-        for (const rentalCase of expiringCases) {
-            const retentionDate = new Date(rentalCase.retention_until)
-            const daysUntil = Math.ceil((retentionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-
-            // Get user email from the joined profiles data
-            const userEmail = (rentalCase.profiles as any)?.email
-
-            if (!userEmail) {
-                console.error(`[Retention Notices] No email found for case ${rentalCase.case_id}`)
-                errorCount++
-                continue
+        if (expiringCases30 && expiringCases30.length > 0) {
+            for (const rentalCase of expiringCases30) {
+                const result = await sendWarningEmail(supabaseAdmin, rentalCase, today, 'expiry_notified_at')
+                if (result.success) totalSent++
+                else totalErrors++
             }
+        }
 
-            // Send the retention warning email
-            const result = await sendRetentionWarningEmail({
-                to: userEmail,
-                rentalLabel: rentalCase.label || 'Your rental',
-                caseId: rentalCase.case_id,
-                expiryDate: rentalCase.retention_until,
-                daysUntil
-            })
+        // ============================================
+        // 2. FINAL WARNING: 1 day before expiry
+        // ============================================
+        const oneDayFromNow = new Date()
+        oneDayFromNow.setDate(oneDayFromNow.getDate() + 1)
+        const twoDaysFromNow = new Date()
+        twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2)
 
-            if (result.success) {
-                console.log(`[Retention Notices] Sent warning to ${userEmail} for case ${rentalCase.case_id} (expires in ${daysUntil} days)`)
+        const { data: expiringCases1, error: error1 } = await supabaseAdmin
+            .from('cases')
+            .select(`
+                case_id,
+                label,
+                retention_until,
+                user_id,
+                profiles!inner(email)
+            `)
+            .gt('retention_until', oneDayFromNow.toISOString())
+            .lt('retention_until', twoDaysFromNow.toISOString())
+            .is('final_expiry_notified_at', null)
 
-                // Mark as notified
-                await supabaseAdmin
-                    .from('cases')
-                    .update({ expiry_notified_at: new Date().toISOString() })
-                    .eq('case_id', rentalCase.case_id)
+        if (error1) {
+            console.error('[Retention Notices] Error fetching 1-day cases:', error1)
+        }
 
-                processedCount++
-            } else {
-                console.error(`[Retention Notices] Failed to send email to ${userEmail}:`, result.error)
-                errorCount++
+        if (expiringCases1 && expiringCases1.length > 0) {
+            for (const rentalCase of expiringCases1) {
+                const result = await sendWarningEmail(supabaseAdmin, rentalCase, today, 'final_expiry_notified_at')
+                if (result.success) totalSent++
+                else totalErrors++
             }
         }
 
         return NextResponse.json({
-            message: `Processed ${processedCount} expiring cases`,
-            sent: processedCount,
-            errors: errorCount
+            message: `Sent ${totalSent} retention warnings`,
+            sent: totalSent,
+            errors: totalErrors
         })
 
     } catch (error: any) {
         console.error('[Retention Notices] Cron job error:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+}
+
+// Helper function to send warning email and update database
+async function sendWarningEmail(
+    supabaseAdmin: any,
+    rentalCase: any,
+    today: Date,
+    notifiedColumn: 'expiry_notified_at' | 'final_expiry_notified_at'
+): Promise<{ success: boolean }> {
+    const retentionDate = new Date(rentalCase.retention_until)
+    const daysUntil = Math.ceil((retentionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    const userEmail = (rentalCase.profiles as any)?.email
+
+    if (!userEmail) {
+        console.error(`[Retention Notices] No email found for case ${rentalCase.case_id}`)
+        return { success: false }
+    }
+
+    const result = await sendRetentionWarningEmail({
+        to: userEmail,
+        rentalLabel: rentalCase.label || 'Your rental',
+        caseId: rentalCase.case_id,
+        expiryDate: rentalCase.retention_until,
+        daysUntil
+    })
+
+    if (result.success) {
+        const warningType = notifiedColumn === 'final_expiry_notified_at' ? 'FINAL' : '30-day'
+        console.log(`[Retention Notices] Sent ${warningType} warning to ${userEmail} for case ${rentalCase.case_id}`)
+
+        await supabaseAdmin
+            .from('cases')
+            .update({ [notifiedColumn]: new Date().toISOString() })
+            .eq('case_id', rentalCase.case_id)
+
+        return { success: true }
+    } else {
+        console.error(`[Retention Notices] Failed to send email to ${userEmail}:`, result.error)
+        return { success: false }
     }
 }
