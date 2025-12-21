@@ -24,7 +24,7 @@ export function Logo({ className = '', size = 'md' }: LogoProps) {
             alt="RentVault"
             width={width}
             height={height}
-            className={className}
+            className={`block ${className}`}
             priority
             style={{ objectFit: 'contain' }}
         />

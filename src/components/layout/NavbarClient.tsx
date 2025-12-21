@@ -21,13 +21,9 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
             <div className="max-w-[1120px] mx-auto px-6 md:px-8">
                 <div className="h-20 flex items-center justify-between">
-                    <Link href="/" className="flex items-center">
-                        <div className="md:hidden">
-                            <Logo size="sm" />
-                        </div>
-                        <div className="hidden md:block">
-                            <Logo size="lg" />
-                        </div>
+                    <Link href="/" className="flex items-center -my-1">
+                        <Logo size="sm" className="md:hidden" />
+                        <Logo size="lg" className="hidden md:block" />
                     </Link>
 
                     {/* Desktop Nav */}
