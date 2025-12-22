@@ -273,7 +273,7 @@ export default function Home() {
                         </div>
                         <div className="flex items-center gap-2">
                             <Check size={16} className="text-green-500" />
-                            <span>GDPR compliant</span>
+                            <span>Your data stays private</span>
                         </div>
                     </div>
                 </div>
