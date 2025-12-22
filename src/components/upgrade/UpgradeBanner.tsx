@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Shield, Sparkles } from 'lucide-react'
+import { Shield } from 'lucide-react'
 
 interface UpgradeBannerProps {
     caseId: string
@@ -42,10 +42,10 @@ export function UpgradeBanner({ caseId, currentPack }: UpgradeBannerProps) {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
             <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
-                    <Sparkles size={24} />
+                    <Shield size={24} />
                 </div>
                 <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1 text-slate-900">Unlock unlimited features</h3>
+                    <h3 className="font-semibold text-lg mb-1 text-slate-900">Save and protect your data</h3>
                     <p className="text-sm text-slate-600 mb-4">
                         Get unlimited contract questions, translations, PDF exports, and 12 months of secure storage.
                     </p>

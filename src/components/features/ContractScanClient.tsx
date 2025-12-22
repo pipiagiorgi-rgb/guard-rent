@@ -690,7 +690,7 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                             </div>
 
                             <p className="text-sm text-slate-500 mb-4">
-                                Ask factual questions about your contract. I can help find information, summarize clauses, or draft notices.
+                                Ask factual questions about your contract. Find information, summarize clauses, or draft notices.
                             </p>
 
                             {/* Limit reached state */}

@@ -441,7 +441,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                     <p className="text-sm text-amber-800">
                         <strong>{getPhotosRemaining(caseId)} preview photo{getPhotosRemaining(caseId) !== 1 ? 's' : ''} remaining.</strong>
-                        {' '}Photos are not saved in preview mode. Unlock a pack to save everything permanently.
+                        {' '}Photos are not saved in preview mode. Buy a pack to save everything permanently.
                     </p>
                 </div>
             )}

@@ -30,13 +30,14 @@ export default async function ContractPage({ params }: { params: { id: string } 
             <UpgradeBanner caseId={params.id} currentPack={rentalCase?.purchase_type} />
 
             {/* Preview mode banner - only show when not purchased */}
+            {/* Preview mode banner - only show when not purchased */}
             {!hasPurchasedPack && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
                     <Info size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
                     <div>
                         <p className="text-sm text-blue-800 font-medium">Preview mode</p>
                         <p className="text-xs text-blue-700 mt-0.5">
-                            Preview features let you explore RentVault. Unlock a pack to save, protect, and reuse your data.
+                            You can try RentVault for free. Buy a pack to save your data permanently.
                         </p>
                     </div>
                 </div>

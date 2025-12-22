@@ -9,6 +9,10 @@ import { useRouter } from 'next/navigation'
 
 const faqItems = [
     {
+        question: "Can I use RentVault if I'm already renting?",
+        answer: "Yes. RentVault is useful whether you're preparing to move or already renting. You can store your contract, track notice dates, set reminders, and keep everything organised so nothing important is missed later."
+    },
+    {
         question: "Can I try RentVault before paying?",
         answer: "Yes. You can explore preview features for free — including 3 contract questions, 1 translation, and 3 photos per rental. Preview results are temporary and cleared on refresh. Purchasing a pack unlocks unlimited access and saves everything permanently."
     },
@@ -92,10 +96,10 @@ export default function PricingPage() {
                             <Eye size={20} />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-blue-900 mb-1">Try before you pay</h3>
+                            <h3 className="font-semibold text-blue-900 mb-1">Preview features</h3>
                             <p className="text-sm text-blue-800">
-                                Preview features let you explore RentVault for free. You can upload contracts, scan for key dates,
-                                ask questions, and translate — all in preview mode. Unlock a pack to save, protect, and reuse your data.
+                                You can explore RentVault for free. Upload contracts, scan for dates,
+                                ask questions, and translate in preview mode. Data is cleared on refresh. Buy a pack to save your data.
                             </p>
                         </div>
                     </div>
@@ -110,7 +114,7 @@ export default function PricingPage() {
                                 <FileText size={20} />
                             </div>
                             <h3 className="text-xl font-bold mb-1">Check-In Pack</h3>
-                            <p className="text-sm text-slate-500">For when you move in</p>
+                            <p className="text-sm text-slate-500">For moving in</p>
                         </div>
                         <div className="mb-6">
                             <span className="text-4xl font-bold">€19</span>
@@ -137,7 +141,7 @@ export default function PricingPage() {
                             onClick={() => handleGetStarted('checkin')}
                             className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
                         >
-                            Get started
+                            Select
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
@@ -146,15 +150,12 @@ export default function PricingPage() {
 
                     {/* Full Bundle */}
                     <div className="bg-slate-900 text-white p-6 md:p-8 rounded-2xl relative flex flex-col">
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
-                            BEST VALUE
-                        </div>
                         <div className="mb-6">
                             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-white mb-3">
                                 <Shield size={20} />
                             </div>
                             <h3 className="text-xl font-bold mb-1">Full Bundle</h3>
-                            <p className="text-sm text-slate-400">Protection from start to finish</p>
+                            <p className="text-sm text-slate-400">Complete protection</p>
                         </div>
                         <div className="mb-6">
                             <span className="text-4xl font-bold">€39</span>
@@ -166,7 +167,7 @@ export default function PricingPage() {
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                                <span>Smart deadline notifications</span>
+                                <span>Deadline reminders</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
@@ -185,7 +186,7 @@ export default function PricingPage() {
                             onClick={() => handleGetStarted('bundle')}
                             className="w-full py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all"
                         >
-                            Get full protection
+                            Select
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
@@ -199,7 +200,7 @@ export default function PricingPage() {
                                 <Clock size={20} />
                             </div>
                             <h3 className="text-xl font-bold mb-1">Move-Out Pack</h3>
-                            <p className="text-sm text-slate-500">For when you're leaving</p>
+                            <p className="text-sm text-slate-500">For moving out</p>
                         </div>
                         <div className="mb-6">
                             <span className="text-4xl font-bold">€29</span>
@@ -226,7 +227,7 @@ export default function PricingPage() {
                             onClick={() => handleGetStarted('moveout')}
                             className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
                         >
-                            Get started
+                            Select
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
@@ -236,8 +237,8 @@ export default function PricingPage() {
 
                 {/* Footnote */}
                 <div className="text-center mt-10 md:mt-12 space-y-1 text-sm text-slate-500">
-                    <p>You can delete your data at any time.</p>
-                    <p>No automatic renewals. No hidden fees.</p>
+                    <p>Delete your data at any time.</p>
+                    <p>No automatic renewals.</p>
                 </div>
 
                 {/* Preview vs Saved comparison */}

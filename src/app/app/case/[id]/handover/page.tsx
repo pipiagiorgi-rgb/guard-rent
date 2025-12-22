@@ -427,7 +427,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     </div>
                     <h3 className="font-semibold text-xl mb-3">Handover requires a pack</h3>
                     <p className="text-slate-600 mb-6 max-w-md mx-auto">
-                        Purchase the <strong>Move-Out Pack</strong> or <strong>Full Bundle</strong> to record your handover evidence and protect your deposit.
+                        Buy the <strong>Move-Out Pack</strong> or <strong>Full Bundle</strong> to record your handover evidence and protect your deposit.
                     </p>
                     <div className="text-sm text-slate-500  space-y-1">
                         <p>✓ Unlimited handover photos</p>

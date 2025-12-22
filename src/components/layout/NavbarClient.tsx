@@ -42,7 +42,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                 href="/app"
                                 className="text-[15px] font-medium bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors leading-none"
                             >
-                                Sign in
+                                Dashboard
                             </Link>
                         ) : (
                             <>
@@ -56,7 +56,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                     href="/login"
                                     className="text-[15px] font-medium bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors leading-none"
                                 >
-                                    Get started
+                                    Start now
                                 </Link>
                             </>
                         )}
@@ -92,7 +92,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                             className="block w-full text-center py-3 bg-slate-900 text-white rounded-lg font-medium"
                             onClick={() => setMobileMenuOpen(false)}
                         >
-                            Sign in
+                            Dashboard
                         </Link>
                     ) : (
                         <>
@@ -108,7 +108,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                 className="block w-full text-center py-3 bg-slate-900 text-white rounded-lg font-medium"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
-                                Get started
+                                Start now
                             </Link>
                         </>
                     )}
