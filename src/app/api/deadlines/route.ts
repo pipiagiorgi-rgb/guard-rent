@@ -51,6 +51,8 @@ export async function POST(request: Request) {
         if (type === 'termination_notice') preferences.noticeMethod = noticeMethod
         if (type === 'custom') preferences.label = label
 
+        let reminderId: string | undefined
+
         // For custom reminders, always insert new (no upsert)
         if (type === 'custom') {
             const { data: newReminder, error: insertError } = await supabase
@@ -70,59 +72,63 @@ export async function POST(request: Request) {
                 return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
             }
 
-            return NextResponse.json({ success: true, id: newReminder?.id })
-        }
+            reminderId = newReminder?.id
+        } else {
+            // For standard reminders, upsert (replace if exists)
+            const { error: upsertError } = await supabase
+                .from('deadlines')
+                .upsert({
+                    case_id: caseId,
+                    type,
+                    due_date: deadlineDate,
+                    preferences,
+                    created_at: new Date().toISOString()
+                }, {
+                    onConflict: 'case_id,type'
+                })
 
-        // For standard reminders, upsert (replace if exists)
-        const { error: upsertError } = await supabase
-            .from('deadlines')
-            .upsert({
-                case_id: caseId,
-                type,
-                due_date: deadlineDate,
-                preferences,
-                created_at: new Date().toISOString()
-            }, {
-                onConflict: 'case_id,type'
-            })
+            if (upsertError) {
+                console.error('Deadline upsert error:', upsertError)
 
-        if (upsertError) {
-            console.error('Deadline upsert error:', upsertError)
+                // If unique constraint error, try update instead
+                if (upsertError.code === '23505' || upsertError.code === '42P10') {
+                    const { error: updateError } = await supabase
+                        .from('deadlines')
+                        .update({
+                            due_date: deadlineDate,
+                            preferences
+                        })
+                        .eq('case_id', caseId)
+                        .eq('type', type)
 
-            // If unique constraint error, try update instead
-            if (upsertError.code === '23505' || upsertError.code === '42P10') {
-                const { error: updateError } = await supabase
-                    .from('deadlines')
-                    .update({
-                        due_date: deadlineDate,
-                        preferences
-                    })
-                    .eq('case_id', caseId)
-                    .eq('type', type)
-
-                if (updateError) {
-                    console.error('Deadline update error:', updateError)
+                    if (updateError) {
+                        console.error('Deadline update error:', updateError)
+                        return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
+                    }
+                } else {
                     return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
                 }
-            } else {
-                return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
             }
         }
 
-        // Send confirmation email for standard reminders
-        if (type !== 'custom') {
+        // Send confirmation email for ALL reminder types
+        try {
             await sendReminderConfirmationEmail({
                 to: user.email!,
-                type: type as 'termination_notice' | 'rent_payment',
+                type: type as 'termination_notice' | 'rent_payment' | 'custom',
                 rentalLabel,
                 date: deadlineDate,
                 offsets,
                 noticeMethod,
-                dueDay
+                dueDay,
+                customLabel: label
             })
+        } catch (emailError) {
+            // Log but don't fail the request if email fails
+            console.error('Failed to send confirmation email:', emailError)
         }
 
-        return NextResponse.json({ success: true })
+        return NextResponse.json({ success: true, id: reminderId })
 
     } catch (error: any) {
         console.error('Deadline API error:', error)
