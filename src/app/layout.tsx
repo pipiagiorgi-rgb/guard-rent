@@ -4,15 +4,15 @@ import Navbar from '@/components/layout/Navbar';
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://rentvault.ai'),
-    title: 'RentVault',
-    description: 'A privacy-first vault for tenants to store rental documents, photos, and key dates — securely in one place.',
+    title: 'RentVault | Rental Records, Secured',
+    description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
     icons: {
         icon: '/favicon.png',
         apple: '/apple-icon.png',
     },
     openGraph: {
-        title: 'RentVault | Rental Documentation & Protection',
-        description: 'A privacy-first vault for tenants to store rental documents, photos, and key dates.',
+        title: 'RentVault | Protect Your Rental Deposit',
+        description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
         url: 'https://rentvault.ai',
         siteName: 'RentVault',
         images: [
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
                 url: 'https://rentvault.ai/og-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'RentVault — Protect your rental deposit',
+                alt: 'RentVault — Protect your rental deposit. Never miss an important deadline.',
             },
         ],
         locale: 'en_GB',
@@ -28,11 +28,12 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'RentVault | Rental Documentation & Protection',
-        description: 'A privacy-first vault for tenants to store rental documents, photos, and key dates.',
+        title: 'RentVault | Protect Your Rental Deposit',
+        description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
         images: ['https://rentvault.ai/og-image.png'],
     },
 };
+
 
 export default function RootLayout({
     children,

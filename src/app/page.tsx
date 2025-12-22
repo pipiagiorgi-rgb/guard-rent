@@ -5,7 +5,7 @@ import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
     title: 'RentVault | Protect Your Rental Deposit',
-    description: 'A privacy-first vault for tenants to store rental documents, move-in photos, and key notice dates — securely in one place.',
+    description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
     alternates: {
         canonical: 'https://rentvault.ai'
     }
@@ -27,13 +27,13 @@ export default function Home() {
                         Protect your rental deposit.
                         <br />
                         <span className="bg-gradient-to-r from-slate-600 to-slate-400 bg-clip-text text-transparent">
-                            Never miss a critical date.
+                            Never miss an important deadline.
                         </span>
                     </h1>
 
                     {/* Subheadline */}
                     <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed px-4 animate-fade-in-up opacity-0 delay-200">
-                        A secure vault for tenants to store rental documents, move-in photos, and key notice dates. Kept in one place.
+                        A secure vault for tenants to store contracts, photos, and key dates — all in one place.
                     </p>
 
                     {/* CTA Buttons */}
