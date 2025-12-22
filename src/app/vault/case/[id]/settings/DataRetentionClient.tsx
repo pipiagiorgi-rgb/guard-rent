@@ -100,18 +100,18 @@ export default function DataRetentionClient({
                 </div>
             </div>
 
-            {/* Retention status */}
+            {/* Retention status - calm, neutral */}
             <div className="bg-white p-5 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600">
+                    <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center text-green-600">
                         <Clock size={20} />
                     </div>
                     <div>
-                        <h3 className="font-semibold">Retention status</h3>
+                        <h3 className="font-semibold">Storage status</h3>
                     </div>
                 </div>
                 <p className="text-slate-900 font-medium">
-                    Retention until: {formatDate(retentionDate)}
+                    Your records are available until {formatDate(retentionDate)}
                 </p>
                 {extensionCount > 0 && (
                     <p className="text-sm text-slate-500 mt-1">
@@ -119,41 +119,31 @@ export default function DataRetentionClient({
                     </p>
                 )}
 
-                {/* Soft reminder when retention ending soon */}
-                {retentionEndingSoon && !showExtensionSuggestion && (
-                    <p className="text-sm text-amber-600 mt-3">
-                        Storage for this rental will end soon. You can extend if you need more time.{' '}
-                        <button
-                            onClick={() => setShowExtendModal(true)}
-                            className="underline font-medium hover:no-underline"
-                        >
-                            Extend storage
-                        </button>
+                {/* Soft option - always available, not just when ending soon */}
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                    <button
+                        onClick={() => setShowExtendModal(true)}
+                        className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors"
+                    >
+                        Keep records longer — €9/year
+                    </button>
+                    <p className="text-xs text-slate-500 mt-2">
+                        Adds 12 months. One-time payment per rental, no auto-renewal.
                     </p>
-                )}
+                </div>
             </div>
 
-            {/* Extension suggestion - only show if lease exceeds retention */}
-            {showExtensionSuggestion && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+            {/* Gentle nudge only when ending soon - still calm */}
+            {retentionEndingSoon && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
                     <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 flex-shrink-0">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
                             <Info size={20} />
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-semibold text-amber-900 mb-1">Storage period ends before your rental</h3>
-                            <p className="text-amber-700 text-sm mb-4">
-                                This rental extends beyond the included storage period.<br />
-                                You can extend secure storage to keep your documents available.
-                            </p>
-                            <button
-                                onClick={() => setShowExtendModal(true)}
-                                className="px-5 py-2.5 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700 transition-colors"
-                            >
-                                Extend storage (+12 months · €9)
-                            </button>
-                            <p className="text-xs text-amber-600 mt-2">
-                                One-time payment. No automatic renewals.
+                            <h3 className="font-semibold text-blue-900 mb-1">Your storage period ends soon</h3>
+                            <p className="text-blue-700 text-sm mb-3">
+                                Your documents remain fully accessible until then. If you'd like to keep them available after, you can extend anytime.
                             </p>
                         </div>
                     </div>
@@ -217,37 +207,37 @@ export default function DataRetentionClient({
                 </div>
             )}
 
-            {/* Extension Modal */}
+            {/* Extension Modal - value-driven, calm */}
             {showExtendModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
-                        <h2 className="text-xl font-bold mb-3">Extend secure storage</h2>
+                        <h2 className="text-xl font-bold mb-3">Keep your rental records</h2>
                         <p className="text-slate-600 mb-4">
-                            This will extend secure storage for this rental by 12 months.
+                            Continue secure storage for this rental so your documents stay available when you need them.
                         </p>
                         <div className="bg-slate-50 p-4 rounded-xl mb-4">
                             <div className="flex justify-between mb-2">
-                                <span className="font-medium">Price</span>
-                                <span className="font-bold">€9</span>
+                                <span className="font-medium">Storage extension</span>
+                                <span className="font-bold">€9/year</span>
                             </div>
-                            <p className="text-sm text-slate-500">One-time payment</p>
+                            <p className="text-sm text-slate-500">+12 months from today. Per rental.</p>
                         </div>
                         <p className="text-sm text-slate-500 mb-6">
-                            No automatic renewals.
+                            One-time payment. No subscriptions, no auto-renewal.
                         </p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowExtendModal(false)}
                                 className="flex-1 py-3 border-2 border-slate-200 rounded-xl font-medium hover:bg-slate-50 transition-colors"
                             >
-                                Cancel
+                                Maybe later
                             </button>
                             <button
                                 onClick={handleExtendStorage}
                                 disabled={extending}
                                 className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
                             >
-                                {extending ? 'Processing...' : 'Extend storage'}
+                                {extending ? 'Processing...' : 'Continue storage'}
                             </button>
                         </div>
                     </div>

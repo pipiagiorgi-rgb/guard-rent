@@ -632,18 +632,38 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 </div>
             </div>
 
-            {/* Secure storage note */}
-            {evidence.retentionUntil && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-                    <Shield className="text-green-600" size={20} />
-                    <p className="text-sm text-green-800">
-                        <span className="font-medium">Secure storage active</span> until {' '}
-                        {new Date(evidence.retentionUntil).toLocaleDateString('en-GB', {
-                            day: 'numeric', month: 'long', year: 'numeric'
-                        })}
-                    </p>
+            {/* Archive / Keep documents offer - value-driven */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+                <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 flex-shrink-0">
+                        <Shield size={20} />
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="font-semibold text-slate-900 mb-1">Keep these documents available</h3>
+                        {evidence.retentionUntil ? (
+                            <p className="text-slate-600 text-sm mb-3">
+                                Your records are stored securely until {' '}
+                                <span className="font-medium">
+                                    {new Date(evidence.retentionUntil).toLocaleDateString('en-GB', {
+                                        day: 'numeric', month: 'long', year: 'numeric'
+                                    })}
+                                </span>.
+                                You can extend anytime.
+                            </p>
+                        ) : (
+                            <p className="text-slate-600 text-sm mb-3">
+                                Your evidence is stored for 12 months. Extend storage to keep records available longer.
+                            </p>
+                        )}
+                        <Link
+                            href={`/vault/case/${caseId}/settings`}
+                            className="inline-flex items-center gap-2 text-sm text-slate-700 font-medium hover:text-slate-900"
+                        >
+                            View storage options <ChevronRight size={16} />
+                        </Link>
+                    </div>
                 </div>
-            )}
+            </div>
 
             {/* Disclaimer */}
 

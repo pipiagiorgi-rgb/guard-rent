@@ -484,51 +484,42 @@ export async function sendRetentionWarningEmail({
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
     const settingsUrl = `${siteUrl}/vault/case/${caseId}/settings`
 
-    const subject = `Storage reminder: ${rentalLabel} — ${formattedDate}`
-    const title = 'Storage reminder'
+    const subject = `Your rental records: ${rentalLabel}`
+    const title = 'Your storage period is ending'
 
     const bodyContent = `
-        <p style="margin: 0 0 16px 0;">Your included 12-month storage period for <strong>"${rentalLabel}"</strong> will end on <strong>${formattedDate}</strong>.</p>
+        <p style="margin: 0 0 16px 0;">Your 12-month storage period for <strong>"${rentalLabel}"</strong> ends on <strong>${formattedDate}</strong>.</p>
         
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 16px;">
-            <tr>
-                <td style="padding: 16px;">
-                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">No action needed yet</p>
-                    <p style="margin: 0; font-size: 14px; color: #166534;">Your documents remain fully accessible until the expiry date.</p>
-                </td>
-            </tr>
-        </table>
-
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 8px; margin-bottom: 16px;">
             <tr>
                 <td style="padding: 16px;">
-                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Storage expires</p>
-                    <p style="margin: 0; font-weight: 600; color: #0f172a; font-size: 16px;">${formattedDate}</p>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">No action needed yet</p>
+                    <p style="margin: 0; font-size: 14px; color: #334155;">Your documents remain fully accessible until then.</p>
                 </td>
             </tr>
         </table>
 
-        <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">Before the expiry date, you can choose to:</p>
+        <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">If you'd like to keep your records available after this date:</p>
         
         <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #475569; font-size: 14px;">
-            <li style="margin-bottom: 8px;"><strong>Extend storage</strong> for another 12 months (€9 one-time)</li>
-            <li><strong>Download your files</strong> and let the storage expire</li>
+            <li style="margin-bottom: 8px;"><strong>Continue storage</strong> for €9/year — adds 12 months</li>
+            <li><strong>Download your files</strong> anytime before the end date</li>
         </ul>
         
-        <p style="margin: 0; font-size: 13px; color: #64748b;">If no action is taken by ${formattedDate}, your documents will be permanently deleted.</p>
+        <p style="margin: 0; font-size: 13px; color: #64748b;">No auto-charges. You choose if and when to extend.</p>
     `
 
-    const text = `Storage reminder
+    const text = `Your rental records: ${rentalLabel}
 
-Your included 12-month storage period for "${rentalLabel}" will end on ${formattedDate}.
+Your 12-month storage period ends on ${formattedDate}.
 
 No action is needed yet — your documents remain fully accessible until then.
 
-Before the expiry date, you can choose to:
-- Extend storage for another 12 months (€9 one-time)
-- Download your files and let the storage expire
+If you'd like to keep your records available after this date:
+- Continue storage for €9/year (adds 12 months)
+- Or download your files anytime before the end date
 
-If no action is taken by ${formattedDate}, your documents will be permanently deleted.
+No auto-charges. You choose if and when to extend.
 
 View storage options: ${settingsUrl}
 
@@ -537,7 +528,7 @@ RentVault securely stores and organises your rental documents. Not legal advice.
 
     const html = emailTemplate({
         title,
-        previewText: `Your rental storage ends ${formattedDate} — no action needed yet`,
+        previewText: `Your rental records for ${rentalLabel} — no action needed yet`,
         bodyContent,
         ctaText: 'View storage options',
         ctaUrl: settingsUrl

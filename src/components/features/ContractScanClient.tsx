@@ -262,9 +262,10 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
             const leaseStart = parseDate(analysisToSave.lease_start_date?.value)
             const leaseEnd = parseDate(analysisToSave.lease_end_date?.value)
 
-            // Parse address (handle 'not found')
+            // Parse address (handle 'not found' case-insensitively)
             const address = analysisToSave.property_address?.value &&
-                analysisToSave.property_address.value !== 'not found'
+                analysisToSave.property_address.value.toLowerCase() !== 'not found' &&
+                analysisToSave.property_address.value !== '...'
                 ? analysisToSave.property_address.value
                 : null
 
@@ -551,7 +552,7 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
             )
         }
 
-        if (!field || field.value === 'not found') {
+        if (!field || !field.value || field.value.toLowerCase() === 'not found' || field.value === '...') {
             return (
                 <div className="bg-white p-5 rounded-xl border border-slate-200 text-slate-400 italic">
                     <p className="text-sm text-slate-500 mb-1">{label}</p>
