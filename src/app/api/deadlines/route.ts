@@ -60,11 +60,11 @@ export async function POST(request: Request) {
                 .insert({
                     case_id: caseId,
                     type,
-                    due_date: deadlineDate,
+                    date: deadlineDate,  // Column is 'date', not 'due_date'
                     preferences,
                     created_at: new Date().toISOString()
                 })
-                .select('id')
+                .select('deadline_id')  // Column is 'deadline_id', not 'id'
                 .single()
 
             if (insertError) {
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
                 return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
             }
 
-            reminderId = newReminder?.id
+            reminderId = newReminder?.deadline_id
         } else {
             // For standard reminders, upsert (replace if exists)
             const { error: upsertError } = await supabase
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
                 .upsert({
                     case_id: caseId,
                     type,
-                    due_date: deadlineDate,
+                    date: deadlineDate,  // Column is 'date', not 'due_date'
                     preferences,
                     created_at: new Date().toISOString()
                 }, {
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
                     const { error: updateError } = await supabase
                         .from('deadlines')
                         .update({
-                            due_date: deadlineDate,
+                            date: deadlineDate,
                             preferences
                         })
                         .eq('case_id', caseId)
@@ -172,7 +172,7 @@ export async function DELETE(request: Request) {
             await supabase
                 .from('deadlines')
                 .delete()
-                .eq('id', id)
+                .eq('deadline_id', id)  // Column is 'deadline_id', not 'id'
                 .eq('case_id', caseId)
         } else {
             // For standard reminders, delete by type
