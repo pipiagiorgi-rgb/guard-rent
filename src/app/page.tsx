@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { FileText, Clock, Lock, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, Sparkles } from 'lucide-react'
+import { FileText, Clock, Lock, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'RentVault | Protect Your Rental Deposit',
@@ -18,7 +18,6 @@ export default function Home() {
                 <div className="max-w-[1120px] mx-auto text-center">
                     {/* Badge */}
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-full mb-8 animate-fade-in-up opacity-0">
-                        <Sparkles size={14} className="text-amber-500" />
                         <span className="text-sm font-medium text-slate-600">Privacy-first. Built for tenants.</span>
                     </div>
 
