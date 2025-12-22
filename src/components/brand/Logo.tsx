@@ -6,11 +6,18 @@ import Image from 'next/image'
 interface LogoProps {
     className?: string
     height?: number | string
+    size?: 'sm' | 'md' | 'lg'
 }
 
-export function Logo({ className = '', height = 32 }: LogoProps) {
-    // Standardize height as a string for CSS
-    const h = typeof height === 'number' ? `${height}px` : height
+const SIZE_MAP = {
+    sm: 28,
+    md: 32,
+    lg: 40
+}
+
+export function Logo({ className = '', height, size = 'md' }: LogoProps) {
+    // Use explicit height if provided, otherwise use size preset
+    const h = height ? (typeof height === 'number' ? `${height}px` : height) : `${SIZE_MAP[size]}px`
 
     /**
      * PRECISION ALIGNMENT LOGIC:
