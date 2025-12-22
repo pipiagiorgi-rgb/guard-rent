@@ -6,8 +6,6 @@ import { login } from './actions'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { Footer } from '@/components/layout/Footer'
-import { Logo } from '@/components/brand/Logo'
-import Link from 'next/link'
 
 export default function LoginPage() {
     const [loading, setLoading] = useState(false)
@@ -49,13 +47,6 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
-            {/* Header with Logo */}
-            <header className="py-6 px-5">
-                <Link href="/" className="inline-block">
-                    <Logo height={36} />
-                </Link>
-            </header>
-
             {/* Main Content */}
             <main className="flex-1 flex items-center justify-center p-6">
                 <div className="w-full max-w-[400px]">

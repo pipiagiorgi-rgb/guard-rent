@@ -99,23 +99,25 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
             </header>
 
             {/* ═══════════════════════════════════════════════════════════════
-                MOBILE MENU - TRUE FULL-SCREEN MODAL
+                MOBILE MENU - PREMIUM ANIMATED MODAL
             ═══════════════════════════════════════════════════════════════ */}
-            {
-                mobileMenuOpen && (
+            {mobileMenuOpen && (
+                <div
+                    className="fixed inset-0 z-[100] md:hidden"
+                    role="dialog"
+                    aria-modal="true"
+                >
+                    {/* Dimmed backdrop overlay - tap to close */}
                     <div
-                        className="fixed inset-0 z-[100] md:hidden"
-                        role="dialog"
-                        aria-modal="true"
-                    >
-                        {/* Solid opaque background - full screen */}
-                        <div className="absolute inset-0 bg-white" />
+                        className="absolute inset-0 bg-black/20 animate-in fade-in duration-200"
+                        onClick={() => setMobileMenuOpen(false)}
+                        aria-hidden="true"
+                    />
 
-                        {/* Menu content container - scrollable if needed */}
-                        <div className="relative h-full flex flex-col">
-                            {/* ═══════════════════════════════════════════════════
-                            TOP ROW: Logo + Close
-                        ═══════════════════════════════════════════════════ */}
+                    {/* Menu panel - slides in from right */}
+                    <div className="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl animate-in slide-in-from-right duration-300 ease-out">
+                        <div className="h-full flex flex-col">
+                            {/* TOP ROW: Logo + Close */}
                             <div className="flex-shrink-0 px-5 h-16 flex items-center justify-between border-b border-slate-100">
                                 <Link
                                     href="/"
@@ -126,22 +128,20 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                 </Link>
                                 <button
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
+                                    className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
                                     aria-label="Close menu"
                                 >
-                                    <X size={26} />
+                                    <X size={24} />
                                 </button>
                             </div>
 
-                            {/* ═══════════════════════════════════════════════════
-                            NAVIGATION LINKS (Secondary)
-                        ═══════════════════════════════════════════════════ */}
-                            <div className="flex-1 px-5 py-8 overflow-y-auto">
+                            {/* NAVIGATION LINKS */}
+                            <div className="flex-1 px-5 py-6 overflow-y-auto">
                                 <nav className="space-y-1">
                                     <Link
                                         href="/pricing"
                                         onClick={handleNavClick}
-                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
                                     >
                                         Pricing
                                     </Link>
@@ -150,7 +150,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                         <Link
                                             href="/vault"
                                             onClick={handleNavClick}
-                                            className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                            className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
                                         >
                                             Dashboard
                                         </Link>
@@ -158,7 +158,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                         <Link
                                             href="/login"
                                             onClick={handleNavClick}
-                                            className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                            className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
                                         >
                                             Log in
                                         </Link>
@@ -166,9 +166,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                 </nav>
                             </div>
 
-                            {/* ═══════════════════════════════════════════════════
-                            PRIMARY CTA - Bottom (Single Action)
-                        ═══════════════════════════════════════════════════ */}
+                            {/* PRIMARY CTA - Bottom */}
                             <div className="flex-shrink-0 px-5 py-6 border-t border-slate-100 bg-white">
                                 {isLoggedIn ? (
                                     <Link
@@ -190,8 +188,8 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                             </div>
                         </div>
                     </div>
-                )
-            }
+                </div>
+            )}
         </>
     );
 }
