@@ -15,7 +15,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json()
-        const { caseId, type, date, dueDay, offsets, rentalLabel, noticeMethod } = body
+        const { caseId, type, date, dueDay, offsets, rentalLabel, noticeMethod, label } = body
 
         if (!caseId || !type) {
             return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 })
@@ -45,18 +45,42 @@ export async function POST(request: Request) {
             deadlineDate = thisMonth.toISOString().split('T')[0]
         }
 
-        // Upsert the deadline (replace if exists)
+        // Build preferences object
+        const preferences: Record<string, any> = { offsets }
+        if (type === 'rent_payment') preferences.dueDay = dueDay
+        if (type === 'termination_notice') preferences.noticeMethod = noticeMethod
+        if (type === 'custom') preferences.label = label
+
+        // For custom reminders, always insert new (no upsert)
+        if (type === 'custom') {
+            const { data: newReminder, error: insertError } = await supabase
+                .from('deadlines')
+                .insert({
+                    case_id: caseId,
+                    type,
+                    due_date: deadlineDate,
+                    preferences,
+                    created_at: new Date().toISOString()
+                })
+                .select('id')
+                .single()
+
+            if (insertError) {
+                console.error('Custom deadline insert error:', insertError)
+                return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
+            }
+
+            return NextResponse.json({ success: true, id: newReminder?.id })
+        }
+
+        // For standard reminders, upsert (replace if exists)
         const { error: upsertError } = await supabase
             .from('deadlines')
             .upsert({
                 case_id: caseId,
                 type,
-                date: deadlineDate,
-                preferences: {
-                    offsets,
-                    dueDay: type === 'rent_payment' ? dueDay : null,
-                    noticeMethod: type === 'termination_notice' ? noticeMethod : null
-                },
+                due_date: deadlineDate,
+                preferences,
                 created_at: new Date().toISOString()
             }, {
                 onConflict: 'case_id,type'
@@ -70,12 +94,8 @@ export async function POST(request: Request) {
                 const { error: updateError } = await supabase
                     .from('deadlines')
                     .update({
-                        date: deadlineDate,
-                        preferences: {
-                            offsets,
-                            dueDay: type === 'rent_payment' ? dueDay : null,
-                            noticeMethod: type === 'termination_notice' ? noticeMethod : null
-                        }
+                        due_date: deadlineDate,
+                        preferences
                     })
                     .eq('case_id', caseId)
                     .eq('type', type)
@@ -89,16 +109,18 @@ export async function POST(request: Request) {
             }
         }
 
-        // Send confirmation email using centralized email utility
-        await sendReminderConfirmationEmail({
-            to: user.email!,
-            type: type as 'termination_notice' | 'rent_payment',
-            rentalLabel,
-            date: deadlineDate,
-            offsets,
-            noticeMethod,
-            dueDay
-        })
+        // Send confirmation email for standard reminders
+        if (type !== 'custom') {
+            await sendReminderConfirmationEmail({
+                to: user.email!,
+                type: type as 'termination_notice' | 'rent_payment',
+                rentalLabel,
+                date: deadlineDate,
+                offsets,
+                noticeMethod,
+                dueDay
+            })
+        }
 
         return NextResponse.json({ success: true })
 
@@ -109,7 +131,7 @@ export async function POST(request: Request) {
 }
 
 // ============================================================
-// DELETE - Disable a reminder
+// DELETE - Remove a reminder
 // ============================================================
 export async function DELETE(request: Request) {
     try {
@@ -121,13 +143,13 @@ export async function DELETE(request: Request) {
         }
 
         const body = await request.json()
-        const { caseId, type } = body
+        const { caseId, type, id } = body
 
         if (!caseId || !type) {
             return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 })
         }
 
-        // Verify ownership and delete
+        // Verify ownership
         const { data: rentalCase } = await supabase
             .from('cases')
             .select('case_id')
@@ -139,11 +161,21 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Case not found.' }, { status: 404 })
         }
 
-        await supabase
-            .from('deadlines')
-            .delete()
-            .eq('case_id', caseId)
-            .eq('type', type)
+        // For custom reminders, delete by ID
+        if (type === 'custom' && id) {
+            await supabase
+                .from('deadlines')
+                .delete()
+                .eq('id', id)
+                .eq('case_id', caseId)
+        } else {
+            // For standard reminders, delete by type
+            await supabase
+                .from('deadlines')
+                .delete()
+                .eq('case_id', caseId)
+                .eq('type', type)
+        }
 
         return NextResponse.json({ success: true })
 

@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, Check, Info, Calendar, CreditCard, Loader2, AlertCircle, Save } from 'lucide-react'
+import { Bell, Check, Info, Calendar, CreditCard, Loader2, AlertCircle, Save, FileText, Plus, Trash2, Edit3 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link'
 
 interface ContractData {
     lease_end_date?: { value: string }
@@ -20,13 +21,28 @@ interface Reminder {
     saved: boolean
 }
 
+interface CustomReminder {
+    id?: string
+    label: string
+    date: string
+    offsets: number[]
+    saved: boolean
+}
+
 export default function DeadlinesPage({ params }: { params: Promise<{ id: string }> }) {
     const [caseId, setCaseId] = useState<string>('')
     const [loading, setLoading] = useState(true)
-    const [saving, setSaving] = useState<'termination' | 'rent' | null>(null)
+    const [saving, setSaving] = useState<'termination' | 'rent' | 'custom' | null>(null)
     const [rentalLabel, setRentalLabel] = useState('')
     const [contractData, setContractData] = useState<ContractData | null>(null)
+    const [hasContract, setHasContract] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [successMessage, setSuccessMessage] = useState<string | null>(null)
+
+    // Manual input state (for when contract has no data)
+    const [manualLeaseEnd, setManualLeaseEnd] = useState('')
+    const [manualNoticePeriod, setManualNoticePeriod] = useState('3')
+    const [showManualInput, setShowManualInput] = useState(false)
 
     // Reminders state
     const [termination, setTermination] = useState<Reminder>({
@@ -40,6 +56,16 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
         offsets: [3],
         saved: false,
         dueDay: '1'
+    })
+
+    // Custom reminders
+    const [customReminders, setCustomReminders] = useState<CustomReminder[]>([])
+    const [showAddCustom, setShowAddCustom] = useState(false)
+    const [newCustomReminder, setNewCustomReminder] = useState<CustomReminder>({
+        label: '',
+        date: '',
+        offsets: [7],
+        saved: false
     })
 
     // Load initial data
@@ -60,20 +86,25 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
                 if (caseData) {
                     setRentalLabel(caseData.label || 'Your rental')
+
+                    // Check if contract was analyzed
                     if (caseData.contract_analysis?.analysis) {
+                        setHasContract(true)
                         const analysis = caseData.contract_analysis.analysis
                         setContractData(analysis)
 
-                        // Pre-calculate termination date if possible
-                        if (analysis.lease_end_date?.value && analysis.lease_end_date.value !== 'not found') {
-                            // Logic to pre-fill date could go here, but we let user confirm
-                        }
-
-                        // Pre-fill rent day
+                        // Pre-fill rent day from contract
                         if (analysis.payment_due_date?.value) {
                             const match = analysis.payment_due_date.value.match(/\d+/)
                             if (match) setRent(prev => ({ ...prev, dueDay: match[0] }))
                         }
+                    } else {
+                        setHasContract(false)
+                    }
+
+                    // Pre-fill manual lease end from database if exists
+                    if (caseData.lease_end) {
+                        setManualLeaseEnd(caseData.lease_end)
                     }
                 }
 
@@ -86,6 +117,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                 if (deadlines) {
                     const termData = deadlines.find(d => d.type === 'termination_notice')
                     const rentData = deadlines.find(d => d.type === 'rent_payment')
+                    const customData = deadlines.filter(d => d.type === 'custom')
 
                     if (termData) {
                         setTermination({
@@ -104,6 +136,16 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                             dueDay: rentData.preferences?.dueDay || '1'
                         })
                     }
+
+                    if (customData.length > 0) {
+                        setCustomReminders(customData.map(d => ({
+                            id: d.id,
+                            label: d.preferences?.label || 'Custom reminder',
+                            date: d.due_date ? new Date(d.due_date).toISOString().split('T')[0] : '',
+                            offsets: d.preferences?.offsets || [7],
+                            saved: true
+                        })))
+                    }
                 }
 
             } catch (err) {
@@ -115,26 +157,78 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
         load()
     }, [params])
 
-    // Calculate suggested termination date
+    // Calculate suggested termination date from contract or manual input
     const getSuggestedTerminationDate = () => {
-        if (!contractData?.lease_end_date?.value) return null
+        // Try contract data first
+        let leaseEndStr = contractData?.lease_end_date?.value
+        let noticeMonths = 3
+
+        // Parse notice period from contract
+        if (contractData?.notice_period?.value) {
+            const match = contractData.notice_period.value.match(/(\d+)/)
+            if (match) noticeMonths = parseInt(match[1])
+        }
+
+        // Fall back to manual input
+        if (!leaseEndStr || leaseEndStr === 'not found') {
+            leaseEndStr = manualLeaseEnd
+            noticeMonths = parseInt(manualNoticePeriod) || 3
+        }
+
+        if (!leaseEndStr) return null
 
         try {
-            const leaseEnd = new Date(contractData.lease_end_date.value)
+            const leaseEnd = new Date(leaseEndStr)
             if (isNaN(leaseEnd.getTime())) return null
-
-            // Default 3 months notice
-            let noticeMonths = 3
-            if (contractData.notice_period?.value) {
-                const match = contractData.notice_period.value.match(/(\d+)/)
-                if (match) noticeMonths = parseInt(match[1])
-            }
 
             const sendBy = new Date(leaseEnd)
             sendBy.setMonth(sendBy.getMonth() - noticeMonths)
             return sendBy.toISOString().split('T')[0]
         } catch {
             return null
+        }
+    }
+
+    // Get display values 
+    const getLeaseEndDisplay = () => {
+        if (contractData?.lease_end_date?.value && contractData.lease_end_date.value !== 'not found') {
+            return { value: contractData.lease_end_date.value, source: 'contract' }
+        }
+        if (manualLeaseEnd) {
+            return { value: manualLeaseEnd, source: 'manual' }
+        }
+        return null
+    }
+
+    const getNoticePeriodDisplay = () => {
+        if (contractData?.notice_period?.value && contractData.notice_period.value !== 'not found') {
+            return { value: contractData.notice_period.value, source: 'contract' }
+        }
+        if (manualNoticePeriod) {
+            return { value: `${manualNoticePeriod} months`, source: 'manual' }
+        }
+        return null
+    }
+
+    // Save manual inputs to case
+    const saveManualInputs = async () => {
+        if (!manualLeaseEnd) return
+
+        try {
+            const supabase = createClient()
+            await supabase
+                .from('cases')
+                .update({
+                    lease_end: manualLeaseEnd,
+                    last_activity_at: new Date().toISOString()
+                })
+                .eq('case_id', caseId)
+
+            setShowManualInput(false)
+            setSuccessMessage('Lease end date saved')
+            setTimeout(() => setSuccessMessage(null), 3000)
+        } catch (err) {
+            console.error(err)
         }
     }
 
@@ -160,6 +254,8 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
             if (!res.ok) throw new Error('Failed to save')
             setTermination(prev => ({ ...prev, saved: true }))
+            setSuccessMessage('Reminder saved')
+            setTimeout(() => setSuccessMessage(null), 3000)
         } catch (err) {
             setError('Could not save reminder. Please try again.')
         } finally {
@@ -186,6 +282,8 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
             if (!res.ok) throw new Error('Failed to save')
             setRent(prev => ({ ...prev, saved: true }))
+            setSuccessMessage('Reminder saved')
+            setTimeout(() => setSuccessMessage(null), 3000)
         } catch (err) {
             setError('Could not save reminder. Please try again.')
         } finally {
@@ -193,18 +291,60 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
         }
     }
 
-    const deleteReminder = async (type: 'termination_notice' | 'rent_payment') => {
+    const saveCustomReminder = async () => {
+        if (!newCustomReminder.label || !newCustomReminder.date) return
+        setSaving('custom')
+        setError(null)
+
+        try {
+            const res = await fetch('/api/deadlines', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    caseId,
+                    type: 'custom',
+                    date: newCustomReminder.date,
+                    offsets: newCustomReminder.offsets,
+                    rentalLabel,
+                    label: newCustomReminder.label
+                })
+            })
+
+            if (!res.ok) throw new Error('Failed to save')
+
+            const data = await res.json()
+            setCustomReminders(prev => [...prev, {
+                id: data.id,
+                label: newCustomReminder.label,
+                date: newCustomReminder.date,
+                offsets: newCustomReminder.offsets,
+                saved: true
+            }])
+            setNewCustomReminder({ label: '', date: '', offsets: [7], saved: false })
+            setShowAddCustom(false)
+            setSuccessMessage('Custom reminder added')
+            setTimeout(() => setSuccessMessage(null), 3000)
+        } catch (err) {
+            setError('Could not save reminder. Please try again.')
+        } finally {
+            setSaving(null)
+        }
+    }
+
+    const deleteReminder = async (type: 'termination_notice' | 'rent_payment' | 'custom', id?: string) => {
         try {
             await fetch('/api/deadlines', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ caseId, type })
+                body: JSON.stringify({ caseId, type, id })
             })
 
             if (type === 'termination_notice') {
                 setTermination(prev => ({ ...prev, enabled: false, saved: false }))
-            } else {
+            } else if (type === 'rent_payment') {
                 setRent(prev => ({ ...prev, enabled: false, saved: false }))
+            } else if (type === 'custom' && id) {
+                setCustomReminders(prev => prev.filter(r => r.id !== id))
             }
         } catch (err) {
             console.error(err)
@@ -214,18 +354,122 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-slate-400" /></div>
 
     const suggestedDate = getSuggestedTerminationDate()
+    const leaseEnd = getLeaseEndDisplay()
+    const noticePeriod = getNoticePeriodDisplay()
 
     return (
         <div className="space-y-8 max-w-3xl">
             <div>
                 <h1 className="text-2xl font-bold mb-1">Deadlines & reminders</h1>
-                <p className="text-slate-500">Enable reminders for key dates in your tenancy.</p>
+                <p className="text-slate-500">Set reminders for important dates so you never miss a deadline.</p>
             </div>
+
+            {/* Success message */}
+            {successMessage && (
+                <div className="p-4 bg-green-50 text-green-700 rounded-xl flex items-center gap-2 animate-in fade-in duration-200">
+                    <Check size={20} />
+                    {successMessage}
+                </div>
+            )}
 
             {error && (
                 <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2">
                     <AlertCircle size={20} />
                     {error}
+                </div>
+            )}
+
+            {/* Contract Status Banner */}
+            {hasContract && (leaseEnd || noticePeriod) ? (
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div className="flex items-center gap-3 mb-3">
+                        <FileText size={20} className="text-slate-600" />
+                        <span className="font-medium text-slate-900">From your contract</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        {leaseEnd && (
+                            <div>
+                                <span className="text-slate-500">Lease ends:</span>
+                                <span className="ml-2 font-medium">{leaseEnd.value}</span>
+                            </div>
+                        )}
+                        {noticePeriod && (
+                            <div>
+                                <span className="text-slate-500">Notice period:</span>
+                                <span className="ml-2 font-medium">{noticePeriod.value}</span>
+                            </div>
+                        )}
+                    </div>
+                    {!showManualInput && (
+                        <button
+                            onClick={() => setShowManualInput(true)}
+                            className="mt-3 text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1"
+                        >
+                            <Edit3 size={14} />
+                            Edit dates manually
+                        </button>
+                    )}
+                </div>
+            ) : (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                    <div className="flex items-center gap-3 mb-3">
+                        <Info size={20} className="text-blue-600" />
+                        <span className="font-medium text-blue-900">No contract data yet</span>
+                    </div>
+                    <p className="text-sm text-blue-700 mb-3">
+                        <Link href={`/vault/case/${caseId}/contract`} className="underline hover:no-underline">Upload your contract</Link> to automatically extract dates, or enter them manually below.
+                    </p>
+                    {!showManualInput && (
+                        <button
+                            onClick={() => setShowManualInput(true)}
+                            className="text-sm font-medium text-blue-700 hover:text-blue-800"
+                        >
+                            + Enter dates manually
+                        </button>
+                    )}
+                </div>
+            )}
+
+            {/* Manual Input Section */}
+            {showManualInput && (
+                <div className="p-5 bg-white border border-slate-200 rounded-xl space-y-4">
+                    <h3 className="font-medium text-slate-900">Enter your lease details</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Lease end date</label>
+                            <input
+                                type="date"
+                                value={manualLeaseEnd}
+                                onChange={(e) => setManualLeaseEnd(e.target.value)}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Notice period (months)</label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="12"
+                                value={manualNoticePeriod}
+                                onChange={(e) => setManualNoticePeriod(e.target.value)}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={saveManualInputs}
+                            className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800"
+                        >
+                            Save dates
+                        </button>
+                        <button
+                            onClick={() => setShowManualInput(false)}
+                            className="px-4 py-2 text-slate-600 hover:text-slate-900 text-sm"
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -236,12 +480,12 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                         <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center shrink-0">
                             <Calendar size={20} />
                         </div>
-                        <div>
+                        <div className="flex-1">
                             <h2 className="font-semibold text-lg text-slate-900">Contract termination</h2>
                             <p className="text-slate-500 text-sm mt-1">
-                                {contractData?.notice_period?.value
-                                    ? `Your contract mentions a ${contractData.notice_period.value} notice period.`
-                                    : 'Set a reminder to cancel your contract on time.'}
+                                {noticePeriod
+                                    ? `Based on ${noticePeriod.value} notice period.`
+                                    : 'Get reminded before your termination deadline.'}
                             </p>
                         </div>
                     </div>
@@ -279,7 +523,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                                     />
                                     {suggestedDate && !termination.saved && (
                                         <p className="text-xs text-slate-500 mt-1.5">
-                                            Suggested based on contract: {new Date(suggestedDate).toLocaleDateString()}
+                                            Suggested: {new Date(suggestedDate).toLocaleDateString()}
                                         </p>
                                     )}
                                 </div>
@@ -332,7 +576,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                         <div>
                             <h2 className="font-semibold text-lg text-slate-900">Rent payments</h2>
                             <p className="text-slate-500 text-sm mt-1">
-                                {'Receive monthly reminders to pay your rent.'}
+                                Receive monthly reminders to pay your rent.
                             </p>
                         </div>
                     </div>
@@ -409,7 +653,100 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                 </div>
             </div>
 
+            {/* Custom Reminders */}
+            <div className="bg-white rounded-xl border border-slate-200">
+                <div className="p-6">
+                    <div className="flex items-start gap-4 mb-4">
+                        <div className="w-10 h-10 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center shrink-0">
+                            <Bell size={20} />
+                        </div>
+                        <div className="flex-1">
+                            <h2 className="font-semibold text-lg text-slate-900">Custom reminders</h2>
+                            <p className="text-slate-500 text-sm mt-1">
+                                Add reminders for any date — inspections, renewals, deposit follow-ups.
+                            </p>
+                        </div>
+                    </div>
 
+                    {/* Existing custom reminders */}
+                    {customReminders.length > 0 && (
+                        <div className="space-y-3 mb-4">
+                            {customReminders.map((reminder) => (
+                                <div key={reminder.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <div>
+                                        <span className="font-medium text-slate-900">{reminder.label}</span>
+                                        <span className="text-slate-500 text-sm ml-2">
+                                            {new Date(reminder.date).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={() => deleteReminder('custom', reminder.id)}
+                                        className="text-slate-400 hover:text-red-500 p-1"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Add new custom reminder */}
+                    {showAddCustom ? (
+                        <div className="space-y-4 p-4 bg-slate-50 rounded-lg">
+                            <input
+                                type="text"
+                                placeholder="Reminder label (e.g., Landlord inspection)"
+                                value={newCustomReminder.label}
+                                onChange={(e) => setNewCustomReminder(prev => ({ ...prev, label: e.target.value }))}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white"
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                                <input
+                                    type="date"
+                                    value={newCustomReminder.date}
+                                    onChange={(e) => setNewCustomReminder(prev => ({ ...prev, date: e.target.value }))}
+                                    className="px-3 py-2 border border-slate-200 rounded-lg bg-white"
+                                />
+                                <select
+                                    value={newCustomReminder.offsets[0]}
+                                    onChange={(e) => setNewCustomReminder(prev => ({ ...prev, offsets: [parseInt(e.target.value)] }))}
+                                    className="px-3 py-2 border border-slate-200 rounded-lg bg-white"
+                                >
+                                    <option value={14}>2 weeks before</option>
+                                    <option value={7}>1 week before</option>
+                                    <option value={3}>3 days before</option>
+                                    <option value={1}>1 day before</option>
+                                    <option value={0}>On the day</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={saveCustomReminder}
+                                    disabled={!newCustomReminder.label || !newCustomReminder.date}
+                                    className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {saving === 'custom' ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+                                    Save reminder
+                                </button>
+                                <button
+                                    onClick={() => setShowAddCustom(false)}
+                                    className="px-4 py-2 text-slate-600 hover:text-slate-900 text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setShowAddCustom(true)}
+                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium"
+                        >
+                            <Plus size={18} />
+                            Add custom reminder
+                        </button>
+                    )}
+                </div>
+            </div>
         </div>
     )
 }
