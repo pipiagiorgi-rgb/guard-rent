@@ -3,12 +3,29 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Logo } from '@/components/brand/Logo';
 
 export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // Lock body scroll when mobile menu is open
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [mobileMenuOpen]);
+
+    // Close menu on route change
+    useEffect(() => {
+        setMobileMenuOpen(false);
+    }, [pathname]);
 
     // Don't show navbar on app routes (they have their own layout)
     if (pathname?.startsWith('/vault')) return null;
@@ -17,103 +34,161 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
     // Don't show navbar on login page
     if (pathname === '/login') return null;
 
-    return (
-        <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
-            <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-                {/* 1) Fixed-height flex container for the header */}
-                <div className="h-16 flex items-center justify-between">
-                    {/* 2) Logo wrapper - flex aligned, h-full */}
-                    <Link href="/" className="h-full flex items-center flex-shrink-0">
-                        {/* 3) Explicit logo height, no intrinsic sizing or hacks */}
-                        <Logo height={40} />
-                    </Link>
+    const handleNavClick = () => {
+        setMobileMenuOpen(false);
+    };
 
-                    {/* Desktop Nav - right aligned, vertically centered */}
-                    <nav className="hidden md:flex items-center gap-6 h-full">
-                        <Link
-                            href="/pricing"
-                            className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
-                        >
-                            Pricing
+    return (
+        <>
+            <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
+                <div className="max-w-[1120px] mx-auto px-5 md:px-8">
+                    {/* Fixed-height flex container for the header */}
+                    <div className="h-16 flex items-center justify-between">
+                        {/* Logo wrapper */}
+                        <Link href="/" className="h-full flex items-center flex-shrink-0">
+                            <Logo height={40} />
                         </Link>
 
-                        {isLoggedIn ? (
+                        {/* Desktop Nav - right aligned */}
+                        <nav className="hidden md:flex items-center gap-6 h-full">
                             <Link
-                                href="/vault"
-                                className="text-[15px] font-medium bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors leading-none"
+                                href="/pricing"
+                                className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
                             >
-                                Dashboard
+                                Pricing
                             </Link>
-                        ) : (
-                            <>
+
+                            {isLoggedIn ? (
                                 <Link
-                                    href="/login"
-                                    className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
-                                >
-                                    Log in
-                                </Link>
-                                <Link
-                                    href="/login"
+                                    href="/vault"
                                     className="text-[15px] font-medium bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors leading-none"
+                                >
+                                    Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link
+                                        href="/login"
+                                        className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
+                                    >
+                                        Log in
+                                    </Link>
+                                    <Link
+                                        href="/login"
+                                        className="text-[15px] font-medium bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors leading-none"
+                                    >
+                                        Start now
+                                    </Link>
+                                </>
+                            )}
+                        </nav>
+
+                        {/* Mobile Menu Button */}
+                        <div className="md:hidden flex items-center h-full">
+                            <button
+                                className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
+                                onClick={() => setMobileMenuOpen(true)}
+                                aria-label="Open menu"
+                            >
+                                <Menu size={26} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* ═══════════════════════════════════════════════════════════════
+                MOBILE MENU - TRUE FULL-SCREEN MODAL
+            ═══════════════════════════════════════════════════════════════ */}
+            {mobileMenuOpen && (
+                <div
+                    className="fixed inset-0 z-[100] md:hidden"
+                    role="dialog"
+                    aria-modal="true"
+                >
+                    {/* Solid opaque background - full screen */}
+                    <div className="absolute inset-0 bg-white" />
+
+                    {/* Menu content container - scrollable if needed */}
+                    <div className="relative h-full flex flex-col">
+                        {/* ═══════════════════════════════════════════════════
+                            TOP ROW: Logo + Close
+                        ═══════════════════════════════════════════════════ */}
+                        <div className="flex-shrink-0 px-5 h-16 flex items-center justify-between border-b border-slate-100">
+                            <Link
+                                href="/"
+                                onClick={handleNavClick}
+                                className="h-full flex items-center"
+                            >
+                                <Logo height={40} />
+                            </Link>
+                            <button
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
+                                aria-label="Close menu"
+                            >
+                                <X size={26} />
+                            </button>
+                        </div>
+
+                        {/* ═══════════════════════════════════════════════════
+                            NAVIGATION LINKS (Secondary)
+                        ═══════════════════════════════════════════════════ */}
+                        <div className="flex-1 px-5 py-8 overflow-y-auto">
+                            <nav className="space-y-1">
+                                <Link
+                                    href="/pricing"
+                                    onClick={handleNavClick}
+                                    className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                >
+                                    Pricing
+                                </Link>
+
+                                {isLoggedIn ? (
+                                    <Link
+                                        href="/vault"
+                                        onClick={handleNavClick}
+                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href="/login"
+                                        onClick={handleNavClick}
+                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                    >
+                                        Log in
+                                    </Link>
+                                )}
+                            </nav>
+                        </div>
+
+                        {/* ═══════════════════════════════════════════════════
+                            PRIMARY CTA - Bottom (Single Action)
+                        ═══════════════════════════════════════════════════ */}
+                        <div className="flex-shrink-0 px-5 py-6 border-t border-slate-100 bg-white">
+                            {isLoggedIn ? (
+                                <Link
+                                    href="/vault"
+                                    onClick={handleNavClick}
+                                    className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl text-[17px] font-semibold hover:bg-slate-800 transition-colors"
+                                >
+                                    Go to Dashboard
+                                </Link>
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    onClick={handleNavClick}
+                                    className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl text-[17px] font-semibold hover:bg-slate-800 transition-colors"
                                 >
                                     Start now
                                 </Link>
-                            </>
-                        )}
-                    </nav>
-
-                    {/* Mobile Menu Button - centered using flex */}
-                    <div className="md:hidden flex items-center h-full">
-                        <button
-                            className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            aria-label="Toggle menu"
-                        >
-                            {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
-                        </button>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Mobile Menu */}
-            {mobileMenuOpen && (
-                <div className="md:hidden bg-white border-t border-slate-100 px-6 py-4 space-y-3">
-                    <Link
-                        href="/pricing"
-                        className="block py-2 text-slate-600 font-medium"
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        Pricing
-                    </Link>
-
-                    {isLoggedIn ? (
-                        <Link
-                            href="/vault"
-                            className="block w-full text-center py-3 bg-slate-900 text-white rounded-lg font-medium"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Dashboard
-                        </Link>
-                    ) : (
-                        <>
-                            <Link
-                                href="/login"
-                                className="block py-2 text-slate-600 font-medium"
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                href="/login"
-                                className="block w-full text-center py-3 bg-slate-900 text-white rounded-lg font-medium"
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                Start now
-                            </Link>
-                        </>
-                    )}
-                </div>
             )}
-        </header>
+        </>
     );
 }
