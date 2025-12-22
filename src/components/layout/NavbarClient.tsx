@@ -40,8 +40,8 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
 
     return (
         <>
-            {/* Header: sticky on desktop (lg+), scrolls naturally on mobile */}
-            <header className="lg:sticky lg:top-0 z-50 bg-white border-b border-slate-100">
+            {/* Header: sticky on all screen sizes */}
+            <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
                 <div className="max-w-[1120px] mx-auto px-5 md:px-8">
                     {/* Fixed-height flex container for the header */}
                     <div className="h-16 flex items-center justify-between">
