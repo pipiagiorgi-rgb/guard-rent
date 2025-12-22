@@ -48,29 +48,32 @@ Return this exact JSON structure:
   "jurisdiction": { "value": "...", "confidence": "high/medium/low", "source": "..." }
 }
 
-ADDRESS RULES (CRITICAL):
-- Extract the FULL rental property address (Street, Number, Zip, City).
-- Do NOT include the Landlord's or Tenant's personal address.
-- Look for sections like "Lieu loué", "Objet du bail", "Adresse du bien".
+=== ADDRESS EXTRACTION (HIGHEST PRIORITY) ===
+The property address is CRITICAL. Search THOROUGHLY for it:
+- Look for: "Lieu loué", "Objet du bail", "Désignation du bien", "situé à", "sis à"
+- Look for street patterns: "rue", "avenue", "boulevard", "place" + number
+- Look for postal codes: 4-5 digit numbers (1000, 75001, 1050, etc.)
+- The address is usually near the TOP of the contract or in a "DÉSIGNATION" section
+- Extract the FULL address: Street + Number + Postal Code + City
+- Do NOT confuse with landlord/tenant personal addresses (those appear in party sections)
 
-TERMINATION RULES (CRITICAL):
-- Look for "date anniversaire", "à l'échéance" → notice_condition = "anniversary only"
-- Look for "à tout moment" → notice_condition = "anytime"
-- Look for "durée minimale", "ne peut être résilié avant" → earliest_possible_date
+=== TERMINATION RULES ===
+- "date anniversaire", "à l'échéance" → notice_condition = "anniversary only"
+- "à tout moment" → notice_condition = "anytime"
+- "durée minimale", "ne peut être résilié avant" → earliest_possible_date
 - NEVER show notice_period without notice_condition
 
-JURISDICTION RULES:
-- If no specific jurisdiction clause, extract the country from the property address.
+=== JURISDICTION ===
+- If no explicit clause, extract country from the property address
 
-FRENCH PHRASES TO FIND (translate to English):
-- Start date: "prend cours le", "commence le", "à compter du"
-- Duration: "pour une durée de", "jusqu'au"
-- Notice period: "3 mois avant" = "3 months", "préavis de X mois" = "X months notice"
-- Notice method: "lettre recommandée avec avis de réception" = "registered letter with acknowledgment of receipt"
-- Anniversary: "date anniversaire" = "anniversary date"
+=== FRENCH TRANSLATIONS ===
+- "prend cours le", "commence le", "à compter du" → Start date
+- "pour une durée de", "jusqu'au" → Duration
+- "3 mois avant" / "préavis de X mois" → "X months notice"
+- "lettre recommandée" → "registered letter"
 
-For "source", include the exact text from the document (max 100 chars).
-If not found, set value to "not found".
+For "source", include exact text from document (max 100 chars).
+If truly not found after thorough search, set value to "not found".
 
 Contract text:
 `
