@@ -104,9 +104,12 @@ export default function LoginPage() {
 
                             {/* Success Message Area */}
                             {sent && (
-                                <div className="text-center space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="text-center space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                                     <p className="text-slate-600">
                                         Check your inbox for the secure login link.
+                                    </p>
+                                    <p className="text-sm text-slate-500">
+                                        Click the link to sign in on this browser. You'll stay logged in for 7 days.
                                     </p>
                                 </div>
                             )}
