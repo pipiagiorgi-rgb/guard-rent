@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Globe, ArrowRight, Languages } from 'lucide-react'
+import { Globe, Folder, MapPin } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'Tips for Tenants Renting Abroad | RentVault',
@@ -28,6 +28,24 @@ export default function RentingAbroadGuide() {
                         Renting in a foreign country comes with unique challenges. Here's how to protect yourself.
                     </p>
                 </header>
+
+                {/* Why This Matters */}
+                <section className="mb-10 bg-slate-50 rounded-xl p-6">
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <MapPin size={20} className="text-slate-600" />
+                        Why this matters
+                    </h2>
+                    <p className="text-slate-600 mb-3">
+                        When you rent in a foreign country, you're at a disadvantage from the start. You may not know
+                        the local laws, you might not speak the language fluently, and if something goes wrong,
+                        you may have already left the country.
+                    </p>
+                    <p className="text-slate-600">
+                        Expats and international students are disproportionately likely to lose deposits — not because
+                        they're bad tenants, but because they didn't document or understand their situation fully.
+                        Good organisation is your best protection.
+                    </p>
+                </section>
 
                 <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">The challenges of renting abroad</h2>
@@ -108,25 +126,21 @@ export default function RentingAbroadGuide() {
                     </div>
                 </section>
 
+                {/* Soft RentVault Relevance */}
                 <section className="bg-slate-50 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
-                        <Globe className="text-slate-700" size={24} />
-                        <h2 className="text-xl font-semibold">How RentVault helps expats</h2>
+                        <Folder className="text-slate-600" size={22} />
+                        <h2 className="text-xl font-semibold">Staying organised across borders</h2>
                     </div>
-                    <p className="text-slate-600 mb-4">
-                        RentVault is designed with international tenants in mind. Upload your lease in any language,
-                        request translations, and keep all your documentation accessible from anywhere.
+                    <p className="text-slate-600 mb-3">
+                        When you're far from home, organisation becomes even more critical. You need your documents
+                        accessible from anywhere — not buried in a folder on a laptop you left behind.
                     </p>
-                    <div className="flex items-center gap-2 text-slate-600 mb-4">
-                        <Languages size={18} />
-                        <span className="text-sm">Contract translation and key date extraction included.</span>
-                    </div>
-                    <Link
-                        href="/login"
-                        className="inline-flex items-center gap-2 text-slate-900 font-medium hover:underline"
-                    >
-                        Get started for free <ArrowRight size={16} />
-                    </Link>
+                    <p className="text-slate-600">
+                        Tools like RentVault are designed to help international tenants keep contracts, photos, and
+                        key dates in one accessible place. But even a well-organised cloud folder is better than
+                        scattered files across devices.
+                    </p>
                 </section>
 
                 <section>

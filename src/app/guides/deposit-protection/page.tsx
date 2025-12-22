@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Shield, Check, ArrowRight } from 'lucide-react'
+import { Shield, Check, Folder } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'How to Protect Your Rental Deposit | RentVault',
@@ -29,6 +29,23 @@ export default function DepositProtectionGuide() {
                     </p>
                 </header>
 
+                {/* Why This Matters */}
+                <section className="mb-10 bg-slate-50 rounded-xl p-6">
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <Shield size={20} className="text-slate-600" />
+                        Why this matters
+                    </h2>
+                    <p className="text-slate-600 mb-3">
+                        Deposit disputes are rarely about whether damage exists — they're about whether you can prove
+                        it wasn't your fault. Tenants lose money not because they damaged the property, but because
+                        they didn't document its original condition.
+                    </p>
+                    <p className="text-slate-600">
+                        The difference between tenants who recover their full deposit and those who don't usually comes
+                        down to organisation: having the right evidence, in the right place, at the right time.
+                    </p>
+                </section>
+
                 <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">Why deposit disputes happen</h2>
                     <p className="text-slate-600 mb-4">
@@ -45,8 +62,8 @@ export default function DepositProtectionGuide() {
                     <h2 className="text-xl font-semibold mb-4">5 steps to protect your deposit</h2>
                     <div className="space-y-6">
                         <div className="flex gap-4">
-                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Check size={18} className="text-green-600" />
+                            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Check size={18} className="text-slate-600" />
                             </div>
                             <div>
                                 <h3 className="font-medium mb-1">1. Document the apartment on move-in day</h3>
@@ -57,8 +74,8 @@ export default function DepositProtectionGuide() {
                             </div>
                         </div>
                         <div className="flex gap-4">
-                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Check size={18} className="text-green-600" />
+                            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Check size={18} className="text-slate-600" />
                             </div>
                             <div>
                                 <h3 className="font-medium mb-1">2. Read your lease carefully</h3>
@@ -69,8 +86,8 @@ export default function DepositProtectionGuide() {
                             </div>
                         </div>
                         <div className="flex gap-4">
-                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Check size={18} className="text-green-600" />
+                            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Check size={18} className="text-slate-600" />
                             </div>
                             <div>
                                 <h3 className="font-medium mb-1">3. Record meter readings</h3>
@@ -81,8 +98,8 @@ export default function DepositProtectionGuide() {
                             </div>
                         </div>
                         <div className="flex gap-4">
-                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Check size={18} className="text-green-600" />
+                            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Check size={18} className="text-slate-600" />
                             </div>
                             <div>
                                 <h3 className="font-medium mb-1">4. Keep everything organised</h3>
@@ -93,8 +110,8 @@ export default function DepositProtectionGuide() {
                             </div>
                         </div>
                         <div className="flex gap-4">
-                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Check size={18} className="text-green-600" />
+                            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Check size={18} className="text-slate-600" />
                             </div>
                             <div>
                                 <h3 className="font-medium mb-1">5. Document again before handover</h3>
@@ -107,25 +124,25 @@ export default function DepositProtectionGuide() {
                     </div>
                 </section>
 
+                {/* Soft RentVault Relevance */}
                 <section className="bg-slate-50 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
-                        <Shield className="text-slate-700" size={24} />
-                        <h2 className="text-xl font-semibold">How RentVault helps</h2>
+                        <Folder className="text-slate-600" size={22} />
+                        <h2 className="text-xl font-semibold">Staying organised</h2>
                     </div>
-                    <p className="text-slate-600 mb-4">
-                        RentVault is a simple tool for tenants to store rental documentation in one secure place.
-                        Upload your lease, take room-by-room photos, and set reminders for important dates.
+                    <p className="text-slate-600 mb-3">
+                        The advice above only works if you can actually find your documents when you need them.
+                        Many tenants take photos and save contracts, but scatter them across phones, email attachments,
+                        and cloud folders — making them hard to retrieve months later.
                     </p>
-                    <Link
-                        href="/login"
-                        className="inline-flex items-center gap-2 text-slate-900 font-medium hover:underline"
-                    >
-                        Get started for free <ArrowRight size={16} />
-                    </Link>
+                    <p className="text-slate-600">
+                        Tools like RentVault exist to help tenants keep everything in one place: contracts, photos,
+                        and key dates. But whether you use a dedicated tool or your own system, the key is consistency.
+                    </p>
                 </section>
 
                 <section>
-                    <h2 className="text-xl font-semibold mb-4">Further reading</h2>
+                    <h2 className="text-xl font-semibold mb-4">Related guides</h2>
                     <ul className="space-y-2">
                         <li>
                             <Link href="/guides/move-in-photos" className="text-slate-600 hover:text-slate-900">

@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Camera, ArrowRight } from 'lucide-react'
+import { Camera, Folder, ImageIcon } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'Why Move-in Photos Matter | RentVault',
@@ -28,6 +28,23 @@ export default function MoveInPhotosGuide() {
                         The photos you take on day one could save you hundreds when you move out.
                     </p>
                 </header>
+
+                {/* Why This Matters */}
+                <section className="mb-10 bg-slate-50 rounded-xl p-6">
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <ImageIcon size={20} className="text-slate-600" />
+                        Why this matters
+                    </h2>
+                    <p className="text-slate-600 mb-3">
+                        Most tenants who lose part of their deposit didn't damage anything — they simply couldn't prove
+                        the damage was already there. Without move-in photos, there's no evidence that the scratched floor
+                        or marked walls existed before you arrived.
+                    </p>
+                    <p className="text-slate-600">
+                        Taking 20 minutes on your first day to photograph everything can save you hours of frustration —
+                        and potentially hundreds of euros — when you move out.
+                    </p>
+                </section>
 
                 <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">The problem with memory</h2>
@@ -89,21 +106,21 @@ export default function MoveInPhotosGuide() {
                     </div>
                 </section>
 
+                {/* Soft RentVault Relevance */}
                 <section className="bg-slate-50 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
-                        <Camera className="text-slate-700" size={24} />
-                        <h2 className="text-xl font-semibold">How RentVault helps</h2>
+                        <Folder className="text-slate-600" size={22} />
+                        <h2 className="text-xl font-semibold">Keeping photos organised</h2>
                     </div>
-                    <p className="text-slate-600 mb-4">
-                        RentVault lets you upload and organise move-in photos by room, with automatic timestamp tracking.
-                        When you move out, you can take comparison photos and generate a before/after report.
+                    <p className="text-slate-600 mb-3">
+                        Taking photos is only half the battle — finding them 12 months later is the other half.
+                        Many tenants take dozens of move-in photos, then lose them in their camera roll or forget
+                        which folder they saved them to.
                     </p>
-                    <Link
-                        href="/login"
-                        className="inline-flex items-center gap-2 text-slate-900 font-medium hover:underline"
-                    >
-                        Start documenting your rental <ArrowRight size={16} />
-                    </Link>
+                    <p className="text-slate-600">
+                        Tools like RentVault let you upload photos organised by room, with automatic timestamp tracking.
+                        But whatever system you use, the key is to store your photos somewhere you can reliably access later.
+                    </p>
                 </section>
 
                 <section>
@@ -117,6 +134,11 @@ export default function MoveInPhotosGuide() {
                         <li>
                             <Link href="/guides/notice-periods" className="text-slate-600 hover:text-slate-900">
                                 → Understanding rental notice periods
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/guides/renting-abroad" className="text-slate-600 hover:text-slate-900">
+                                → Tips for tenants renting abroad
                             </Link>
                         </li>
                     </ul>

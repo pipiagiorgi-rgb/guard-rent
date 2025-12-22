@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Clock, ArrowRight, AlertCircle } from 'lucide-react'
+import { Clock, Folder, Calendar } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'Understanding Rental Notice Periods | RentVault',
@@ -28,6 +28,23 @@ export default function NoticePeriodsGuide() {
                         Missing a notice deadline can cost you months of extra rent. Here's what you need to know.
                     </p>
                 </header>
+
+                {/* Why This Matters */}
+                <section className="mb-10 bg-slate-50 rounded-xl p-6">
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <Calendar size={20} className="text-slate-600" />
+                        Why this matters
+                    </h2>
+                    <p className="text-slate-600 mb-3">
+                        Many tenants only think about notice periods when they're ready to move — by which point
+                        it's often too late. A 3-month notice period means you need to decide to leave 3 months before
+                        you actually want to move out.
+                    </p>
+                    <p className="text-slate-600">
+                        Missing your deadline by even a single day can legally obligate you to pay rent for another
+                        full month (or more). This isn't about landlords being unreasonable — it's simply how contracts work.
+                    </p>
+                </section>
 
                 <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">What is a notice period?</h2>
@@ -86,35 +103,37 @@ export default function NoticePeriodsGuide() {
                     </div>
                 </section>
 
-                <section className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-10">
+                {/* Softened note - no amber/warning styling */}
+                <section className="bg-slate-100 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
-                        <AlertCircle className="text-amber-600" size={24} />
-                        <h2 className="text-xl font-semibold text-amber-900">Don't miss your deadline</h2>
+                        <Clock className="text-slate-600" size={22} />
+                        <h2 className="text-xl font-semibold">A note on timing</h2>
                     </div>
-                    <p className="text-amber-800 mb-4">
-                        Many tenants forget about notice periods until it's too late. A 3-month notice period
-                        means you need to decide to leave 3 months before you actually want to move out.
+                    <p className="text-slate-600 mb-3">
+                        The tricky thing about notice periods is that you need to think about them before you're
+                        ready to move. If you wait until you've found a new place, you may already be past your deadline.
                     </p>
-                    <p className="text-amber-800">
-                        Set reminders for yourself — or use a tool that tracks your lease dates automatically.
+                    <p className="text-slate-600">
+                        Setting a reminder — whether in your calendar, phone, or a rental tracking tool — ensures
+                        you have time to make decisions without being rushed.
                     </p>
                 </section>
 
+                {/* Soft RentVault Relevance */}
                 <section className="bg-slate-50 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
-                        <Clock className="text-slate-700" size={24} />
-                        <h2 className="text-xl font-semibold">How RentVault helps</h2>
+                        <Folder className="text-slate-600" size={22} />
+                        <h2 className="text-xl font-semibold">Tracking important dates</h2>
                     </div>
-                    <p className="text-slate-600 mb-4">
-                        RentVault can extract your notice period from your lease and remind you before key deadlines.
-                        Choose when you want to be notified — 30, 60, or 90 days in advance.
+                    <p className="text-slate-600 mb-3">
+                        The challenge isn't just knowing your notice period — it's remembering to act on it at the right time.
+                        Most tenants know their deadline exists somewhere in their contract, but don't have it written down
+                        anywhere visible.
                     </p>
-                    <Link
-                        href="/login"
-                        className="inline-flex items-center gap-2 text-slate-900 font-medium hover:underline"
-                    >
-                        Set up deadline reminders <ArrowRight size={16} />
-                    </Link>
+                    <p className="text-slate-600">
+                        Tools like RentVault can extract key dates from your lease and send reminders before deadlines.
+                        But even a simple calendar reminder set when you move in is better than nothing.
+                    </p>
                 </section>
 
                 <section>
@@ -123,6 +142,11 @@ export default function NoticePeriodsGuide() {
                         <li>
                             <Link href="/guides/deposit-protection" className="text-slate-600 hover:text-slate-900">
                                 → How to protect your rental deposit
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/guides/move-in-photos" className="text-slate-600 hover:text-slate-900">
+                                → Why move-in photos matter
                             </Link>
                         </li>
                         <li>
