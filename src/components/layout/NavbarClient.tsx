@@ -40,7 +40,8 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
 
     return (
         <>
-            <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
+            {/* Header: sticky on desktop (lg+), scrolls naturally on mobile */}
+            <header className="lg:sticky lg:top-0 z-50 bg-white border-b border-slate-100">
                 <div className="max-w-[1120px] mx-auto px-5 md:px-8">
                     {/* Fixed-height flex container for the header */}
                     <div className="h-16 flex items-center justify-between">
@@ -100,95 +101,97 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
             {/* ═══════════════════════════════════════════════════════════════
                 MOBILE MENU - TRUE FULL-SCREEN MODAL
             ═══════════════════════════════════════════════════════════════ */}
-            {mobileMenuOpen && (
-                <div
-                    className="fixed inset-0 z-[100] md:hidden"
-                    role="dialog"
-                    aria-modal="true"
-                >
-                    {/* Solid opaque background - full screen */}
-                    <div className="absolute inset-0 bg-white" />
+            {
+                mobileMenuOpen && (
+                    <div
+                        className="fixed inset-0 z-[100] md:hidden"
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        {/* Solid opaque background - full screen */}
+                        <div className="absolute inset-0 bg-white" />
 
-                    {/* Menu content container - scrollable if needed */}
-                    <div className="relative h-full flex flex-col">
-                        {/* ═══════════════════════════════════════════════════
+                        {/* Menu content container - scrollable if needed */}
+                        <div className="relative h-full flex flex-col">
+                            {/* ═══════════════════════════════════════════════════
                             TOP ROW: Logo + Close
                         ═══════════════════════════════════════════════════ */}
-                        <div className="flex-shrink-0 px-5 h-16 flex items-center justify-between border-b border-slate-100">
-                            <Link
-                                href="/"
-                                onClick={handleNavClick}
-                                className="h-full flex items-center"
-                            >
-                                <Logo height={40} />
-                            </Link>
-                            <button
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
-                                aria-label="Close menu"
-                            >
-                                <X size={26} />
-                            </button>
-                        </div>
+                            <div className="flex-shrink-0 px-5 h-16 flex items-center justify-between border-b border-slate-100">
+                                <Link
+                                    href="/"
+                                    onClick={handleNavClick}
+                                    className="h-full flex items-center"
+                                >
+                                    <Logo height={40} />
+                                </Link>
+                                <button
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700"
+                                    aria-label="Close menu"
+                                >
+                                    <X size={26} />
+                                </button>
+                            </div>
 
-                        {/* ═══════════════════════════════════════════════════
+                            {/* ═══════════════════════════════════════════════════
                             NAVIGATION LINKS (Secondary)
                         ═══════════════════════════════════════════════════ */}
-                        <div className="flex-1 px-5 py-8 overflow-y-auto">
-                            <nav className="space-y-1">
-                                <Link
-                                    href="/pricing"
-                                    onClick={handleNavClick}
-                                    className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
-                                >
-                                    Pricing
-                                </Link>
+                            <div className="flex-1 px-5 py-8 overflow-y-auto">
+                                <nav className="space-y-1">
+                                    <Link
+                                        href="/pricing"
+                                        onClick={handleNavClick}
+                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                    >
+                                        Pricing
+                                    </Link>
 
+                                    {isLoggedIn ? (
+                                        <Link
+                                            href="/vault"
+                                            onClick={handleNavClick}
+                                            className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                        >
+                                            Dashboard
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href="/login"
+                                            onClick={handleNavClick}
+                                            className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                        >
+                                            Log in
+                                        </Link>
+                                    )}
+                                </nav>
+                            </div>
+
+                            {/* ═══════════════════════════════════════════════════
+                            PRIMARY CTA - Bottom (Single Action)
+                        ═══════════════════════════════════════════════════ */}
+                            <div className="flex-shrink-0 px-5 py-6 border-t border-slate-100 bg-white">
                                 {isLoggedIn ? (
                                     <Link
                                         href="/vault"
                                         onClick={handleNavClick}
-                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                        className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl text-[17px] font-semibold hover:bg-slate-800 transition-colors"
                                     >
-                                        Dashboard
+                                        Go to Dashboard
                                     </Link>
                                 ) : (
                                     <Link
                                         href="/login"
                                         onClick={handleNavClick}
-                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 border-b border-slate-100"
+                                        className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl text-[17px] font-semibold hover:bg-slate-800 transition-colors"
                                     >
-                                        Log in
+                                        Start now
                                     </Link>
                                 )}
-                            </nav>
-                        </div>
-
-                        {/* ═══════════════════════════════════════════════════
-                            PRIMARY CTA - Bottom (Single Action)
-                        ═══════════════════════════════════════════════════ */}
-                        <div className="flex-shrink-0 px-5 py-6 border-t border-slate-100 bg-white">
-                            {isLoggedIn ? (
-                                <Link
-                                    href="/vault"
-                                    onClick={handleNavClick}
-                                    className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl text-[17px] font-semibold hover:bg-slate-800 transition-colors"
-                                >
-                                    Go to Dashboard
-                                </Link>
-                            ) : (
-                                <Link
-                                    href="/login"
-                                    onClick={handleNavClick}
-                                    className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl text-[17px] font-semibold hover:bg-slate-800 transition-colors"
-                                >
-                                    Start now
-                                </Link>
-                            )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </>
     );
 }
