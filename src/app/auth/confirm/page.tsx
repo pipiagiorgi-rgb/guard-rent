@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { Loader2, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { Logo } from '@/components/brand/Logo'
 
 export default function AuthConfirmPage() {
     const router = useRouter()
@@ -51,66 +52,76 @@ export default function AuthConfirmPage() {
     }, [searchParams, router])
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-            <div className="w-full max-w-[400px]">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
-                    {status === 'loading' && (
-                        <>
-                            <div className="mb-6">
-                                <Loader2 size={48} className="animate-spin text-slate-400 mx-auto" />
-                            </div>
-                            <h1 className="text-xl font-semibold text-slate-900 mb-2">
-                                Signing you in…
-                            </h1>
-                            <p className="text-slate-500 text-sm">
-                                Please wait while we verify your login.
-                            </p>
-                        </>
-                    )}
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+            {/* Header with Logo */}
+            <header className="p-6 flex items-center justify-between">
+                <Link href="/" className="flex items-center">
+                    <Logo size="sm" />
+                </Link>
+            </header>
 
-                    {status === 'success' && (
-                        <>
-                            <div className="mb-6">
-                                <CheckCircle size={48} className="text-green-500 mx-auto" />
-                            </div>
-                            <h1 className="text-xl font-semibold text-slate-900 mb-2">
-                                You're signed in
-                            </h1>
-                            <p className="text-slate-500 text-sm">
-                                Redirecting you to your dashboard…
-                            </p>
-                        </>
-                    )}
+            <main className="flex-1 flex items-center justify-center p-6 -mt-16">
+                <div className="w-full max-w-[400px]">
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
+                        {status === 'loading' && (
+                            <>
+                                <div className="mb-6">
+                                    <Loader2 size={48} className="animate-spin text-slate-400 mx-auto" />
+                                </div>
+                                <h1 className="text-xl font-semibold text-slate-900 mb-2">
+                                    Signing you in…
+                                </h1>
+                                <p className="text-slate-500 text-sm">
+                                    Please wait while we verify your login.
+                                </p>
+                            </>
+                        )}
 
-                    {status === 'error' && (
-                        <>
-                            <div className="mb-6">
-                                <AlertCircle size={48} className="text-amber-500 mx-auto" />
-                            </div>
-                            <h1 className="text-xl font-semibold text-slate-900 mb-2">
-                                Link no longer valid
-                            </h1>
-                            <p className="text-slate-500 text-sm mb-6">
-                                {errorMessage}
-                            </p>
-                            <Link
-                                href="/login"
-                                className="inline-block px-6 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors"
-                            >
-                                Request new link
+                        {status === 'success' && (
+                            <>
+                                <div className="mb-6">
+                                    <CheckCircle size={48} className="text-green-500 mx-auto" />
+                                </div>
+                                <h1 className="text-xl font-semibold text-slate-900 mb-2">
+                                    You're signed in
+                                </h1>
+                                <p className="text-slate-500 text-sm">
+                                    Redirecting you to your dashboard…
+                                </p>
+                            </>
+                        )}
+
+                        {status === 'error' && (
+                            <>
+                                <div className="mb-6">
+                                    <AlertCircle size={48} className="text-amber-500 mx-auto" />
+                                </div>
+                                <h1 className="text-xl font-semibold text-slate-900 mb-2">
+                                    Link no longer valid
+                                </h1>
+                                <p className="text-slate-500 text-sm mb-6">
+                                    {errorMessage}
+                                </p>
+                                <Link
+                                    href="/login"
+                                    className="inline-block px-6 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors"
+                                >
+                                    Request new link
+                                </Link>
+                            </>
+                        )}
+                    </div>
+
+                    {status !== 'error' && (
+                        <div className="text-center mt-6">
+                            <Link href="/" className="text-sm text-slate-500 hover:text-slate-900 transition-colors flex items-center justify-center gap-1.5">
+                                <ArrowLeft size={16} />
+                                Back
                             </Link>
-                        </>
+                        </div>
                     )}
                 </div>
-
-                {status !== 'error' && (
-                    <div className="text-center mt-6">
-                        <Link href="/" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
-                            ← Back to home
-                        </Link>
-                    </div>
-                )}
-            </div>
+            </main>
         </div>
     )
 }

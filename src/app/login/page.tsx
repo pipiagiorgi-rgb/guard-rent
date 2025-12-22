@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { login } from './actions'
 import Link from 'next/link'
-import { Loader2, CheckCircle2 } from 'lucide-react'
+import { Loader2, CheckCircle2, ArrowLeft } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
+import { Logo } from '@/components/brand/Logo'
 
 export default function LoginPage() {
     const [loading, setLoading] = useState(false)
@@ -32,8 +33,22 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
+            {/* Header with Logo */}
+            <header className="p-6 flex items-center justify-between">
+                <Link href="/" className="flex items-center">
+                    <Logo size="sm" />
+                </Link>
+                <Link
+                    href="/"
+                    className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors"
+                >
+                    <ArrowLeft size={16} />
+                    Back
+                </Link>
+            </header>
+
             {/* Main Content */}
-            <main className="flex-1 flex items-center justify-center p-6">
+            <main className="flex-1 flex items-center justify-center p-6 -mt-16">
                 <div className="w-full max-w-[400px]">
                     {/* Card */}
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
@@ -55,7 +70,7 @@ export default function LoginPage() {
                                     required
                                     autoComplete="email"
                                     disabled={loading || sent}
-                                    className="w-full p-4 rounded-xl border-2 border-slate-200 bg-white focus:bg-white focus:border-slate-900 transition-colors outline-none text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full p-4 rounded-xl border-2 border-slate-200 bg-white focus:bg-white focus:border-slate-900 transition-colors outline-none text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50"
                                 />
                             </div>
 
@@ -63,14 +78,13 @@ export default function LoginPage() {
                                 type="submit"
                                 disabled={loading || sent}
                                 className={`
-                                    w-full py-4 rounded-xl font-semibold text-base transition-all
+                                    w-full py-4 rounded-xl font-semibold text-base transition-all min-h-[56px]
                                     ${loading
-                                        ? 'bg-slate-700 text-white cursor-wait'
+                                        ? 'bg-slate-600 text-white cursor-wait'
                                         : sent
-                                            ? 'bg-green-600 text-white cursor-default'
+                                            ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
                                             : 'bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.98] active:bg-slate-950'
                                     }
-                                    disabled:opacity-90
                                 `}
                             >
                                 {loading ? (
@@ -81,16 +95,22 @@ export default function LoginPage() {
                                 ) : sent ? (
                                     <span className="flex items-center justify-center gap-2">
                                         <CheckCircle2 size={18} />
-                                        Email sent!
+                                        Email sent
                                     </span>
                                 ) : (
                                     'Send login link'
                                 )}
                             </button>
 
-                            {(message || sent) && (
+                            {sent && (
+                                <div className="p-4 bg-emerald-50 text-emerald-700 rounded-xl text-sm text-center border border-emerald-100">
+                                    Check your inbox for the login link.
+                                </div>
+                            )}
+
+                            {message && !sent && (
                                 <div className="p-4 bg-blue-50 text-blue-700 rounded-xl text-sm text-center">
-                                    {sent ? 'Check your email for the login link!' : message}
+                                    {message}
                                 </div>
                             )}
 
@@ -111,13 +131,6 @@ export default function LoginPage() {
                                 <p>Check your spam folder or contact support.</p>
                             </div>
                         )}
-                    </div>
-
-                    {/* Back link */}
-                    <div className="text-center mt-8">
-                        <Link href="/" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
-                            ← Back to home
-                        </Link>
                     </div>
                 </div>
             </main>
