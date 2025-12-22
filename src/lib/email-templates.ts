@@ -1,20 +1,14 @@
-import { Resend } from 'resend'
-
-// Lazy initialization of Resend client (only when API key is available)
-function getResendClient(): Resend | null {
-    if (!process.env.RESEND_API_KEY) {
-        return null
-    }
-    return new Resend(process.env.RESEND_API_KEY)
-}
-
-// Email sender address
-const FROM_EMAIL = process.env.FROM_EMAIL || 'RentVault <noreply@rentvault.com>'
+// ============================================================
+// EMAIL TEMPLATE GENERATORS (for preview and sending)
+// ============================================================
+// These functions generate HTML email content without sending.
+// Used by both the email sending functions and the preview route.
+// ============================================================
 
 // ============================================================
-// HTML EMAIL TEMPLATE (Supabase-inspired minimal design)
+// HTML EMAIL TEMPLATE (shared layout)
 // ============================================================
-function emailTemplate({
+export function emailTemplate({
     title,
     previewText,
     bodyContent,
@@ -150,88 +144,24 @@ function emailTemplate({
 }
 
 // ============================================================
-// SEND EMAIL
+// PDF EMAIL HTML
 // ============================================================
-interface SendEmailOptions {
-    to: string
-    subject: string
-    text: string
-    html?: string
-    tags?: { name: string; value: string }[]
-}
-
-export async function sendEmail({ to, subject, text, html, tags }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
-    const resend = getResendClient()
-
-    // If no API key, log to console (development mode)
-    if (!resend) {
-        console.log('========== EMAIL (dev mode) ==========')
-        console.log('To:', to)
-        console.log('Subject:', subject)
-        console.log('Tags:', tags)
-        console.log('Body:', text)
-        console.log('======================================')
-        return { success: true }
-    }
-
-    try {
-        const { error } = await resend.emails.send({
-            from: FROM_EMAIL,
-            to,
-            subject,
-            text,
-            html,
-            tags
-        })
-
-        if (error) {
-            console.error('Resend error:', error)
-            return { success: false, error: error.message }
-        }
-
-        return { success: true }
-    } catch (err: any) {
-        console.error('Email send error:', err)
-        return { success: false, error: err.message || 'Failed to send email' }
-    }
-}
-
-// ============================================================
-// PDF EMAIL
-// ============================================================
-export async function sendPdfEmail({
-    to,
+export function generatePdfEmailHtml({
     rentalLabel,
     packName,
     downloadUrl
 }: {
-    to: string
     rentalLabel: string
     packName: string
     downloadUrl: string
-}): Promise<{ success: boolean; error?: string }> {
+}): string {
     const formattedDate = new Date().toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'long',
         year: 'numeric'
     })
 
-    const subject = `[PDF] Your ${packName} is ready`
-
-    const text = `
-Your ${packName} for "${rentalLabel}" is ready.
-
-Download your PDF: ${downloadUrl}
-
-This link will expire in 1 hour. You can generate a new PDF anytime from RentVault.
-
-Generated on: ${formattedDate}
-
----
-RentVault securely stores and organises your rental documents. Not legal advice.
-    `.trim()
-
-    const html = emailTemplate({
+    return emailTemplate({
         title: `Your ${packName} is ready`,
         previewText: `Download your ${packName} for ${rentalLabel}`,
         bodyContent: `
@@ -242,21 +172,18 @@ RentVault securely stores and organises your rental documents. Not legal advice.
         ctaText: 'Download PDF',
         ctaUrl: downloadUrl
     })
-
-    return sendEmail({
-        to,
-        subject,
-        text,
-        html,
-        tags: [{ name: 'type', value: 'pdf' }]
-    })
 }
 
 // ============================================================
-// REMINDER CONFIRMATION EMAIL
+// REMINDER CONFIRMATION HTML
 // ============================================================
-export async function sendReminderConfirmationEmail({
-    to,
+function getOrdinalSuffix(n: number): string {
+    const s = ['th', 'st', 'nd', 'rd']
+    const v = n % 100
+    return s[(v - 20) % 10] || s[v] || s[0]
+}
+
+export function generateReminderConfirmationHtml({
     type,
     rentalLabel,
     date,
@@ -264,14 +191,13 @@ export async function sendReminderConfirmationEmail({
     noticeMethod,
     dueDay
 }: {
-    to: string
     type: 'termination_notice' | 'rent_payment'
     rentalLabel: string
     date: string
     offsets: number[]
     noticeMethod?: string
     dueDay?: string
-}): Promise<{ success: boolean; error?: string }> {
+}): string {
     const offsetText = offsets
         .sort((a, b) => b - a)
         .map(d => d === 0 ? 'on the due date' : `${d} days before`)
@@ -283,13 +209,10 @@ export async function sendReminderConfirmationEmail({
         year: 'numeric'
     })
 
-    let subject: string
     let title: string
     let bodyContent: string
-    let text: string
 
     if (type === 'termination_notice') {
-        subject = '[Reminder] Termination reminder scheduled'
         title = 'You\'re all set'
         bodyContent = `
             <p style="margin: 0 0 16px 0;">We'll remind you if action is needed to terminate your rental contract.</p>
@@ -311,9 +234,7 @@ export async function sendReminderConfirmationEmail({
             </table>
             <p style="margin: 0; font-size: 13px; color: #64748b;">You can change or disable this reminder anytime in RentVault.</p>
         `
-        text = `You're all set.\n\nWe'll remind you if action is needed to terminate your rental contract.\n\nContract: ${rentalLabel}\nNotice deadline: ${formattedDate}\nYou'll be notified: ${offsetText}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else {
-        subject = '[Reminder] Rent payment reminder scheduled'
         title = 'Reminder active'
         const dueDateText = dueDay ? `${dueDay}${getOrdinalSuffix(parseInt(dueDay))} of each month` : formattedDate
         bodyContent = `
@@ -332,42 +253,31 @@ export async function sendReminderConfirmationEmail({
             </table>
             <p style="margin: 0; font-size: 13px; color: #64748b;">You can change or disable this reminder anytime in RentVault.</p>
         `
-        text = `Reminder active.\n\nYour rent payment reminder is now active.\n\nContract: ${rentalLabel}\nRent due: ${dueDateText}\nYou'll be notified: ${offsetText}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     }
 
-    const html = emailTemplate({
+    return emailTemplate({
         title,
         previewText: `${type === 'termination_notice' ? 'Termination' : 'Rent'} reminder set for ${rentalLabel}`,
         bodyContent
     })
-
-    return sendEmail({
-        to,
-        subject,
-        text,
-        html,
-        tags: [{ name: 'type', value: 'reminder' }]
-    })
 }
 
 // ============================================================
-// DEADLINE REMINDER EMAIL (actual notification)
+// DEADLINE REMINDER HTML
 // ============================================================
-export async function sendDeadlineReminderEmail({
-    to,
+export function generateDeadlineReminderHtml({
     type,
     rentalLabel,
     date,
     daysUntil,
     noticeMethod
 }: {
-    to: string
     type: 'termination_notice' | 'rent_payment'
     rentalLabel: string
     date: string
     daysUntil: number
     noticeMethod?: string
-}): Promise<{ success: boolean; error?: string }> {
+}): string {
     const formattedDate = new Date(date).toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'long',
@@ -380,13 +290,10 @@ export async function sendDeadlineReminderEmail({
 
     const urgencyColor = daysUntil <= 7 ? '#dc2626' : '#f59e0b'
 
-    let subject: string
     let title: string
     let bodyContent: string
-    let text: string
 
     if (type === 'termination_notice') {
-        subject = `[Reminder] Notice deadline ${urgency}`
         title = `Notice deadline ${urgency}`
         bodyContent = `
             <p style="margin: 0 0 16px 0;">Your termination notice deadline is approaching.</p>
@@ -412,9 +319,7 @@ export async function sendDeadlineReminderEmail({
             </table>
             <p style="margin: 0; font-size: 13px; color: #64748b;">If you wish to terminate the contract, make sure to send your notice before this date.</p>
         `
-        text = `Notice deadline ${urgency}\n\nYour termination notice deadline is approaching.\n\nDeadline: ${formattedDate}\nContract: ${rentalLabel}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\nIf you wish to terminate the contract, make sure to send your notice before this date.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else {
-        subject = `[Reminder] Rent due ${urgency}`
         title = `Rent due ${urgency}`
         bodyContent = `
             <p style="margin: 0 0 16px 0;">Your rent payment is due soon.</p>
@@ -435,46 +340,29 @@ export async function sendDeadlineReminderEmail({
                 </tr>
             </table>
         `
-        text = `Rent due ${urgency}\n\nYour rent payment is due soon.\n\nDue date: ${formattedDate}\nContract: ${rentalLabel}\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     }
 
-    const html = emailTemplate({
+    return emailTemplate({
         title,
         previewText: `${type === 'termination_notice' ? 'Notice' : 'Rent'} deadline ${urgency} for ${rentalLabel}`,
         bodyContent
     })
-
-    return sendEmail({
-        to,
-        subject,
-        text,
-        html,
-        tags: [{ name: 'type', value: 'reminder' }]
-    })
-}
-
-function getOrdinalSuffix(n: number): string {
-    const s = ['th', 'st', 'nd', 'rd']
-    const v = n % 100
-    return s[(v - 20) % 10] || s[v] || s[0]
 }
 
 // ============================================================
-// RETENTION WARNING EMAIL (30 days before data expiry)
+// RETENTION WARNING HTML
 // ============================================================
-export async function sendRetentionWarningEmail({
-    to,
+export function generateRetentionWarningHtml({
     rentalLabel,
     caseId,
     expiryDate,
     daysUntil
 }: {
-    to: string
     rentalLabel: string
     caseId: string
     expiryDate: string
     daysUntil: number
-}): Promise<{ success: boolean; error?: string }> {
+}): string {
     const formattedDate = new Date(expiryDate).toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'long',
@@ -483,9 +371,6 @@ export async function sendRetentionWarningEmail({
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
     const settingsUrl = `${siteUrl}/vault/case/${caseId}/settings`
-
-    const subject = `Your rental data expires ${daysUntil <= 7 ? 'soon' : `in ${daysUntil} days`}`
-    const title = 'Storage expiry reminder'
 
     const bodyContent = `
         <p style="margin: 0 0 16px 0;">Your documents for <strong>"${rentalLabel}"</strong> will be permanently deleted on <strong>${formattedDate}</strong>.</p>
@@ -509,68 +394,11 @@ export async function sendRetentionWarningEmail({
         <p style="margin: 0; font-size: 13px; color: #64748b;">After the expiry date, all photos, documents, and data for this rental will be permanently deleted and cannot be recovered.</p>
     `
 
-    const text = `Storage expiry reminder
-
-Your documents for "${rentalLabel}" will be permanently deleted on ${formattedDate}.
-
-You have two options:
-- Extend storage for another 12 months for €9
-- Download your files and let the data expire
-
-After the expiry date, all photos, documents, and data for this rental will be permanently deleted and cannot be recovered.
-
-Manage your rental: ${settingsUrl}
-
----
-RentVault securely stores and organises your rental documents. Not legal advice.`
-
-    const html = emailTemplate({
-        title,
+    return emailTemplate({
+        title: 'Storage expiry reminder',
         previewText: `Your rental data expires ${formattedDate}`,
         bodyContent,
         ctaText: 'Manage storage',
         ctaUrl: settingsUrl
-    })
-
-    return sendEmail({
-        to,
-        subject,
-        text,
-        html,
-        tags: [{ name: 'type', value: 'reminder' }]
-    })
-}
-
-// ============================================================
-// MAGIC LINK EMAIL
-// ============================================================
-export async function sendMagicLinkEmail(to: string, magicLink: string): Promise<{ success: boolean; error?: string }> {
-    const subject = 'Your RentVault login link'
-
-    const bodyContent = `
-        \u003cp style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6;\u003e
-            Click the button below to securely sign in to your RentVault account. This link will expire in 1 hour.
-        \u003c/p\u003e
-        \u003cp style="margin: 24px 0 0 0; font-size: 14px; color: #64748b; line-height: 1.6;\u003e
-            If you didn't request this email, you can safely ignore it.
-        \u003c/p\u003e
-    `
-
-    const text = `Sign in to RentVault\n\nClick this link to securely sign in to your account:\n${magicLink}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this email, you can safely ignore it.`
-
-    const html = emailTemplate({
-        title: 'Sign in to RentVault',
-        previewText: 'Your secure login link is ready',
-        bodyContent,
-        ctaText: 'Sign in to RentVault',
-        ctaUrl: magicLink
-    })
-
-    return sendEmail({
-        to,
-        subject,
-        text,
-        html,
-        tags: [{ name: 'type', value: 'magic-link' }]
     })
 }
