@@ -11,6 +11,7 @@ import { Lightbox } from '@/components/ui/Lightbox'
 import Link from 'next/link'
 import { PhotoComparison } from '@/components/features/PhotoComparison'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
+import { Footer } from '@/components/layout/Footer'
 
 interface EvidenceState {
     checkinPhotos: number
@@ -645,9 +646,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             )}
 
             {/* Disclaimer */}
-            <p className="text-xs text-slate-400 text-center pt-4">
-                RentVault securely stores and organises your rental documents. Not legal advice.
-            </p>
+
         </div>
     )
 }

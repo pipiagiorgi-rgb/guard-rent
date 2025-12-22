@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Logo } from '@/components/brand/Logo'
+import { Footer } from '@/components/layout/Footer'
 
 export default function GuidesLayout({
     children,
@@ -26,16 +27,8 @@ export default function GuidesLayout({
                 </div>
             </header>
             {children}
-            <footer className="border-t border-slate-100 py-8 mt-16">
-                <div className="max-w-[800px] mx-auto px-4 md:px-6 text-center text-sm text-slate-500">
-                    <p>RentVault securely stores and organises your rental documents. Not legal advice.</p>
-                    <div className="flex justify-center gap-6 mt-4">
-                        <Link href="/privacy" className="hover:text-slate-900">Privacy</Link>
-                        <Link href="/terms" className="hover:text-slate-900">Terms</Link>
-                        <Link href="/pricing" className="hover:text-slate-900">Pricing</Link>
-                    </div>
-                </div>
-            </footer>
+            {children}
+            <Footer />
         </div>
     )
 }

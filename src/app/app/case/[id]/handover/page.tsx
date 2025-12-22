@@ -838,10 +838,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 )}
             </div>
 
-            {/* Disclaimer */}
-            <p className="text-xs text-slate-400 text-center">
-                RentVault securely stores and organises your rental documents. Not legal advice.
-            </p>
+
         </div>
     )
 }

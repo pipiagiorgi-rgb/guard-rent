@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
     title: 'Privacy Policy | RentVault',
@@ -136,15 +137,7 @@ export default function PrivacyPage() {
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-slate-100 py-8">
-                <div className="max-w-[720px] mx-auto px-4 md:px-6 text-center text-sm text-slate-500">
-                    <p>RentVault securely stores and organises your rental documents. Not legal advice.</p>
-                    <div className="flex justify-center gap-6 mt-4">
-                        <Link href="/" className="hover:text-slate-900 transition-colors">Home</Link>
-                        <Link href="/terms" className="hover:text-slate-900 transition-colors">Terms</Link>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     )
 }

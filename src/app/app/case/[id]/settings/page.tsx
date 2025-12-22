@@ -6,6 +6,7 @@ import {
     Shield, Trash2, AlertTriangle, Lock,
     Clock, FileText, Loader2, Check
 } from 'lucide-react'
+import { Footer } from '@/components/layout/Footer'
 import { useRouter } from 'next/navigation'
 
 interface DataState {
@@ -348,10 +349,7 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                 </div>
             )}
 
-            {/* Disclaimer */}
-            <p className="text-xs text-slate-400 text-center pt-4">
-                RentVault securely stores and organises your rental documents. Not legal advice.
-            </p>
+
         </div>
     )
 }

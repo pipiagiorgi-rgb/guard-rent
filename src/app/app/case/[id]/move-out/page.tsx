@@ -1,4 +1,5 @@
 import { ClipboardList, Camera, Key, AlertCircle } from 'lucide-react'
+import { Footer } from '@/components/layout/Footer'
 
 export default function MoveOutPage() {
     const checklistItems = [
@@ -40,9 +41,7 @@ export default function MoveOutPage() {
             </div>
 
             {/* Compact disclaimer */}
-            <p className="text-xs text-slate-400 text-center pt-4">
-                RentVault securely stores and organises your rental documents. Not legal advice.
-            </p>
+
         </div>
     )
 }

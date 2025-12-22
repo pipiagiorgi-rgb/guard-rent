@@ -30,7 +30,7 @@ export default async function AppLayout({
                 <div className="max-w-[1200px] mx-auto px-6 md:px-8">
                     <div className="h-16 flex items-center justify-between">
                         <Link href="/app" className="flex items-center">
-                            <Logo size="sm" />
+                            <Logo height={32} />
                         </Link>
 
                         <div className="flex items-center gap-4">

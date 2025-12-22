@@ -31,6 +31,8 @@ export async function login(formData: FormData) {
         origin = 'https://rentvault.ai';
     }
 
+    console.log('[DEBUG] Magic link config:', { origin, emailRedirectTo: `${origin}/auth/callback`, vercelUrl, siteUrl });
+
     const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {

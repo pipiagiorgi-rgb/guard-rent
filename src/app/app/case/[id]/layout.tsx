@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import CaseSidebar from '@/components/layout/CaseSidebar'
+import { Footer } from '@/components/layout/Footer'
 
 export default async function CaseLayout({
     children,
@@ -27,6 +28,7 @@ export default async function CaseLayout({
             <CaseSidebar caseId={rentalCase.case_id} caseLabel={rentalCase.label} />
             <div className="min-w-0">
                 {children}
+                <Footer />
             </div>
         </div>
     )

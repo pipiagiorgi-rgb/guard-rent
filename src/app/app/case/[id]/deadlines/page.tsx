@@ -332,9 +332,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                         <div>
                             <h2 className="font-semibold text-lg text-slate-900">Rent payments</h2>
                             <p className="text-slate-500 text-sm mt-1">
-                                {contractData?.rent_amount?.value
-                                    ? `Rent of ${contractData.rent_amount.value} is due monthly.`
-                                    : 'Recieve monthly reminders to pay your rent.'}
+                                {'Receive monthly reminders to pay your rent.'}
                             </p>
                         </div>
                     </div>
@@ -411,9 +409,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                 </div>
             </div>
 
-            <p className="text-center text-xs text-slate-400 pt-8">
-                RentVault securely stores and organises your rental documents. Not legal advice.
-            </p>
+
         </div>
     )
 }

@@ -103,7 +103,7 @@ export async function POST(request: Request) {
         })
 
         // Footer - Disclaimer
-        page.drawText('RentVault securely stores and organises your rental documents. Not legal advice.', {
+        page.drawText('© RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.', {
             x: 50,
             y: 40,
             size: 10,

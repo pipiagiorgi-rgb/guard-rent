@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Plus, ChevronRight } from 'lucide-react'
 import { formatCountryWithCode } from '@/lib/countries'
 import { UnpaidRentalBanner } from '@/components/upgrade/UnpaidRentalBanner'
+import { Footer } from '@/components/layout/Footer'
 
 // Helper to format country for display (handles custom countries)
 function formatCountry(code: string | null): string {
@@ -82,7 +83,7 @@ export default async function MyRentalsPage() {
                                         </span>
                                     </div>
                                     <p className="text-slate-500 text-sm">
-                                        {formatCountry(rental.country)} · Created {new Date(rental.created_at).toLocaleDateString()}
+                                        {formatCountry(rental.country)} · <span className="text-slate-400">Created {new Date(rental.created_at).toLocaleDateString()}</span>
                                     </p>
                                 </div>
                                 <ChevronRight className="text-slate-400 group-hover:text-slate-600 transition-colors flex-shrink-0" size={20} />
@@ -92,10 +93,8 @@ export default async function MyRentalsPage() {
                 </div>
             )}
 
-            {/* Footer disclaimer */}
-            <p className="text-xs text-slate-400 text-center mt-8">
-                RentVault securely stores and organises your rental documents. Not legal advice.
-            </p>
+            {/* Footer */}
+            <Footer />
         </div>
     )
 }

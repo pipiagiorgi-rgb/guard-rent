@@ -1,15 +1,18 @@
 'use client'
 
+
 import { useState } from 'react'
 import { login } from './actions'
 import Link from 'next/link'
 import { Loader2, CheckCircle2, ArrowLeft } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { Logo } from '@/components/brand/Logo'
+import { Footer } from '@/components/layout/Footer' // Added Footer import
 
 export default function LoginPage() {
     const [loading, setLoading] = useState(false)
     const [sent, setSent] = useState(false)
+    const [canRetry, setCanRetry] = useState(false)
     const searchParams = useSearchParams()
     const message = searchParams.get('message')
     const error = searchParams.get('error')
@@ -18,17 +21,30 @@ export default function LoginPage() {
         e.preventDefault()
         setLoading(true)
         setSent(false)
+        setCanRetry(false)
 
         const formData = new FormData(e.currentTarget)
 
         try {
             await login(formData)
             // If we get here, it was successful
+            setLoading(false)
             setSent(true)
+
+            // Start timer for retry option
+            setTimeout(() => {
+                setCanRetry(true)
+            }, 15000) // 15 seconds
         } catch (err) {
-            // Error will be shown via redirect
+            // Error will be shown via redirect usually, but safe to reset if needed
             setLoading(false)
         }
+    }
+
+    // Reset handler for "Send again"
+    const handleRetry = () => {
+        setSent(false)
+        setCanRetry(false)
     }
 
     return (
@@ -36,14 +52,14 @@ export default function LoginPage() {
             {/* Header with Logo */}
             <header className="p-6 flex items-center justify-between">
                 <Link href="/" className="flex items-center">
-                    <Logo size="sm" />
+                    <Logo height={32} />
                 </Link>
                 <Link
                     href="/"
-                    className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors"
+                    className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors font-medium"
                 >
                     <ArrowLeft size={16} />
-                    Back
+                    Back to RentVault
                 </Link>
             </header>
 
@@ -53,7 +69,7 @@ export default function LoginPage() {
                     {/* Card */}
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                         <div className="text-center mb-8">
-                            <h1 className="text-2xl font-bold mb-2">Sign in to RentVault</h1>
+                            <h1 className="text-2xl font-bold mb-2 text-slate-900">Sign in to RentVault</h1>
                             <p className="text-slate-600">
                                 Enter your email and we'll send you a secure login link.
                             </p>
@@ -70,7 +86,7 @@ export default function LoginPage() {
                                     required
                                     autoComplete="email"
                                     disabled={loading || sent}
-                                    className="w-full p-4 rounded-xl border-2 border-slate-200 bg-white focus:bg-white focus:border-slate-900 transition-colors outline-none text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50"
+                                    className="w-full p-4 rounded-xl border-2 border-slate-200 bg-white focus:bg-white focus:border-slate-900 transition-colors outline-none text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50 text-slate-900 placeholder:text-slate-400"
                                 />
                             </div>
 
@@ -78,23 +94,23 @@ export default function LoginPage() {
                                 type="submit"
                                 disabled={loading || sent}
                                 className={`
-                                    w-full py-4 rounded-xl font-semibold text-base transition-all min-h-[56px]
+                                    w-full py-4 rounded-xl font-semibold text-base transition-all min-h-[56px] flex items-center justify-center
                                     ${loading
-                                        ? 'bg-slate-600 text-white cursor-wait'
+                                        ? 'bg-slate-700 text-white cursor-wait'
                                         : sent
-                                            ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                                            : 'bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.98] active:bg-slate-950'
+                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100 cursor-default'
+                                            : 'bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.98] active:bg-slate-950 shadow-md hover:shadow-lg'
                                     }
                                 `}
                             >
                                 {loading ? (
                                     <span className="flex items-center justify-center gap-2">
-                                        <Loader2 className="animate-spin" size={18} />
+                                        <Loader2 className="animate-spin" size={20} />
                                         Sending...
                                     </span>
                                 ) : sent ? (
                                     <span className="flex items-center justify-center gap-2">
-                                        <CheckCircle2 size={18} />
+                                        <CheckCircle2 size={20} />
                                         Email sent
                                     </span>
                                 ) : (
@@ -102,12 +118,16 @@ export default function LoginPage() {
                                 )}
                             </button>
 
+                            {/* Success Message Area */}
                             {sent && (
-                                <div className="p-4 bg-emerald-50 text-emerald-700 rounded-xl text-sm text-center border border-emerald-100">
-                                    Check your inbox for the login link.
+                                <div className="text-center space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <p className="text-slate-600">
+                                        Check your inbox for the secure login link.
+                                    </p>
                                 </div>
                             )}
 
+                            {/* Error Messages */}
                             {message && !sent && (
                                 <div className="p-4 bg-blue-50 text-blue-700 rounded-xl text-sm text-center">
                                     {message}
@@ -115,7 +135,7 @@ export default function LoginPage() {
                             )}
 
                             {error && (
-                                <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm text-center">
+                                <div className="p-4 bg-red-50 text-red-700 rounded-xl text-sm text-center flex items-center justify-center gap-2">
                                     {error}
                                 </div>
                             )}
@@ -125,15 +145,33 @@ export default function LoginPage() {
                             Passwordless login. No password to remember.
                         </p>
 
-                        {sent && (
-                            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
-                                <p className="font-medium mb-1">Not receiving emails?</p>
-                                <p>Check your spam folder or contact support.</p>
+                        {/* Retry Option (Delayed) */}
+                        {sent && canRetry && (
+                            <div className="mt-6 pt-6 border-t border-slate-100 text-center animate-in fade-in duration-500">
+                                <p className="text-sm text-slate-500 mb-2">Didn't receive it?</p>
+                                <button async
+                                    onClick={handleRetry}
+                                    className="text-sm font-medium text-slate-900 hover:text-slate-700 underline underline-offset-4"
+                                >
+                                    Send again
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Immediate Help (Pre-retry) */}
+                        {sent && !canRetry && (
+                            <div className="mt-8 text-center">
+                                <p className="text-xs text-slate-400">
+                                    Taking too long? Check your spam folder.
+                                </p>
                             </div>
                         )}
                     </div>
                 </div>
             </main>
+
+            {/* Footer */}
+            <Footer />
         </div>
     )
 }

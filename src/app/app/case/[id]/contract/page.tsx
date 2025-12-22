@@ -36,9 +36,6 @@ export default async function ContractPage({ params }: { params: { id: string } 
                     <Info size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
                     <div>
                         <p className="text-sm text-blue-800 font-medium">Preview mode</p>
-                        <p className="text-xs text-blue-700 mt-0.5">
-                            You can try RentVault for free. Buy a pack to save your data permanently.
-                        </p>
                     </div>
                 </div>
             )}
@@ -46,9 +43,7 @@ export default async function ContractPage({ params }: { params: { id: string } 
             <ContractScanClient caseId={params.id} hasPurchasedPack={hasPurchasedPack} />
 
             {/* Compact disclaimer */}
-            <p className="text-xs text-slate-400 text-center pt-4">
-                RentVault securely stores and organises your rental documents. Not legal advice.
-            </p>
+
         </div>
     )
 }

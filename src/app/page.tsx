@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FileText, Clock, Lock, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check } from 'lucide-react'
+import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
     title: 'RentVault | Protect Your Rental Deposit',
@@ -277,25 +278,8 @@ export default function Home() {
             </section>
 
             {/* Footer */}
-            <footer className="py-10 border-t border-slate-100 mt-auto bg-slate-50">
-                <div className="max-w-[1120px] mx-auto px-4 md:px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-6">
-                        <div className="flex flex-col items-center md:items-start gap-2">
-                            <span className="text-lg font-bold text-slate-900">RentVault</span>
-                            <span className="text-slate-500 text-sm text-center md:text-left max-w-md">
-                                RentVault securely stores and organises your rental documents. Not legal advice.
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-6 text-sm">
-                            <Link href="/privacy" className="text-slate-500 hover:text-slate-900 transition-colors font-medium">Privacy</Link>
-                            <Link href="/terms" className="text-slate-500 hover:text-slate-900 transition-colors font-medium">Terms</Link>
-                        </div>
-                    </div>
-                    <div className="text-center mt-8 pt-6 border-t border-slate-200">
-                        <span className="text-sm text-slate-400">© 2025 RentVault. All rights reserved.</span>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     )
 }
+

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Calendar, MapPin, Clock, ChevronRight } from 'lucide-react'
 import { formatCountryWithCode } from '@/lib/countries'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
+import { Footer } from '@/components/layout/Footer'
 
 // Helper to format country for display (handles custom countries)
 function formatCountry(code: string | null): string {
@@ -69,7 +70,7 @@ export default async function CaseOverviewPage({ params }: { params: { id: strin
 
                 <div className="bg-white p-5 rounded-xl border border-slate-200 sm:col-span-2 lg:col-span-1">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600">
+                        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
                             <Clock size={20} />
                         </div>
                         <span className="text-sm font-medium text-slate-500">Created</span>
@@ -129,9 +130,7 @@ export default async function CaseOverviewPage({ params }: { params: { id: strin
             </div>
 
             {/* Compact footer disclaimer */}
-            <p className="text-xs text-slate-400 text-center pt-4">
-                RentVault securely stores and organises your rental documents. Not legal advice.
-            </p>
+
         </div>
     )
 }
