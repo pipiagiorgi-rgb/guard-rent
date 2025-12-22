@@ -5,7 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import {
     FileText, Camera, Download, Lock, Check,
     Loader2, Calendar, Shield, AlertCircle,
-    ChevronRight, Eye, Mail, CheckCircle2
+    ChevronRight, Eye, Mail, CheckCircle2,
+    ChevronDown, ChevronUp, PenLine, Star, X
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import Link from 'next/link'
@@ -27,6 +28,14 @@ interface PhotoAsset {
     src: string
     caption: string
     subcaption: string
+}
+
+interface CustomSection {
+    personalNotes: string
+    propertyReview: string
+    propertyRating: number
+    customTitle: string
+    customContent: string
 }
 
 export default function ExportsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -55,6 +64,22 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const [emailing, setEmailing] = useState(false)
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
+
+    // PDF Customization State
+    const [showCustomize, setShowCustomize] = useState<string | null>(null) // 'checkin_pack' | 'deposit_pack' | null
+    const [customSections, setCustomSections] = useState<CustomSection>({
+        personalNotes: '',
+        propertyReview: '',
+        propertyRating: 0,
+        customTitle: '',
+        customContent: ''
+    })
+
+    // PDF Preview State
+    const [previewOpen, setPreviewOpen] = useState(false)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const [previewType, setPreviewType] = useState<string | null>(null)
+    const [previewing, setPreviewing] = useState<string | null>(null)
 
     useEffect(() => {
         async function load() {
@@ -210,25 +235,43 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         }
     }
 
-    const handleGenerate = async (packType: string) => {
-        setGenerating(packType)
-        setLastGeneratedPdf(null) // Reset previous
+    const handleGenerate = async (packType: string, forPreview = false) => {
+        if (forPreview) {
+            setPreviewing(packType)
+        } else {
+            setGenerating(packType)
+        }
+        setLastGeneratedPdf(null)
+
         try {
             const endpoint = packType === 'checkin_pack'
                 ? '/api/pdf/checkin-report'
                 : '/api/pdf/deposit-pack'
 
+            // Include custom sections if any are filled
+            const hasCustomContent = customSections.personalNotes ||
+                customSections.propertyReview ||
+                customSections.customContent
+
             const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ caseId })
+                body: JSON.stringify({
+                    caseId,
+                    customSections: hasCustomContent ? customSections : undefined,
+                    forPreview
+                })
             })
 
             if (!res.ok) throw new Error('Generation failed')
             const { url } = await res.json()
-            if (url) {
+
+            if (forPreview && url) {
+                setPreviewUrl(url)
+                setPreviewType(packType)
+                setPreviewOpen(true)
+            } else if (url) {
                 window.open(url, '_blank')
-                // Track for email option (only for paid packs)
                 const hasPack = packType === 'checkin_pack' ? hasCheckinPack : hasDepositPack
                 if (hasPack) {
                     setLastGeneratedPdf({ type: packType, url })
@@ -238,7 +281,18 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             console.error('Generate error:', err)
         } finally {
             setGenerating(null)
+            setPreviewing(null)
         }
+    }
+
+    const handlePreview = (packType: string) => {
+        handleGenerate(packType, true)
+    }
+
+    const closePreview = () => {
+        setPreviewOpen(false)
+        setPreviewUrl(null)
+        setPreviewType(null)
     }
 
     const handleEmailPdf = async () => {
@@ -301,6 +355,57 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 onClose={() => setLightboxOpen(false)}
                 images={lightboxImages}
             />
+
+            {/* PDF Preview Modal */}
+            {previewOpen && previewUrl && (
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between p-4 border-b border-slate-200">
+                            <div>
+                                <h3 className="font-semibold text-lg">PDF Preview</h3>
+                                <p className="text-sm text-slate-500">
+                                    {previewType === 'checkin_pack' ? 'Check-in Pack' : 'Deposit Recovery Pack'}
+                                </p>
+                            </div>
+                            <button
+                                onClick={closePreview}
+                                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* PDF Viewer */}
+                        <div className="flex-1 bg-slate-100 overflow-auto">
+                            <iframe
+                                src={previewUrl}
+                                className="w-full h-full"
+                                title="PDF Preview"
+                            />
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="flex items-center justify-between p-4 border-t border-slate-200 bg-slate-50">
+                            <button
+                                onClick={closePreview}
+                                className="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
+                            >
+                                ← Back to customize
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (previewUrl) window.open(previewUrl, '_blank')
+                                }}
+                                className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center gap-2"
+                            >
+                                <Download size={18} />
+                                Download PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div>
                 <h1 className="text-2xl font-bold mb-1">Your evidence</h1>
@@ -499,39 +604,156 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                 </div>
                             </div>
 
-                            {hasCheckinPack ? (
-                                <button
-                                    onClick={() => handleGenerate('checkin_pack')}
-                                    disabled={generating === 'checkin_pack'}
-                                    className="w-full py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
-                                >
-                                    {generating === 'checkin_pack' ? (
-                                        <Loader2 className="animate-spin" size={20} />
-                                    ) : (
-                                        <>
-                                            <Download size={20} />
-                                            Download PDF
-                                        </>
+                            {/* Customize PDF Section */}
+                            {canUnlockCheckin && (
+                                <div className="mb-4">
+                                    <button
+                                        onClick={() => setShowCustomize(showCustomize === 'checkin_pack' ? null : 'checkin_pack')}
+                                        className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                                    >
+                                        <PenLine size={16} />
+                                        Customize PDF
+                                        {showCustomize === 'checkin_pack' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                    </button>
+
+                                    {showCustomize === 'checkin_pack' && (
+                                        <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-4">
+                                            {/* Personal Notes */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                    Personal notes
+                                                </label>
+                                                <textarea
+                                                    value={customSections.personalNotes}
+                                                    onChange={(e) => setCustomSections(prev => ({ ...prev, personalNotes: e.target.value }))}
+                                                    placeholder="Any additional notes you'd like to include..."
+                                                    rows={2}
+                                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+                                            </div>
+
+                                            {/* Property Review */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                    Property review (optional)
+                                                </label>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <button
+                                                            key={star}
+                                                            type="button"
+                                                            onClick={() => setCustomSections(prev => ({ ...prev, propertyRating: star }))}
+                                                            className="focus:outline-none"
+                                                        >
+                                                            <Star
+                                                                size={20}
+                                                                className={star <= customSections.propertyRating
+                                                                    ? 'text-amber-400 fill-amber-400'
+                                                                    : 'text-slate-300'}
+                                                            />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <textarea
+                                                    value={customSections.propertyReview}
+                                                    onChange={(e) => setCustomSections(prev => ({ ...prev, propertyReview: e.target.value }))}
+                                                    placeholder="Your experience with this property..."
+                                                    rows={2}
+                                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+                                            </div>
+
+                                            {/* Custom Section */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                    Custom section (optional)
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={customSections.customTitle}
+                                                    onChange={(e) => setCustomSections(prev => ({ ...prev, customTitle: e.target.value }))}
+                                                    placeholder="Section title..."
+                                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm mb-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+                                                <textarea
+                                                    value={customSections.customContent}
+                                                    onChange={(e) => setCustomSections(prev => ({ ...prev, customContent: e.target.value }))}
+                                                    placeholder="Section content..."
+                                                    rows={2}
+                                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+                                            </div>
+                                        </div>
                                     )}
-                                </button>
-                            ) : canUnlockCheckin ? (
-                                <div className="space-y-2">
+                                </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            {hasCheckinPack ? (
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => handlePreview('checkin_pack')}
+                                        disabled={previewing === 'checkin_pack'}
+                                        className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
+                                    >
+                                        {previewing === 'checkin_pack' ? (
+                                            <Loader2 className="animate-spin" size={20} />
+                                        ) : (
+                                            <>
+                                                <Eye size={20} />
+                                                Preview
+                                            </>
+                                        )}
+                                    </button>
                                     <button
                                         onClick={() => handleGenerate('checkin_pack')}
                                         disabled={generating === 'checkin_pack'}
-                                        className="w-full py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
+                                        className="flex-1 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
                                     >
                                         {generating === 'checkin_pack' ? (
                                             <Loader2 className="animate-spin" size={20} />
                                         ) : (
                                             <>
                                                 <Download size={20} />
-                                                Preview PDF (Free)
+                                                Download
                                             </>
                                         )}
                                     </button>
+                                </div>
+                            ) : canUnlockCheckin ? (
+                                <div className="space-y-3">
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => handlePreview('checkin_pack')}
+                                            disabled={previewing === 'checkin_pack'}
+                                            className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
+                                        >
+                                            {previewing === 'checkin_pack' ? (
+                                                <Loader2 className="animate-spin" size={20} />
+                                            ) : (
+                                                <>
+                                                    <Eye size={20} />
+                                                    Preview
+                                                </>
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={() => handlePurchase('checkin_pack', 1900)}
+                                            disabled={purchasing === 'checkin_pack'}
+                                            className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
+                                        >
+                                            {purchasing === 'checkin_pack' ? (
+                                                <Loader2 className="animate-spin" size={20} />
+                                            ) : (
+                                                <>
+                                                    <Download size={20} />
+                                                    Buy & Download
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
                                     <p className="text-xs text-slate-400 text-center">
-                                        Full purchase enables watermark-free downloads
+                                        Preview is free • Purchase for watermark-free PDF
                                     </p>
                                 </div>
                             ) : (
@@ -580,39 +802,156 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                 </div>
                             </div>
 
-                            {hasDepositPack ? (
-                                <button
-                                    onClick={() => handleGenerate('deposit_pack')}
-                                    disabled={generating === 'deposit_pack'}
-                                    className="w-full py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
-                                >
-                                    {generating === 'deposit_pack' ? (
-                                        <Loader2 className="animate-spin" size={20} />
-                                    ) : (
-                                        <>
-                                            <Download size={20} />
-                                            Download PDF
-                                        </>
+                            {/* Customize PDF Section */}
+                            {canUnlockDeposit && (
+                                <div className="mb-4">
+                                    <button
+                                        onClick={() => setShowCustomize(showCustomize === 'deposit_pack' ? null : 'deposit_pack')}
+                                        className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
+                                    >
+                                        <PenLine size={16} />
+                                        Customize PDF
+                                        {showCustomize === 'deposit_pack' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                    </button>
+
+                                    {showCustomize === 'deposit_pack' && (
+                                        <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-4">
+                                            {/* Personal Notes */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                    Personal notes
+                                                </label>
+                                                <textarea
+                                                    value={customSections.personalNotes}
+                                                    onChange={(e) => setCustomSections(prev => ({ ...prev, personalNotes: e.target.value }))}
+                                                    placeholder="Any additional notes for the dispute record..."
+                                                    rows={2}
+                                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                />
+                                            </div>
+
+                                            {/* Property Review */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                    Property review (optional)
+                                                </label>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <button
+                                                            key={star}
+                                                            type="button"
+                                                            onClick={() => setCustomSections(prev => ({ ...prev, propertyRating: star }))}
+                                                            className="focus:outline-none"
+                                                        >
+                                                            <Star
+                                                                size={20}
+                                                                className={star <= customSections.propertyRating
+                                                                    ? 'text-amber-400 fill-amber-400'
+                                                                    : 'text-slate-300'}
+                                                            />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <textarea
+                                                    value={customSections.propertyReview}
+                                                    onChange={(e) => setCustomSections(prev => ({ ...prev, propertyReview: e.target.value }))}
+                                                    placeholder="Your overall experience with this property..."
+                                                    rows={2}
+                                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                />
+                                            </div>
+
+                                            {/* Custom Section */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                    Custom section (optional)
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={customSections.customTitle}
+                                                    onChange={(e) => setCustomSections(prev => ({ ...prev, customTitle: e.target.value }))}
+                                                    placeholder="Section title..."
+                                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm mb-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                />
+                                                <textarea
+                                                    value={customSections.customContent}
+                                                    onChange={(e) => setCustomSections(prev => ({ ...prev, customContent: e.target.value }))}
+                                                    placeholder="Section content..."
+                                                    rows={2}
+                                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                />
+                                            </div>
+                                        </div>
                                     )}
-                                </button>
-                            ) : canUnlockDeposit ? (
-                                <div className="space-y-2">
+                                </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            {hasDepositPack ? (
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => handlePreview('deposit_pack')}
+                                        disabled={previewing === 'deposit_pack'}
+                                        className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
+                                    >
+                                        {previewing === 'deposit_pack' ? (
+                                            <Loader2 className="animate-spin" size={20} />
+                                        ) : (
+                                            <>
+                                                <Eye size={20} />
+                                                Preview
+                                            </>
+                                        )}
+                                    </button>
                                     <button
                                         onClick={() => handleGenerate('deposit_pack')}
                                         disabled={generating === 'deposit_pack'}
-                                        className="w-full py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
+                                        className="flex-1 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
                                     >
                                         {generating === 'deposit_pack' ? (
                                             <Loader2 className="animate-spin" size={20} />
                                         ) : (
                                             <>
                                                 <Download size={20} />
-                                                Preview PDF (Free)
+                                                Download
                                             </>
                                         )}
                                     </button>
+                                </div>
+                            ) : canUnlockDeposit ? (
+                                <div className="space-y-3">
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => handlePreview('deposit_pack')}
+                                            disabled={previewing === 'deposit_pack'}
+                                            className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
+                                        >
+                                            {previewing === 'deposit_pack' ? (
+                                                <Loader2 className="animate-spin" size={20} />
+                                            ) : (
+                                                <>
+                                                    <Eye size={20} />
+                                                    Preview
+                                                </>
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={() => handlePurchase('deposit_pack', 2900)}
+                                            disabled={purchasing === 'deposit_pack'}
+                                            className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
+                                        >
+                                            {purchasing === 'deposit_pack' ? (
+                                                <Loader2 className="animate-spin" size={20} />
+                                            ) : (
+                                                <>
+                                                    <Download size={20} />
+                                                    Buy & Download
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
                                     <p className="text-xs text-slate-400 text-center">
-                                        Full purchase enables watermark-free downloads
+                                        Preview is free • Purchase for watermark-free PDF
                                     </p>
                                 </div>
                             ) : (
