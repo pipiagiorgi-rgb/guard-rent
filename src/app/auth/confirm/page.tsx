@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { Logo } from '@/components/brand/Logo'
 
 export default function AuthConfirmPage() {
     const router = useRouter()
@@ -53,14 +52,7 @@ export default function AuthConfirmPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
-            {/* Header with Logo */}
-            <header className="p-6 flex items-center justify-between">
-                <Link href="/" className="flex items-center">
-                    <Logo size="sm" />
-                </Link>
-            </header>
-
-            <main className="flex-1 flex items-center justify-center p-6 -mt-16">
+            <main className="flex-1 flex items-center justify-center p-6">
                 <div className="w-full max-w-[400px]">
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
                         {status === 'loading' && (

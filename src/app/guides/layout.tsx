@@ -14,7 +14,7 @@ export default function GuidesLayout({
                 <div className="max-w-[800px] mx-auto px-4 md:px-6">
                     <div className="h-16 flex items-center justify-between">
                         <Link href="/" className="flex items-center">
-                            <Logo size="sm" />
+                            <Logo height={40} />
                         </Link>
                         <Link
                             href="/"
@@ -26,7 +26,6 @@ export default function GuidesLayout({
                     </div>
                 </div>
             </header>
-            {children}
             {children}
             <Footer />
         </div>
