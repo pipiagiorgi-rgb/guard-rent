@@ -241,28 +241,122 @@ export default function PricingPage() {
                     <p>No automatic renewals.</p>
                 </div>
 
-                {/* Preview vs Saved comparison */}
-                <div className="max-w-3xl mx-auto mt-12 p-6 bg-slate-50 rounded-xl">
-                    <h3 className="font-semibold mb-4 text-center">Preview mode vs Unlocked</h3>
-                    <div className="grid sm:grid-cols-2 gap-6">
-                        <div className="bg-white p-5 rounded-lg border border-slate-200">
-                            <p className="text-sm font-medium text-slate-700 mb-3">Preview mode (free)</p>
-                            <ul className="space-y-2 text-sm text-slate-600">
-                                <li>• Upload and scan contracts</li>
-                                <li>• 3 contract questions per rental</li>
-                                <li>• 1 translation per rental</li>
-                                <li>• 3 photos (not saved)</li>
-                                <li>• Results cleared on refresh</li>
+                {/* Feature Comparison Table */}
+                <div className="max-w-3xl mx-auto mt-12">
+                    <h3 className="text-lg font-semibold mb-6 text-center text-slate-900">What's included</h3>
+
+                    {/* Desktop Table */}
+                    <div className="hidden sm:block overflow-hidden rounded-xl border border-slate-200 bg-white">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="bg-slate-50 border-b border-slate-200">
+                                    <th className="text-left py-4 px-5 text-sm font-semibold text-slate-700">Feature</th>
+                                    <th className="text-center py-4 px-4 text-sm font-semibold text-slate-500 w-32">Preview</th>
+                                    <th className="text-center py-4 px-4 text-sm font-semibold text-slate-900 w-32 bg-emerald-50">Full access</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Upload and scan contracts</td>
+                                    <td className="py-3.5 px-4 text-center"><span className="text-emerald-600">✓</span></td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Ask questions about the contract</td>
+                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">Limited</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Contract translation</td>
+                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">Preview only</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Add photos (check-in / handover)</td>
+                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">Preview only</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Data saved securely</td>
+                                    <td className="py-3.5 px-4 text-center text-slate-300">—</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Deadline reminder emails</td>
+                                    <td className="py-3.5 px-4 text-center text-slate-300">—</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Official PDF reports</td>
+                                    <td className="py-3.5 px-4 text-center text-slate-300">—</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Evidence preserved for records</td>
+                                    <td className="py-3.5 px-4 text-center text-slate-300">—</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">12-month secure retention</td>
+                                    <td className="py-3.5 px-4 text-center text-slate-300">—</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile Cards */}
+                    <div className="sm:hidden space-y-3">
+                        {/* Preview Column */}
+                        <div className="bg-white rounded-xl border border-slate-200 p-5">
+                            <p className="text-sm font-semibold text-slate-500 mb-4">Preview (free)</p>
+                            <ul className="space-y-3 text-sm">
+                                <li className="flex items-center gap-3">
+                                    <span className="text-emerald-600 text-base">✓</span>
+                                    <span className="text-slate-700">Upload and scan contracts</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-slate-400 text-xs font-medium bg-slate-100 px-2 py-0.5 rounded">Limited</span>
+                                    <span className="text-slate-700">Ask questions</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-slate-400 text-xs font-medium bg-slate-100 px-2 py-0.5 rounded">Preview</span>
+                                    <span className="text-slate-700">Translation & photos</span>
+                                </li>
                             </ul>
+                            <p className="text-xs text-slate-400 mt-4 pt-3 border-t border-slate-100">Results are temporary.</p>
                         </div>
-                        <div className="bg-white p-5 rounded-lg border border-slate-200">
-                            <p className="text-sm font-medium text-slate-700 mb-3">With a pack</p>
-                            <ul className="space-y-2 text-sm text-slate-600">
-                                <li>• Unlimited questions &amp; translations</li>
-                                <li>• All data saved for 12 months</li>
-                                <li>• PDF exports available</li>
-                                <li>• Deadline notifications</li>
+
+                        {/* Full Access Column */}
+                        <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-5">
+                            <p className="text-sm font-semibold text-emerald-800 mb-4">Full access</p>
+                            <ul className="space-y-3 text-sm">
+                                <li className="flex items-center gap-3">
+                                    <span className="text-emerald-600 text-base">✓</span>
+                                    <span className="text-slate-700">Unlimited questions & translations</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-emerald-600 text-base">✓</span>
+                                    <span className="text-slate-700">Unlimited photos</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-emerald-600 text-base">✓</span>
+                                    <span className="text-slate-700">Data saved for 12 months</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-emerald-600 text-base">✓</span>
+                                    <span className="text-slate-700">Deadline reminder emails</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-emerald-600 text-base">✓</span>
+                                    <span className="text-slate-700">Official PDF reports</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-emerald-600 text-base">✓</span>
+                                    <span className="text-slate-700">Evidence preserved</span>
+                                </li>
                             </ul>
+                            <p className="text-xs text-emerald-700 mt-4 pt-3 border-t border-emerald-200">One payment. No subscription.</p>
                         </div>
                     </div>
                 </div>
