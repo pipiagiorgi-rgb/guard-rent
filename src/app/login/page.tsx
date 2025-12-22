@@ -3,11 +3,9 @@
 
 import { useState } from 'react'
 import { login } from './actions'
-import Link from 'next/link'
-import { Loader2, CheckCircle2, ArrowLeft } from 'lucide-react'
+import { Loader2, CheckCircle2 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { Logo } from '@/components/brand/Logo'
-import { Footer } from '@/components/layout/Footer' // Added Footer import
+import { Footer } from '@/components/layout/Footer'
 
 export default function LoginPage() {
     const [loading, setLoading] = useState(false)
@@ -49,22 +47,8 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
-            {/* Header with Logo */}
-            <header className="p-6 flex items-center justify-between">
-                <Link href="/" className="flex items-center">
-                    <Logo height={32} />
-                </Link>
-                <Link
-                    href="/"
-                    className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors font-medium"
-                >
-                    <ArrowLeft size={16} />
-                    Back to RentVault
-                </Link>
-            </header>
-
             {/* Main Content */}
-            <main className="flex-1 flex items-center justify-center p-6 -mt-16">
+            <main className="flex-1 flex items-center justify-center p-6">
                 <div className="w-full max-w-[400px]">
                     {/* Card */}
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
