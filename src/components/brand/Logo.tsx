@@ -9,10 +9,11 @@ interface LogoProps {
     size?: 'sm' | 'md' | 'lg'
 }
 
+// Size presets - 1.7x scaling for premium feel
 const SIZE_MAP = {
-    sm: 28,
-    md: 32,
-    lg: 40
+    sm: 48,   // Was 28
+    md: 54,   // Was 32 (1.7x = 54.4)
+    lg: 68    // Was 40
 }
 
 export function Logo({ className = '', height, size = 'md' }: LogoProps) {

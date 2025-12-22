@@ -24,11 +24,20 @@ export default async function CaseLayout({
     }
 
     return (
-        <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-8">
-            <CaseSidebar caseId={rentalCase.case_id} caseLabel={rentalCase.label} />
-            <div className="min-w-0">
-                {children}
-                <Footer />
+        <div className="lg:flex lg:h-[calc(100vh-72px)]">
+            {/* Fixed Sidebar - Desktop */}
+            <div className="lg:w-[260px] lg:flex-shrink-0 lg:overflow-y-auto lg:border-r lg:border-slate-100 lg:py-4 lg:pr-6">
+                <CaseSidebar caseId={rentalCase.case_id} caseLabel={rentalCase.label} />
+            </div>
+
+            {/* Scrollable Content Area */}
+            <div className="flex-1 lg:overflow-y-auto">
+                <div className="min-h-full flex flex-col lg:pl-8">
+                    <main className="flex-1 py-2">
+                        {children}
+                    </main>
+                    <Footer />
+                </div>
             </div>
         </div>
     )

@@ -44,10 +44,10 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
             <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
                 <div className="max-w-[1120px] mx-auto px-5 md:px-8">
                     {/* Fixed-height flex container for the header */}
-                    <div className="h-16 flex items-center justify-between">
+                    <div className="h-[72px] flex items-center justify-between">
                         {/* Logo wrapper */}
                         <Link href="/" className="h-full flex items-center flex-shrink-0">
-                            <Logo height={40} />
+                            <Logo size="lg" />
                         </Link>
 
                         {/* Desktop Nav - right aligned */}
@@ -118,13 +118,13 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <div className="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl animate-in slide-in-from-right duration-300 ease-out">
                         <div className="h-full flex flex-col">
                             {/* TOP ROW: Logo + Close */}
-                            <div className="flex-shrink-0 px-5 h-16 flex items-center justify-between border-b border-slate-100">
+                            <div className="flex-shrink-0 px-5 h-[72px] flex items-center justify-between border-b border-slate-100">
                                 <Link
                                     href="/"
                                     onClick={handleNavClick}
                                     className="h-full flex items-center"
                                 >
-                                    <Logo height={40} />
+                                    <Logo size="lg" />
                                 </Link>
                                 <button
                                     onClick={() => setMobileMenuOpen(false)}
