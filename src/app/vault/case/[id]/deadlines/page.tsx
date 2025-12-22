@@ -221,6 +221,14 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
         return null
     }
 
+    // Get rent amount from contract
+    const getRentAmountDisplay = () => {
+        if (contractData?.rent_amount?.value && contractData.rent_amount.value !== 'not found') {
+            return contractData.rent_amount.value
+        }
+        return null
+    }
+
     // Save manual inputs to case
     const saveManualInputs = async () => {
         if (!manualLeaseEnd) return
@@ -538,12 +546,43 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                         <div className="flex-1">
                             <h2 className="font-semibold text-lg text-slate-900">Contract termination</h2>
                             <p className="text-slate-500 text-sm mt-1">
-                                {noticePeriod
-                                    ? `Based on ${noticePeriod.value} notice period.`
-                                    : 'Get reminded before your termination deadline.'}
+                                Don't let your contract auto-renew without deciding.
                             </p>
                         </div>
                     </div>
+
+                    {/* Contract info display */}
+                    {(leaseEnd || noticePeriod || suggestedDate) && (
+                        <div className="mb-4 p-4 bg-amber-50 rounded-lg border border-amber-100">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                {leaseEnd && (
+                                    <div>
+                                        <span className="text-amber-700 font-medium">Lease ends</span>
+                                        <p className="text-slate-900 font-semibold mt-0.5">
+                                            {new Date(leaseEnd.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </p>
+                                        <span className="text-xs text-slate-500">from {leaseEnd.source}</span>
+                                    </div>
+                                )}
+                                {noticePeriod && (
+                                    <div>
+                                        <span className="text-amber-700 font-medium">Notice period</span>
+                                        <p className="text-slate-900 font-semibold mt-0.5">{noticePeriod.value}</p>
+                                        <span className="text-xs text-slate-500">from {noticePeriod.source}</span>
+                                    </div>
+                                )}
+                                {suggestedDate && (
+                                    <div>
+                                        <span className="text-amber-700 font-medium">⚠️ Last day to give notice</span>
+                                        <p className="text-slate-900 font-semibold mt-0.5">
+                                            {new Date(suggestedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </p>
+                                        <span className="text-xs text-slate-500">to avoid rollover</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     <label className="flex items-center gap-3 cursor-pointer py-2">
                         <input
@@ -562,7 +601,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                             }}
                             className="w-5 h-5 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
                         />
-                        <span className="font-medium text-slate-700">Remind me if I need to cancel this contract</span>
+                        <span className="font-medium text-slate-700">Remind me before this deadline</span>
                     </label>
 
                     {termination.enabled && (
@@ -628,13 +667,24 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                         <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
                             <CreditCard size={20} />
                         </div>
-                        <div>
+                        <div className="flex-1">
                             <h2 className="font-semibold text-lg text-slate-900">Rent payments</h2>
                             <p className="text-slate-500 text-sm mt-1">
                                 Receive monthly reminders to pay your rent.
                             </p>
                         </div>
                     </div>
+
+                    {/* Rent amount from contract */}
+                    {getRentAmountDisplay() && (
+                        <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                            <div className="text-sm">
+                                <span className="text-blue-700 font-medium">Monthly rent</span>
+                                <p className="text-slate-900 font-semibold text-lg mt-0.5">{getRentAmountDisplay()}</p>
+                                <span className="text-xs text-slate-500">from contract</span>
+                            </div>
+                        </div>
+                    )}
 
                     <label className="flex items-center gap-3 cursor-pointer py-2">
                         <input

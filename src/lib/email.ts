@@ -263,7 +263,9 @@ export async function sendReminderConfirmationEmail({
     offsets,
     noticeMethod,
     dueDay,
-    customLabel
+    customLabel,
+    rentAmount,
+    leaseEndDate
 }: {
     to: string
     type: 'termination_notice' | 'rent_payment' | 'custom'
@@ -273,6 +275,8 @@ export async function sendReminderConfirmationEmail({
     noticeMethod?: string
     dueDay?: string
     customLabel?: string
+    rentAmount?: string
+    leaseEndDate?: string
 }): Promise<{ success: boolean; error?: string }> {
     const offsetText = offsets
         .sort((a, b) => b - a)
@@ -293,15 +297,20 @@ export async function sendReminderConfirmationEmail({
     if (type === 'termination_notice') {
         subject = '[Reminder] Termination reminder scheduled'
         title = 'You\'re all set'
+        const leaseEndFormatted = leaseEndDate ? new Date(leaseEndDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : null
         bodyContent = `
-            <p style="margin: 0 0 16px 0;">We'll remind you if action is needed to terminate your rental contract.</p>
+            <p style="margin: 0 0 16px 0;">We'll remind you before the deadline to avoid auto-renewal.</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; margin-bottom: 16px;">
                 <tr>
                     <td style="padding: 16px;">
                         <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Contract</p>
                         <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${rentalLabel}</p>
-                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Notice deadline</p>
-                        <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${formattedDate}</p>
+                        ${leaseEndFormatted ? `
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Lease ends</p>
+                        <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${leaseEndFormatted}</p>
+                        ` : ''}
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">⚠️ Send notice by</p>
+                        <p style="margin: 0 0 16px 0; font-weight: 600; color: #b45309;">${formattedDate}</p>
                         <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">You'll be notified</p>
                         <p style="margin: 0; font-weight: 600; color: #0f172a;">${offsetText}</p>
                         ${noticeMethod && noticeMethod !== 'not found' ? `
@@ -313,7 +322,7 @@ export async function sendReminderConfirmationEmail({
             </table>
             <p style="margin: 0; font-size: 13px; color: #64748b;">You can change or disable this reminder anytime in RentVault.</p>
         `
-        text = `You're all set.\n\nWe'll remind you if action is needed to terminate your rental contract.\n\nContract: ${rentalLabel}\nNotice deadline: ${formattedDate}\nYou'll be notified: ${offsetText}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
+        text = `You're all set.\n\nWe'll remind you before the deadline to avoid auto-renewal.\n\nContract: ${rentalLabel}${leaseEndFormatted ? `\nLease ends: ${leaseEndFormatted}` : ''}\nSend notice by: ${formattedDate}\nYou'll be notified: ${offsetText}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else if (type === 'rent_payment') {
         subject = '[Reminder] Rent payment reminder scheduled'
         title = 'Reminder active'
@@ -325,6 +334,10 @@ export async function sendReminderConfirmationEmail({
                     <td style="padding: 16px;">
                         <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Contract</p>
                         <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${rentalLabel}</p>
+                        ${rentAmount ? `
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Monthly rent</p>
+                        <p style="margin: 0 0 16px 0; font-weight: 700; font-size: 18px; color: #0f172a;">${rentAmount}</p>
+                        ` : ''}
                         <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Rent due</p>
                         <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${dueDateText}</p>
                         <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">You'll be notified</p>
@@ -334,7 +347,7 @@ export async function sendReminderConfirmationEmail({
             </table>
             <p style="margin: 0; font-size: 13px; color: #64748b;">You can change or disable this reminder anytime in RentVault.</p>
         `
-        text = `Reminder active.\n\nYour rent payment reminder is now active.\n\nContract: ${rentalLabel}\nRent due: ${dueDateText}\nYou'll be notified: ${offsetText}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
+        text = `Reminder active.\n\nYour rent payment reminder is now active.\n\nContract: ${rentalLabel}${rentAmount ? `\nMonthly rent: ${rentAmount}` : ''}\nRent due: ${dueDateText}\nYou'll be notified: ${offsetText}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else {
         // Custom reminder
         const reminderName = customLabel || 'Custom reminder'

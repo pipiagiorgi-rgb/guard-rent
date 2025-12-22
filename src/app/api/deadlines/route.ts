@@ -21,10 +21,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 })
         }
 
-        // Verify case ownership
+        // Verify case ownership and get contract data for email
         const { data: rentalCase } = await supabase
             .from('cases')
-            .select('case_id, user_id')
+            .select('case_id, user_id, contract_analysis, lease_end')
             .eq('case_id', caseId)
             .eq('user_id', user.id)
             .single()
@@ -32,6 +32,10 @@ export async function POST(request: Request) {
         if (!rentalCase) {
             return NextResponse.json({ error: 'Case not found.' }, { status: 404 })
         }
+
+        // Extract rent amount and lease end from contract for email
+        const contractRentAmount = rentalCase.contract_analysis?.analysis?.rent_amount?.value
+        const contractLeaseEnd = rentalCase.lease_end || rentalCase.contract_analysis?.analysis?.lease_end_date?.value
 
         // Calculate the actual date for rent payments
         let deadlineDate = date
@@ -121,7 +125,9 @@ export async function POST(request: Request) {
                 offsets,
                 noticeMethod,
                 dueDay,
-                customLabel: label
+                customLabel: label,
+                rentAmount: contractRentAmount,
+                leaseEndDate: contractLeaseEnd
             })
         } catch (emailError) {
             // Log but don't fail the request if email fails
