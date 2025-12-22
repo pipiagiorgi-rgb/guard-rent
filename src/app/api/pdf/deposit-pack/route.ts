@@ -112,7 +112,7 @@ export async function POST(request: Request) {
 
         const details = [
             ['Rental', rentalCase.label],
-            ['Address', rentalCase.address || 'Not specified'],
+            ['Address', rentalCase.address || 'Address not provided'],
             ['Lease Period', `${rentalCase.lease_start || 'N/A'} to ${rentalCase.lease_end || 'N/A'}`],
             ['Generated', new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })],
         ]

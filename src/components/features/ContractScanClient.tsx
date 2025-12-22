@@ -23,6 +23,7 @@ interface ExtractedField {
 }
 
 interface ContractAnalysis {
+    property_address?: ExtractedField
     lease_start_date: ExtractedField
     lease_end_date: ExtractedField
     earliest_termination_date: ExtractedField
@@ -261,24 +262,41 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
             const leaseStart = parseDate(analysisToSave.lease_start_date?.value)
             const leaseEnd = parseDate(analysisToSave.lease_end_date?.value)
 
-            console.log("Lease dates to save:", { leaseStart, leaseEnd })
+            // Parse address (handle 'not found')
+            const address = analysisToSave.property_address?.value &&
+                analysisToSave.property_address.value !== 'not found'
+                ? analysisToSave.property_address.value
+                : null
+
+            // Parse country
+            const country = analysisToSave.jurisdiction_or_country?.value &&
+                analysisToSave.jurisdiction_or_country.value !== 'not found'
+                ? analysisToSave.jurisdiction_or_country.value
+                : null
+
+            console.log("Saving details:", { leaseStart, leaseEnd, address, country })
 
             // Store everything in contract_analysis JSONB (only use existing columns)
+            const updatePayload: any = {
+                contract_analysis: {
+                    analysis: analysisToSave,
+                    fileName: fileName,
+                    extractedText: extractedText,
+                    analyzedAt: new Date().toISOString(),
+                    applied: true,  // Track applied status inside JSON
+                    appliedAt: new Date().toISOString()
+                },
+                lease_start: leaseStart,
+                lease_end: leaseEnd,
+                last_activity_at: new Date().toISOString()
+            }
+
+            if (address) updatePayload.address = address
+            if (country) updatePayload.country = country
+
             const { data, error } = await supabase
                 .from("cases")
-                .update({
-                    contract_analysis: {
-                        analysis: analysisToSave,
-                        fileName: fileName,
-                        extractedText: extractedText,
-                        analyzedAt: new Date().toISOString(),
-                        applied: true,  // Track applied status inside JSON
-                        appliedAt: new Date().toISOString()
-                    },
-                    lease_start: leaseStart,
-                    lease_end: leaseEnd,
-                    last_activity_at: new Date().toISOString()
-                })
+                .update(updatePayload)
                 .eq("case_id", caseId)
                 .select()
                 .single();
@@ -612,6 +630,9 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                     )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="sm:col-span-2">
+                            {renderField('Property address', 'property_address')}
+                        </div>
                         {renderField('Lease start', 'lease_start_date')}
                         {renderField('Initial lease end', 'lease_end_date')}
                         {renderField('Earliest termination possible', 'earliest_termination_date')}

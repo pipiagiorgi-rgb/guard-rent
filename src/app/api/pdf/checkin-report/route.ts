@@ -86,7 +86,7 @@ export async function POST(request: Request) {
             color: rgb(0.4, 0.4, 0.4),
         })
 
-        page.drawText(`Address: ${rentalCase.address || 'Not specified'}`, {
+        page.drawText(`Address: ${rentalCase.address || 'Address not provided'}`, {
             x: 50,
             y: height - 185,
             size: 14,

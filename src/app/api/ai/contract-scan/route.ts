@@ -26,12 +26,14 @@ Return this exact JSON structure:
 
 {
   "document_language": { "value": "...", "confidence": "high/medium/low" },
+
+  "property_address": { "value": "...", "confidence": "high/medium/low", "source": "..." },
   
-  "lease_start_date": { "value": "...", "confidence": "high/medium/low", "source": "..." },
-  "lease_end_date": { "value": "...", "confidence": "high/medium/low", "source": "..." },
+  "lease_start_date": { "value": "YYYY-MM-DD", "confidence": "high/medium/low", "source": "..." },
+  "lease_end_date": { "value": "YYYY-MM-DD", "confidence": "high/medium/low", "source": "..." },
   
   "termination": {
-    "earliest_possible_date": { "value": "...", "confidence": "high/medium/low", "source": "..." },
+    "earliest_possible_date": { "value": "YYYY-MM-DD", "confidence": "high/medium/low", "source": "..." },
     "notice_period": { "value": "...", "confidence": "high/medium/low", "source": "..." },
     "notice_condition": { "value": "...", "confidence": "high/medium/low", "source": "..." },
     "notice_method": { "value": "...", "confidence": "high/medium/low", "source": "..." }
@@ -45,6 +47,11 @@ Return this exact JSON structure:
   
   "jurisdiction": { "value": "...", "confidence": "high/medium/low", "source": "..." }
 }
+
+ADDRESS RULES (CRITICAL):
+- Extract the FULL rental property address (Street, Number, Zip, City).
+- Do NOT include the Landlord's or Tenant's personal address.
+- Look for sections like "Lieu loué", "Objet du bail", "Adresse du bien".
 
 TERMINATION RULES (CRITICAL):
 - Look for "date anniversaire", "à l'échéance" → notice_condition = "anniversary only"
@@ -204,6 +211,7 @@ export async function POST(request: Request) {
         // The frontend expects flat structure, so we normalize
         const flatAnalysis = {
             document_language: analysis.document_language,
+            property_address: analysis.property_address,
             lease_start_date: analysis.lease_start_date,
             lease_end_date: analysis.lease_end_date,
             earliest_termination_date: analysis.termination?.earliest_possible_date,
@@ -227,12 +235,39 @@ export async function POST(request: Request) {
             analyzedAt: new Date().toISOString()
         }
 
+        // Map extracted fields to DB columns if they were found and have high/medium confidence
+        // We only overwrite if the value is not "not found"
+        const updatePayload: any = {
+            contract_analysis: contractAnalysisData,
+            last_activity_at: new Date().toISOString()
+        }
+
+        // Helper to check validity
+        const isValid = (field: any) => field?.value && field?.value.toLowerCase() !== 'not found' && field?.value !== '...'
+
+        if (isValid(analysis.property_address)) {
+            updatePayload.address = analysis.property_address.value
+        }
+        if (isValid(analysis.jurisdiction)) {
+            updatePayload.country = analysis.jurisdiction.value
+        }
+        if (isValid(analysis.lease_start_date)) {
+            // Check formatted date
+            const date = analysis.lease_start_date.value
+            if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                updatePayload.lease_start = date
+            }
+        }
+        if (isValid(analysis.lease_end_date)) {
+            const date = analysis.lease_end_date.value
+            if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                updatePayload.lease_end = date
+            }
+        }
+
         const { data: savedCase, error: saveError } = await supabase
             .from('cases')
-            .update({
-                contract_analysis: contractAnalysisData,
-                last_activity_at: new Date().toISOString()
-            })
+            .update(updatePayload)
             .eq('case_id', caseId)
             .eq('user_id', user.id)
             .select('case_id')

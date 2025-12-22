@@ -102,10 +102,10 @@ export async function POST(request: Request) {
             })
         }
 
-        // Fetch contract text
+        // Fetch contract text and structured data
         const { data: rentalCase, error: fetchError } = await supabase
             .from('cases')
-            .select('contract_analysis')
+            .select('contract_analysis, address, country, lease_start, lease_end')
             .eq('case_id', caseId)
             .eq('user_id', user.id)
             .single()
@@ -120,6 +120,21 @@ export async function POST(request: Request) {
                 error: 'No contract text available. Please upload and analyze a contract first.'
             }, { status: 400 })
         }
+
+        // Construct Known Facts Block
+        const facts = []
+        if (rentalCase.address) facts.push(`Property Address: ${rentalCase.address}`)
+        if (rentalCase.country) facts.push(`Jurisdiction/Country: ${rentalCase.country}`)
+        if (rentalCase.lease_start) facts.push(`Lease Start Date: ${rentalCase.lease_start}`)
+        if (rentalCase.lease_end) facts.push(`Lease End Date: ${rentalCase.lease_end}`)
+
+        // Add rent info from analysis if available (since it's not a top-level column)
+        const rentAmount = rentalCase.contract_analysis?.analysis?.rent_amount?.value
+        if (rentAmount && rentAmount !== 'not found') facts.push(`Rent Amount: ${rentAmount}`)
+
+        const knownFacts = facts.length > 0
+            ? `KNOWN FACTS (Database Records - PRIORITIZE THESE):\n${facts.join('\n')}\n\n`
+            : ''
 
         // Call OpenAI
         const apiKey = process.env.OPENAI_API_KEY
@@ -138,7 +153,7 @@ export async function POST(request: Request) {
                 { role: 'system', content: SYSTEM_PROMPT },
                 {
                     role: 'user',
-                    content: `CONTRACT TEXT:\n${limitedText}\n\n---\n\nQUESTION: ${trimmedQuestion}`
+                    content: `CONTRACT TEXT:\n${limitedText}\n\n---\n\n${knownFacts}QUESTION: ${trimmedQuestion}`
                 }
             ],
             max_tokens: 500,
