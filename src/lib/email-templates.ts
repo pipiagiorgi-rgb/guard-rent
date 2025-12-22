@@ -373,32 +373,41 @@ export function generateRetentionWarningHtml({
     const settingsUrl = `${siteUrl}/vault/case/${caseId}/settings`
 
     const bodyContent = `
-        <p style="margin: 0 0 16px 0;">Your documents for <strong>"${rentalLabel}"</strong> will be permanently deleted on <strong>${formattedDate}</strong>.</p>
+        <p style="margin: 0 0 16px 0;">Your included 12-month storage period for <strong>"${rentalLabel}"</strong> will end on <strong>${formattedDate}</strong>.</p>
         
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; margin-bottom: 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 16px;">
             <tr>
                 <td style="padding: 16px;">
-                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Data expires</p>
-                    <p style="margin: 0; font-weight: 700; color: #92400e; font-size: 16px;">${formattedDate}</p>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">No action needed yet</p>
+                    <p style="margin: 0; font-size: 14px; color: #166534;">Your documents remain fully accessible until the expiry date.</p>
                 </td>
             </tr>
         </table>
 
-        <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">You have two options:</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 8px; margin-bottom: 16px;">
+            <tr>
+                <td style="padding: 16px;">
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Storage expires</p>
+                    <p style="margin: 0; font-weight: 600; color: #0f172a; font-size: 16px;">${formattedDate}</p>
+                </td>
+            </tr>
+        </table>
+
+        <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">Before the expiry date, you can choose to:</p>
         
         <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #475569; font-size: 14px;">
-            <li style="margin-bottom: 8px;"><strong>Extend storage</strong> for another 12 months for €9</li>
-            <li><strong>Download your files</strong> and let the data expire</li>
+            <li style="margin-bottom: 8px;"><strong>Extend storage</strong> for another 12 months (€9 one-time)</li>
+            <li><strong>Download your files</strong> and let the storage expire</li>
         </ul>
         
-        <p style="margin: 0; font-size: 13px; color: #64748b;">After the expiry date, all photos, documents, and data for this rental will be permanently deleted and cannot be recovered.</p>
+        <p style="margin: 0; font-size: 13px; color: #64748b;">If no action is taken by ${formattedDate}, your documents will be permanently deleted.</p>
     `
 
     return emailTemplate({
-        title: 'Storage expiry reminder',
-        previewText: `Your rental data expires ${formattedDate}`,
+        title: 'Storage reminder',
+        previewText: `Your rental storage ends ${formattedDate} — no action needed yet`,
         bodyContent,
-        ctaText: 'Manage storage',
+        ctaText: 'View storage options',
         ctaUrl: settingsUrl
     })
 }
