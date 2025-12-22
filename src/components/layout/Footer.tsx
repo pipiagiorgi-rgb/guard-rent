@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Logo } from '@/components/brand/Logo'
 
 export function Footer() {
     return (
@@ -6,7 +7,9 @@ export function Footer() {
             <div className="max-w-[1120px] mx-auto px-4 md:px-6">
                 <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-6">
                     <div className="flex flex-col items-center md:items-start gap-3">
-                        <span className="text-lg font-bold text-slate-900">RentVault</span>
+                        <Link href="/" className="hover:opacity-80 transition-opacity">
+                            <Logo size="sm" />
+                        </Link>
                         <p className="text-slate-500 text-sm text-center md:text-left">
                             © RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.
                         </p>
