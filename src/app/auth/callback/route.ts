@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     const code = searchParams.get('code')
     const token_hash = searchParams.get('token_hash')
     const type = searchParams.get('type')
-    const next = searchParams.get('next') ?? '/app'
+    const next = searchParams.get('next') ?? '/vault'
 
     // Helper to get redirect base URL
     const getBaseUrl = () => {

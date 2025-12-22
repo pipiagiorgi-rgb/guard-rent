@@ -40,5 +40,5 @@ export async function deleteCase(caseId: string) {
         objects_deleted: assets?.length || 0
     })
 
-    redirect('/app')
+    redirect('/vault')
 }

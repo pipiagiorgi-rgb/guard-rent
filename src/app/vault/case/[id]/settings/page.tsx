@@ -147,7 +147,7 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                 objects_deleted: (assets?.length || 0) + 1
             })
 
-            router.push('/app')
+            router.push('/vault')
         } catch (err) {
             console.error('Delete error:', err)
             setDeleting(false)

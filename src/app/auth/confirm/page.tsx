@@ -37,7 +37,7 @@ export default function AuthConfirmPage() {
             setStatus('success')
             // Redirect after brief success state
             setTimeout(() => {
-                router.push('/app')
+                router.push('/vault')
             }, 1500)
             return
         }
@@ -45,7 +45,7 @@ export default function AuthConfirmPage() {
         // If no params, we're still processing - redirect to app after delay
         // (in case they landed here directly)
         const timer = setTimeout(() => {
-            router.push('/app')
+            router.push('/vault')
         }, 3000)
 
         return () => clearTimeout(timer)

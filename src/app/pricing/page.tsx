@@ -75,7 +75,7 @@ export default function PricingPage() {
             router.push('/login')
         } else {
             // Logged in - send to app to select rental
-            router.push('/app')
+            router.push('/vault')
         }
     }
 

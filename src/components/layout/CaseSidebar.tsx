@@ -22,17 +22,17 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
     const pathname = usePathname()
 
     const navItems = [
-        { href: `/app/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
-        { href: `/app/case/${caseId}/contract`, label: 'Contract', icon: FileText },
-        { href: `/app/case/${caseId}/check-in`, label: 'Check-in', icon: Camera },
-        { href: `/app/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
-        { href: `/app/case/${caseId}/handover`, label: 'Handover', icon: KeyRound },
-        { href: `/app/case/${caseId}/exports`, label: 'Exports', icon: Download },
-        { href: `/app/case/${caseId}/settings`, label: 'Data', icon: Database },
+        { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
+        { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText },
+        { href: `/vault/case/${caseId}/check-in`, label: 'Check-in', icon: Camera },
+        { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
+        { href: `/vault/case/${caseId}/handover`, label: 'Handover', icon: KeyRound },
+        { href: `/vault/case/${caseId}/exports`, label: 'Exports', icon: Download },
+        { href: `/vault/case/${caseId}/settings`, label: 'Data', icon: Database },
     ]
 
     const isActive = (href: string) => {
-        if (href === `/app/case/${caseId}`) {
+        if (href === `/vault/case/${caseId}`) {
             return pathname === href
         }
         return pathname?.startsWith(href)
@@ -43,7 +43,7 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
             {/* Mobile: Back link and title */}
             <div className="lg:hidden mb-4 flex items-center justify-between">
                 <Link
-                    href="/app"
+                    href="/vault"
                     className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors py-2"
                 >
                     <ChevronLeft size={16} />
@@ -55,7 +55,7 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
             {/* Desktop: Back and Title */}
             <div className="mb-4 hidden lg:block">
                 <Link
-                    href="/app"
+                    href="/vault"
                     className="text-xs text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1 mb-2"
                 >
                     <ChevronLeft size={14} />

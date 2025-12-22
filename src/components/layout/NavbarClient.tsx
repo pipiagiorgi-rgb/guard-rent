@@ -11,7 +11,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     // Don't show navbar on app routes (they have their own layout)
-    if (pathname?.startsWith('/app')) return null;
+    if (pathname?.startsWith('/vault')) return null;
     // Don't show navbar on guides pages (they have their own custom header)
     if (pathname?.startsWith('/guides')) return null;
     // Don't show navbar on login page
@@ -25,7 +25,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                     {/* 2) Logo wrapper - flex aligned, h-full */}
                     <Link href="/" className="h-full flex items-center flex-shrink-0">
                         {/* 3) Explicit logo height, no intrinsic sizing or hacks */}
-                        <Logo height={32} />
+                        <Logo height={40} />
                     </Link>
 
                     {/* Desktop Nav - right aligned, vertically centered */}
@@ -39,7 +39,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
 
                         {isLoggedIn ? (
                             <Link
-                                href="/app"
+                                href="/vault"
                                 className="text-[15px] font-medium bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors leading-none"
                             >
                                 Dashboard
@@ -88,7 +88,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
 
                     {isLoggedIn ? (
                         <Link
-                            href="/app"
+                            href="/vault"
                             className="block w-full text-center py-3 bg-slate-900 text-white rounded-lg font-medium"
                             onClick={() => setMobileMenuOpen(false)}
                         >

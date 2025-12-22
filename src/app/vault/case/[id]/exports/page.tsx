@@ -367,7 +367,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                             View gallery
                         </button>
                     ) : (
-                        <Link href={`/app/case/${caseId}/check-in`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                        <Link href={`/vault/case/${caseId}/check-in`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
                             Go to check-in <ChevronRight size={16} />
                         </Link>
                     )}
@@ -396,7 +396,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                             View gallery
                         </button>
                     ) : (
-                        <Link href={`/app/case/${caseId}/handover`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                        <Link href={`/vault/case/${caseId}/handover`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
                             Go to handover <ChevronRight size={16} />
                         </Link>
                     )}
@@ -417,7 +417,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                     </div>
                     {evidence.contractSummary ? (
                         <Link
-                            href={`/app/case/${caseId}/contract`}
+                            href={`/vault/case/${caseId}/contract`}
                             className="text-sm text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors"
                         >
                             <Eye size={16} />
@@ -442,7 +442,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                         </div>
                     </div>
                     <Link
-                        href={`/app/case/${caseId}/deadlines`}
+                        href={`/vault/case/${caseId}/deadlines`}
                         className="text-sm text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors"
                     >
                         <Eye size={16} />

@@ -34,7 +34,7 @@ export function UnpaidRentalBanner({ unpaidRentals }: UnpaidRentalBannerProps) {
                         {unpaidRentals.slice(0, 3).map((rental) => (
                             <Link
                                 key={rental.case_id}
-                                href={`/app/case/${rental.case_id}`}
+                                href={`/vault/case/${rental.case_id}`}
                                 className="flex items-center justify-between gap-3 p-3 bg-white border border-amber-200 rounded-lg hover:border-amber-300 hover:shadow-sm transition-all group"
                             >
                                 <span className="text-sm font-medium text-slate-900">{rental.label}</span>

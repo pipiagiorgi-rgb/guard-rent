@@ -46,7 +46,7 @@ export default function NewCasePage() {
 
             if (res.ok) {
                 const data = await res.json()
-                router.push(`/app/case/${data.case_id}`)
+                router.push(`/vault/case/${data.case_id}`)
             } else {
                 alert('Failed to create rental')
             }
@@ -155,7 +155,7 @@ export default function NewCasePage() {
 
                 <div className="flex gap-3">
                     <Link
-                        href="/app"
+                        href="/vault"
                         className="flex-1 py-3.5 text-center border-2 border-slate-200 rounded-xl font-medium hover:bg-slate-50 transition-colors"
                     >
                         Back

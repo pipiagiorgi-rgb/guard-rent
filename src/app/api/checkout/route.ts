@@ -35,8 +35,8 @@ export async function POST(request: Request) {
 
         if (caseId) {
             // User is buying for an existing case
-            successUrl = `${origin}/app/case/${caseId}?success=true`
-            cancelUrl = `${origin}/app/case/${caseId}?canceled=true`
+            successUrl = `${origin}/vault/case/${caseId}?success=true`
+            cancelUrl = `${origin}/vault/case/${caseId}?canceled=true`
         } else {
             // User is buying from pricing page (no account yet)
             successUrl = `${origin}/login?purchased=${packType}`

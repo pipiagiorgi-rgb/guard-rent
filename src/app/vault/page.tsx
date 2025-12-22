@@ -39,7 +39,7 @@ export default async function MyRentalsPage() {
                     <p className="text-slate-600 text-sm mt-1">Create and manage your rentals.</p>
                 </div>
                 <Link
-                    href="/app/new"
+                    href="/vault/new"
                     className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors sm:w-auto w-full"
                 >
                     <Plus size={18} />
@@ -61,7 +61,7 @@ export default async function MyRentalsPage() {
                         Create a rental to store your contract, photos, and key dates in one place.
                     </p>
                     <Link
-                        href="/app/new"
+                        href="/vault/new"
                         className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors"
                     >
                         Create your first rental
@@ -70,7 +70,7 @@ export default async function MyRentalsPage() {
             ) : (
                 <div className="space-y-3">
                     {rentals.map((rental: any) => (
-                        <Link key={rental.case_id} href={`/app/case/${rental.case_id}`} className="block group">
+                        <Link key={rental.case_id} href={`/vault/case/${rental.case_id}`} className="block group">
                             <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 hover:border-slate-300 hover:shadow-sm transition-all flex items-center justify-between gap-4">
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-3 mb-1">

@@ -29,7 +29,7 @@ export default async function CaseOverviewPage({ params }: { params: { id: strin
 
     // Graceful handling - redirect to app if rental not found
     if (!rental) {
-        redirect('/app')
+        redirect('/vault')
     }
 
     const hasLeaseDates = rental.lease_start || rental.lease_end
@@ -117,7 +117,7 @@ export default async function CaseOverviewPage({ params }: { params: { id: strin
                     </div>
                 ) : (
                     <Link
-                        href={`/app/case/${params.id}/contract`}
+                        href={`/vault/case/${params.id}/contract`}
                         className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors group"
                     >
                         <div>

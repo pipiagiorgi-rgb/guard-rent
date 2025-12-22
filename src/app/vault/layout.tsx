@@ -29,7 +29,7 @@ export default async function AppLayout({
             <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-[1200px] mx-auto px-6 md:px-8">
                     <div className="h-16 flex items-center justify-between">
-                        <Link href="/app" className="flex items-center">
+                        <Link href="/vault" className="flex items-center">
                             <Logo height={40} />
                         </Link>
 

@@ -146,7 +146,7 @@ function emailTemplate({
                             <p style="margin: 0; font-size: 11px; color: #94a3b8;">
                                 <a href="https://rentvault.ai/privacy" style="color: #94a3b8; text-decoration: underline;">Privacy Policy</a> &nbsp;&bull;&nbsp; 
                                 <a href="https://rentvault.ai/terms" style="color: #94a3b8; text-decoration: underline;">Terms of Service</a> &nbsp;&bull;&nbsp;
-                                <a href="https://rentvault.ai/app" style="color: #94a3b8; text-decoration: underline;">Dashboard</a>
+                                <a href="https://rentvault.ai/vault" style="color: #94a3b8; text-decoration: underline;">Dashboard</a>
                             </p>
                         </td>
                     </tr>
@@ -492,7 +492,7 @@ export async function sendRetentionWarningEmail({
     })
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
-    const settingsUrl = `${siteUrl}/app/case/${caseId}/settings`
+    const settingsUrl = `${siteUrl}/vault/case/${caseId}/settings`
 
     const subject = `Your rental data expires ${daysUntil <= 7 ? 'soon' : `in ${daysUntil} days`}`
     const title = 'Storage expiry reminder'
