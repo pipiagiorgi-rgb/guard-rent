@@ -1,9 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, Check, Info, Calendar, CreditCard, Loader2, AlertCircle, Save, FileText, Plus, Trash2, Edit3 } from 'lucide-react'
+import { Bell, Check, Info, Calendar, CreditCard, Loader2, AlertCircle, Save, FileText, Plus, Trash2, Edit3, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+
+interface Suggestion {
+    label: string
+    date: string
+    reason: string
+}
 
 interface ContractData {
     lease_end_date?: { value: string }
@@ -67,6 +73,11 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
         offsets: [7],
         saved: false
     })
+
+    // AI Suggestions
+    const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+    const [loadingSuggestions, setLoadingSuggestions] = useState(false)
+    const [suggestionsError, setSuggestionsError] = useState<string | null>(null)
 
     // Load initial data
     useEffect(() => {
@@ -230,6 +241,50 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
         } catch (err) {
             console.error(err)
         }
+    }
+
+    // Get AI Suggestions
+    const getSuggestions = async () => {
+        if (!hasContract) return
+
+        setLoadingSuggestions(true)
+        setSuggestionsError(null)
+        setSuggestions([])
+
+        try {
+            const res = await fetch('/api/ai/suggest-reminders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ caseId })
+            })
+
+            const data = await res.json()
+
+            if (data.error) {
+                setSuggestionsError(data.error)
+            } else if (data.suggestions?.length > 0) {
+                setSuggestions(data.suggestions)
+            } else {
+                setSuggestionsError('No suggestions generated. Try adding more contract details.')
+            }
+        } catch (err) {
+            setSuggestionsError('Could not get suggestions. Please try again.')
+        } finally {
+            setLoadingSuggestions(false)
+        }
+    }
+
+    // Add a suggested reminder
+    const addSuggestion = (suggestion: Suggestion) => {
+        setNewCustomReminder({
+            label: suggestion.label,
+            date: suggestion.date,
+            offsets: [7],
+            saved: false
+        })
+        setShowAddCustom(true)
+        // Remove from suggestions list
+        setSuggestions(prev => prev.filter(s => s.date !== suggestion.date || s.label !== suggestion.label))
     }
 
     // Save Handlers
@@ -737,13 +792,71 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                             </div>
                         </div>
                     ) : (
-                        <button
-                            onClick={() => setShowAddCustom(true)}
-                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium"
-                        >
-                            <Plus size={18} />
-                            Add custom reminder
-                        </button>
+                        <div className="space-y-4">
+                            {/* AI Suggestions */}
+                            {hasContract && (
+                                <div className="space-y-3">
+                                    {suggestions.length === 0 && !loadingSuggestions && !suggestionsError && (
+                                        <button
+                                            onClick={getSuggestions}
+                                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-50 to-blue-50 text-purple-700 rounded-lg font-medium hover:from-purple-100 hover:to-blue-100 border border-purple-200 transition-colors"
+                                        >
+                                            <Sparkles size={16} />
+                                            Suggest reminders from contract
+                                        </button>
+                                    )}
+
+                                    {loadingSuggestions && (
+                                        <div className="flex items-center gap-2 text-slate-500 p-3 bg-slate-50 rounded-lg">
+                                            <Loader2 className="animate-spin" size={16} />
+                                            Analyzing your contract...
+                                        </div>
+                                    )}
+
+                                    {suggestionsError && (
+                                        <div className="text-sm text-amber-600 p-3 bg-amber-50 rounded-lg">
+                                            {suggestionsError}
+                                        </div>
+                                    )}
+
+                                    {suggestions.length > 0 && (
+                                        <div className="space-y-2">
+                                            <div className="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                                <Sparkles size={14} className="text-purple-500" />
+                                                Suggested reminders
+                                            </div>
+                                            {suggestions.map((suggestion, i) => (
+                                                <div key={i} className="p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-100">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1">
+                                                            <div className="font-medium text-slate-900">{suggestion.label}</div>
+                                                            <div className="text-sm text-slate-500 mt-1">
+                                                                {new Date(suggestion.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                            </div>
+                                                            <div className="text-xs text-slate-400 mt-1 italic">{suggestion.reason}</div>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => addSuggestion(suggestion)}
+                                                            className="px-3 py-1 bg-white text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-100 border border-purple-200 shrink-0"
+                                                        >
+                                                            Add
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <button
+                                onClick={() => setShowAddCustom(true)}
+                                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium"
+                            >
+                                <Plus size={18} />
+                                Add custom reminder
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
