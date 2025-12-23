@@ -268,24 +268,24 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Guides for Tenants - NEW SECTION */}
-                <section className="py-12 md:py-16 px-4 md:px-6">
-                    <div className="max-w-[720px] mx-auto text-center">
-                        <div className="flex items-center justify-center gap-2 mb-6">
-                            <BookOpen size={20} className="text-slate-500" />
-                            <h2 className="text-xl font-semibold text-slate-900">Guides for tenants</h2>
+                {/* Guides for Tenants */}
+                <section className="py-8 md:py-10 px-4 md:px-6">
+                    <div className="max-w-[600px] mx-auto">
+                        <div className="flex items-center justify-center gap-2 mb-5">
+                            <BookOpen size={18} className="text-slate-400" />
+                            <span className="text-sm font-medium text-slate-500 uppercase tracking-wide">Guides for tenants</span>
                         </div>
-                        <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
-                            <Link href="/guides/move-in-photos" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                            <Link href="/guides/move-in-photos" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
                                 Why move-in photos matter
                             </Link>
-                            <Link href="/guides/notice-periods" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+                            <Link href="/guides/notice-periods" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
                                 Understanding notice periods
                             </Link>
-                            <Link href="/guides/renting-abroad" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+                            <Link href="/guides/renting-abroad" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
                                 Renting abroad: what to watch for
                             </Link>
-                            <Link href="/guides/deposit-protection" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+                            <Link href="/guides/deposit-protection" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
                                 How to protect your deposit
                             </Link>
                         </div>
