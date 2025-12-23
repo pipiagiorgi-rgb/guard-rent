@@ -540,7 +540,17 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to extract address')
 
-            const extractedAddress = data.answer?.trim()
+            let extractedAddress = data.answer?.trim() || ''
+
+            // Clean up AI response - extract just the address
+            // Remove "Source:" suffix and everything after it
+            if (extractedAddress.includes('Source:')) {
+                extractedAddress = extractedAddress.split('Source:')[0].trim()
+            }
+            // Remove "ℹ️ Not legal advice" suffix
+            extractedAddress = extractedAddress.replace(/ℹ️.*$/i, '').trim()
+            // Remove any trailing quotes or punctuation
+            extractedAddress = extractedAddress.replace(/["'.]$/, '').trim()
 
             // Check if we got a valid address (not empty, not "not found", etc.)
             if (!extractedAddress ||
