@@ -735,31 +735,7 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="sm:col-span-2">
-                            <div className="relative">
-                                {renderField('Property address', 'property_address')}
-                                {/* Extract Address button - show if address not found */}
-                                {(!result?.property_address?.value ||
-                                    result?.property_address?.value.toLowerCase() === 'not found' ||
-                                    result?.property_address?.value === '...') && savedContract?.extractedText && (
-                                        <button
-                                            onClick={handleExtractAddress}
-                                            disabled={extractingAddress}
-                                            className="absolute top-2 right-2 px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50 flex items-center gap-1.5"
-                                        >
-                                            {extractingAddress ? (
-                                                <>
-                                                    <Loader2 size={12} className="animate-spin" />
-                                                    Extracting...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <MapPin size={12} />
-                                                    Extract Address
-                                                </>
-                                            )}
-                                        </button>
-                                    )}
-                            </div>
+                            {renderField('Property address', 'property_address')}
                         </div>
                         {renderField('Lease start', 'lease_start_date')}
                         {renderField('Initial lease end', 'lease_end_date')}
