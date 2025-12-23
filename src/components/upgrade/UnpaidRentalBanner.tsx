@@ -34,7 +34,7 @@ export function UnpaidRentalBanner({ unpaidRentals }: UnpaidRentalBannerProps) {
                         {unpaidRentals.slice(0, 3).map((rental) => (
                             <Link
                                 key={rental.case_id}
-                                href={`/vault/case/${rental.case_id}`}
+                                href={`/vault/case/${rental.case_id}/exports`}
                                 className="flex items-center justify-between gap-3 p-3 bg-white border border-amber-200 rounded-lg hover:border-amber-300 hover:shadow-sm transition-all group"
                             >
                                 <span className="text-sm font-medium text-slate-900">{rental.label}</span>
@@ -47,6 +47,13 @@ export function UnpaidRentalBanner({ unpaidRentals }: UnpaidRentalBannerProps) {
                             </p>
                         )}
                     </div>
+                    <Link
+                        href="/pricing"
+                        className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
+                    >
+                        View pricing
+                        <ArrowRight size={14} />
+                    </Link>
                 </div>
             </div>
         </div>
