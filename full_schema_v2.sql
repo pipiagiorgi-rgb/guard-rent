@@ -120,6 +120,11 @@ CREATE TABLE IF NOT EXISTS assets (
   size_bytes BIGINT,
   file_hash TEXT,
   file_hash_server TEXT,
+  -- Video metadata (for walkthrough_video type)
+  phase TEXT, -- 'check-in' or 'handover'
+  duration_seconds INTEGER,
+  resolution TEXT, -- e.g. '1920x1080'
+  codec TEXT,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
