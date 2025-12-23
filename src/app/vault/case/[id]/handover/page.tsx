@@ -10,6 +10,7 @@ import {
 import { Lightbox } from '@/components/ui/Lightbox'
 import { isPurchased } from '@/lib/preview-limits'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
+import { WalkthroughVideoUpload } from '@/components/features/WalkthroughVideoUpload'
 
 interface Room {
     room_id: string
@@ -66,6 +67,15 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     // Lightbox State
     const [lightboxOpen, setLightboxOpen] = useState(false)
     const [lightboxImages, setLightboxImages] = useState<{ src: string; caption: string; subcaption: string }[]>([])
+
+    // Walkthrough video state
+    const [existingVideo, setExistingVideo] = useState<{
+        assetId: string
+        fileName: string
+        durationSeconds?: number
+        uploadedAt: string
+        fileHash?: string
+    } | undefined>(undefined)
 
     useEffect(() => {
         async function load() {
@@ -142,6 +152,27 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     }
                 })
                 setRooms(roomsWithPhotos)
+
+                // Fetch existing walkthrough video for handover
+                const { data: videoAsset } = await supabase
+                    .from('assets')
+                    .select('asset_id, storage_path, duration_seconds, file_hash, created_at')
+                    .eq('case_id', id)
+                    .eq('type', 'walkthrough_video')
+                    .eq('phase', 'handover')
+                    .single()
+
+                if (videoAsset) {
+                    setExistingVideo({
+                        assetId: videoAsset.asset_id,
+                        fileName: videoAsset.storage_path.split('/').pop() || 'walkthrough.mp4',
+                        durationSeconds: videoAsset.duration_seconds,
+                        uploadedAt: videoAsset.created_at,
+                        fileHash: videoAsset.file_hash
+                    })
+                } else {
+                    setExistingVideo(undefined)
+                }
             }
         } catch (err) {
             console.error('Failed to load handover data:', err)
@@ -891,6 +922,16 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     )}
                 </div>
             </div>
+
+            {/* Walkthrough Video Section */}
+            <WalkthroughVideoUpload
+                caseId={caseId}
+                phase="handover"
+                isLocked={!!handover.completedAt}
+                existingVideo={existingVideo}
+                onVideoUploaded={() => loadData(caseId)}
+                onVideoDeleted={() => loadData(caseId)}
+            />
 
             {/* ═══════════════════════════════════════════════════════════
                 COMPLETE HANDOVER BUTTON

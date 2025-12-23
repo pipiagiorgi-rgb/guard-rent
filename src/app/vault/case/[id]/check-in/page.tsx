@@ -6,6 +6,7 @@ import { Camera, Plus, Check, Loader2, Upload, Trash2, AlertCircle, Gauge, Chevr
 import { Lightbox } from '@/components/ui/Lightbox'
 import { canUploadPreviewPhoto, getPhotosRemaining, recordPreviewPhoto, isPurchased } from '@/lib/preview-limits'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
+import { WalkthroughVideoUpload } from '@/components/features/WalkthroughVideoUpload'
 
 interface Room {
     room_id: string
@@ -54,6 +55,15 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     // Lightbox state
     const [lightboxOpen, setLightboxOpen] = useState(false)
     const [lightboxImages, setLightboxImages] = useState<{ src: string; caption: string; subcaption: string }[]>([])
+
+    // Walkthrough video state
+    const [existingVideo, setExistingVideo] = useState<{
+        assetId: string
+        fileName: string
+        durationSeconds?: number
+        uploadedAt: string
+        fileHash?: string
+    } | undefined>(undefined)
 
     // Default rooms for new rentals
     const DEFAULT_ROOMS = ['Living Room', 'Kitchen', 'Bathroom', 'Bedroom']
@@ -151,6 +161,27 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             })
 
             setRooms(roomsWithPhotos)
+
+            // Fetch existing walkthrough video for check-in
+            const { data: videoAsset } = await supabase
+                .from('assets')
+                .select('asset_id, storage_path, duration_seconds, file_hash, created_at')
+                .eq('case_id', id)
+                .eq('type', 'walkthrough_video')
+                .eq('phase', 'check-in')
+                .single()
+
+            if (videoAsset) {
+                setExistingVideo({
+                    assetId: videoAsset.asset_id,
+                    fileName: videoAsset.storage_path.split('/').pop() || 'walkthrough.mp4',
+                    durationSeconds: videoAsset.duration_seconds,
+                    uploadedAt: videoAsset.created_at,
+                    fileHash: videoAsset.file_hash
+                })
+            } else {
+                setExistingVideo(undefined)
+            }
         } catch (err: any) {
             console.error('Failed to load data:', err)
             setError('Failed to load data')
@@ -468,6 +499,16 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                     </p>
                 </div>
             )}
+
+            {/* Walkthrough Video Section */}
+            <WalkthroughVideoUpload
+                caseId={caseId}
+                phase="check-in"
+                isLocked={isLocked}
+                existingVideo={existingVideo}
+                onVideoUploaded={() => loadData(caseId)}
+                onVideoDeleted={() => loadData(caseId)}
+            />
 
             {/* Status banner */}
             {isLocked ? (
