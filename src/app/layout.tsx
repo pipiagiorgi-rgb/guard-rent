@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
+import { OrganizationSchema, WebsiteSchema } from '@/lib/seo-schemas';
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://rentvault.ai'),
     title: 'RentVault | Rental Records, Secured',
     description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
+    keywords: 'rental deposit, tenant protection, move-in photos, rental documents, lease organiser, rent evidence, deposit dispute, tenant rights',
     icons: {
         icon: [
             { url: '/favicon.ico', sizes: '32x32' },
@@ -35,6 +37,20 @@ export const metadata: Metadata = {
         description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
         images: ['https://rentvault.ai/og-image.png'],
     },
+    alternates: {
+        canonical: 'https://rentvault.ai',
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
+    },
 };
 
 
@@ -46,9 +62,12 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
+                <OrganizationSchema />
+                <WebsiteSchema />
                 <Navbar />
                 <main>{children}</main>
             </body>
         </html>
     );
 }
+
