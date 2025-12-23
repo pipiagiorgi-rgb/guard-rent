@@ -7,7 +7,10 @@ export const metadata: Metadata = {
     title: 'RentVault | Rental Records, Secured',
     description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
     icons: {
-        icon: '/favicon.png',
+        icon: [
+            { url: '/favicon.ico', sizes: '32x32' },
+            { url: '/favicon.png', sizes: '192x192' },
+        ],
         apple: '/apple-icon.png',
     },
     openGraph: {
