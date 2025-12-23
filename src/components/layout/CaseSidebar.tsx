@@ -10,6 +10,7 @@ import {
     KeyRound,
     Download,
     Database,
+    HardDrive,
     ChevronLeft
 } from 'lucide-react'
 
@@ -28,6 +29,7 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
         { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
         { href: `/vault/case/${caseId}/handover`, label: 'Handover', icon: KeyRound },
         { href: `/vault/case/${caseId}/exports`, label: 'Exports', icon: Download },
+        { href: `/vault/case/${caseId}/storage`, label: 'Storage', icon: HardDrive },
         { href: `/vault/case/${caseId}/settings`, label: 'Data', icon: Database },
     ]
 

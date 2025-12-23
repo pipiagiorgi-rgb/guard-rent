@@ -33,37 +33,43 @@ export async function POST(req: Request) {
 
         // Handle storage extension purchase
         if (type === 'storage_extension' && caseId) {
-            // Get current retention_until
+            const yearsToAdd = parseInt(session.metadata?.years || '1', 10)
+
+            // Get current storage info
             const { data: currentCase } = await supabaseAdmin
                 .from('cases')
-                .select('retention_until, extension_count')
+                .select('storage_expires_at, storage_years_purchased, retention_until')
                 .eq('case_id', caseId)
                 .single()
 
             if (currentCase) {
-                // Calculate new retention: current + 12 months (additive)
-                const currentRetention = currentCase.retention_until
-                    ? new Date(currentCase.retention_until)
+                // Calculate new expiry: current expiry + years (or from now if no expiry)
+                const currentExpiry = currentCase.storage_expires_at || currentCase.retention_until
+                    ? new Date(currentCase.storage_expires_at || currentCase.retention_until)
                     : new Date()
 
-                const newRetention = new Date(currentRetention)
-                newRetention.setMonth(newRetention.getMonth() + 12)
+                const newExpiry = new Date(currentExpiry)
+                newExpiry.setFullYear(newExpiry.getFullYear() + yearsToAdd)
+
+                const newYearsTotal = (currentCase.storage_years_purchased || 1) + yearsToAdd
 
                 const { error } = await supabaseAdmin
                     .from('cases')
                     .update({
-                        retention_until: newRetention.toISOString(),
-                        extension_count: (currentCase.extension_count || 0) + 1,
+                        storage_expires_at: newExpiry.toISOString(),
+                        storage_years_purchased: newYearsTotal,
+                        storage_extended_at: new Date().toISOString(),
+                        retention_until: newExpiry.toISOString(), // Keep in sync
                         last_activity_at: new Date().toISOString()
                     })
                     .eq('case_id', caseId)
 
                 if (error) {
-                    console.error('Failed to extend retention:', error)
+                    console.error('Failed to extend storage:', error)
                     return NextResponse.json({ error: 'DB Update Failed' }, { status: 500 })
                 }
 
-                console.log(`Extended retention for case ${caseId} until ${newRetention.toISOString()}`)
+                console.log(`Extended storage for case ${caseId}: +${yearsToAdd}yr, total ${newYearsTotal}yr, expires ${newExpiry.toISOString()}`)
             }
         }
         // Handle pack purchases (checkin_pack, deposit_pack, bundle_pack)
