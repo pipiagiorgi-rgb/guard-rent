@@ -985,9 +985,13 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
                                     {showCustomize === 'deposit_pack' && (
                                         <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-4">
-                                            {/* Save Status Indicator */}
+                                            {/* Save Status Indicator with UTC Timestamp */}
                                             <div className="flex items-center justify-between text-xs text-slate-500">
-                                                <span>Your changes are saved automatically</span>
+                                                <span>
+                                                    {lastSavedAt
+                                                        ? `Last saved: ${new Date(lastSavedAt).toLocaleString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} UTC`
+                                                        : 'Your changes are saved automatically'}
+                                                </span>
                                                 {saveStatus === 'saved' && (
                                                     <span className="text-green-600 flex items-center gap-1">
                                                         <Check size={12} /> Saved
@@ -1002,9 +1006,20 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
                                             {/* Personal Notes */}
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                    Personal notes (user-provided)
-                                                </label>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <label className="block text-sm font-medium text-slate-700">
+                                                        Personal notes (user-provided)
+                                                    </label>
+                                                    <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={customSections.includePersonalNotes}
+                                                            onChange={(e) => setCustomSections(prev => ({ ...prev, includePersonalNotes: e.target.checked }))}
+                                                            className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                                                        />
+                                                        Include in PDF
+                                                    </label>
+                                                </div>
                                                 <textarea
                                                     value={customSections.personalNotes}
                                                     onChange={(e) => setCustomSections(prev => ({ ...prev, personalNotes: e.target.value }))}
@@ -1012,14 +1027,24 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                                     rows={2}
                                                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                                 />
-                                                <p className="text-xs text-slate-400 mt-1">Will appear in PDF labeled as user-provided notes</p>
                                             </div>
 
                                             {/* Property Review */}
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                    Property review (optional)
-                                                </label>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <label className="block text-sm font-medium text-slate-700">
+                                                        Property review (optional)
+                                                    </label>
+                                                    <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={customSections.includePropertyReview}
+                                                            onChange={(e) => setCustomSections(prev => ({ ...prev, includePropertyReview: e.target.checked }))}
+                                                            className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                                                        />
+                                                        Include in PDF
+                                                    </label>
+                                                </div>
                                                 <div className="flex items-center gap-2 mb-2">
                                                     {[1, 2, 3, 4, 5].map((star) => (
                                                         <button
@@ -1048,9 +1073,20 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
                                             {/* Custom Section */}
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                    Custom section (optional)
-                                                </label>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <label className="block text-sm font-medium text-slate-700">
+                                                        Custom section (optional)
+                                                    </label>
+                                                    <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={customSections.includeCustomSection}
+                                                            onChange={(e) => setCustomSections(prev => ({ ...prev, includeCustomSection: e.target.checked }))}
+                                                            className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                                                        />
+                                                        Include in PDF
+                                                    </label>
+                                                </div>
                                                 <input
                                                     type="text"
                                                     value={customSections.customTitle}
