@@ -113,16 +113,22 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                     const data = await res.json()
 
                     if (data.contract?.analysis) {
+                        // Merge savedAddress into analysis if it exists
+                        const analysis = { ...data.contract.analysis }
+                        if (data.savedAddress && (!analysis.property_address?.value || analysis.property_address?.value === 'not found' || analysis.property_address?.value === '...')) {
+                            analysis.property_address = { value: data.savedAddress, confidence: 'high', source_excerpt: 'Extracted from contract' }
+                        }
+
                         if (data.contractApplied) {
                             setSavedContract({
-                                analysis: data.contract.analysis,
+                                analysis: analysis,
                                 fileName: data.contract.fileName || 'Contract',
                                 appliedAt: data.contract.analyzedAt || '',
                                 extractedText: data.contract.extractedText || ''
                             })
                             console.log('Saved (applied) contract loaded')
                         } else {
-                            setScanResult(data.contract.analysis)
+                            setScanResult(analysis)
                             console.log('Transient (not applied) scan loaded')
                         }
                         setExtractedText(data.contract.extractedText || '')

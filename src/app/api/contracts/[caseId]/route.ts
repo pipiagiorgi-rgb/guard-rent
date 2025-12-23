@@ -24,7 +24,7 @@ export async function GET(
         // Verify ownership and get contract
         const { data: rentalCase, error } = await supabase
             .from('cases')
-            .select('case_id, contract_analysis')
+            .select('case_id, contract_analysis, address')
             .eq('case_id', caseId)
             .eq('user_id', user.id)
             .single()
@@ -59,7 +59,8 @@ export async function GET(
             console.log('Contract analysis found, applied:', isApplied)
             return NextResponse.json({
                 contract: rentalCase.contract_analysis,
-                contractApplied: isApplied
+                contractApplied: isApplied,
+                savedAddress: rentalCase.address || null
             })
         }
 
