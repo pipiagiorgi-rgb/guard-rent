@@ -197,17 +197,14 @@ export default function StoragePage() {
                 <div className="bg-white rounded-2xl border border-slate-200 p-6">
                     <h3 className="text-lg font-semibold text-slate-900 mb-2">Extend Storage</h3>
                     <p className="text-slate-600 mb-6">
-                        {storageInfo?.yearsTotal && storageInfo.yearsTotal > 1
-                            ? `You have ${storageInfo.yearsTotal} years of storage. Add more time to keep your records accessible.`
-                            : 'Add more time to keep your rental records securely stored and accessible.'
-                        }
+                        Your pack includes 1 year of storage. Add more time to keep your records accessible beyond the initial period.
                     </p>
 
                     <div className="grid gap-3">
                         {[
-                            { years: 1, price: 9, label: '1 Year', sublabel: null },
-                            { years: 2, price: 16, label: '2 Years', sublabel: 'Save €2' },
-                            { years: 3, price: 21, label: '3 Years', sublabel: 'Save €6 · Best value' }
+                            { years: 1, price: 9, label: 'Add 1 Year', sublabel: null },
+                            { years: 2, price: 16, label: 'Add 2 Years', sublabel: 'Save €2' },
+                            { years: 3, price: 21, label: 'Add 3 Years', sublabel: 'Save €6 · Best value' }
                         ].map((option) => (
                             <button
                                 key={option.years}
