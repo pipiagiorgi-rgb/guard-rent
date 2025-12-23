@@ -126,38 +126,57 @@ export default function Home() {
                     <div className="max-w-[900px] mx-auto">
                         <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10 shadow-sm">
                             <h2 className="text-2xl md:text-3xl font-bold mb-6 text-slate-900">
-                                Don't lose part of your deposit over missing photos.
+                                Why this matters
                             </h2>
                             <div className="space-y-5">
                                 <p className="text-slate-700 leading-relaxed text-base md:text-lg">
-                                    Every year, <strong className="text-slate-900">countless deposit disputes</strong> are
-                                    decided based on one thing: who has the evidence.
+                                    Independent research indicates that around <strong className="text-slate-900">one in four renters</strong> report
+                                    not receiving their full <strong className="text-slate-900">deposit</strong> back after a tenancy.<sup className="text-slate-400">*</sup>
                                 </p>
                                 <p className="text-slate-700 leading-relaxed text-base md:text-lg">
-                                    In England & Wales alone, nearly <strong className="text-slate-900">47,000 rental disputes</strong> went
-                                    to adjudication last year.<sup className="text-slate-400">*</sup> If you don't have
-                                    clear move-in photos and dates, you're at a disadvantage.
+                                    The most common reasons are disagreements about <strong className="text-slate-900">property condition</strong>,
+                                    missing or unclear records, and timing issues around notice and handover.
                                 </p>
                                 <p className="text-slate-700 leading-relaxed text-base md:text-lg">
-                                    RentVault helps you document everything — rental contracts, property condition photos,
-                                    and key deadlines — with timestamps and locked records, so you're not scrambling later.
+                                    These situations are <strong className="text-slate-900">evidence-based</strong> and <strong className="text-slate-900">deadline-driven</strong>.
+                                    <br />
+                                    Clear records, accurate timestamps, and preserved files can make a material difference.
+                                </p>
+                                <p className="text-slate-700 leading-relaxed text-base md:text-lg">
+                                    RentVault helps tenants keep <strong className="text-slate-900">rental documents</strong>, <strong className="text-slate-900">photos</strong>,
+                                    and <strong className="text-slate-900">key dates</strong> organised — with system-generated timestamps and locked records
+                                    that preserve what was recorded at the time.
                                 </p>
                             </div>
+
+                            {/* CTA Button */}
+                            <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                <Link
+                                    href="/vault"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md"
+                                >
+                                    Start documenting for free
+                                    <ArrowRight size={18} />
+                                </Link>
+                                <span className="text-sm text-slate-500">No credit card required</span>
+                            </div>
+
                             {/* Source footnote */}
-                            <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-slate-100">
+                            <p className="text-xs text-slate-400 mt-6">
                                 <sup>*</sup> Source:{' '}
                                 <a
-                                    href="https://www.tenancydepositscheme.com/resources/statistics/"
+                                    href="https://www.generationrent.org/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="underline hover:text-slate-600"
                                 >
-                                    Tenancy Deposit Scheme statistics 2024/25
+                                    Generation Rent, 2025
                                 </a>
                             </p>
                         </div>
                     </div>
                 </section>
+
 
                 {/* Features Section */}
                 <section className="py-8 md:py-10 px-4 md:px-6">
