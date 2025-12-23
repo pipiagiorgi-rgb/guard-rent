@@ -111,12 +111,18 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                 const res = await fetch(`/api/contracts/${caseId}`)
                 if (res.ok) {
                     const data = await res.json()
+                    console.log('Contract API response:', {
+                        hasAnalysis: !!data.contract?.analysis,
+                        savedAddress: data.savedAddress,
+                        propertyAddressInAnalysis: data.contract?.analysis?.property_address
+                    })
 
                     if (data.contract?.analysis) {
                         // Merge savedAddress into analysis if it exists
                         const analysis = { ...data.contract.analysis }
                         if (data.savedAddress && (!analysis.property_address?.value || analysis.property_address?.value === 'not found' || analysis.property_address?.value === '...')) {
                             analysis.property_address = { value: data.savedAddress, confidence: 'high', source_excerpt: 'Extracted from contract' }
+                            console.log('Merged savedAddress into analysis:', data.savedAddress)
                         }
 
                         if (data.contractApplied) {
