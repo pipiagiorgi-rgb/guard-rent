@@ -15,10 +15,10 @@ export async function POST(request: Request) {
         }
 
         // Price mapping (pack_type format for database)
-        const packPricing: Record<string, { price: number, type: string, name: string }> = {
-            'checkin': { price: 1900, type: 'checkin', name: 'Check-In Pack' },
-            'moveout': { price: 2900, type: 'moveout', name: 'Move-Out Pack' },
-            'bundle': { price: 3900, type: 'bundle', name: 'Full Bundle' }
+        const packPricing: Record<string, { price: number, type: string, name: string, description: string }> = {
+            'checkin': { price: 1900, type: 'checkin', name: 'Check-In Pack', description: 'Check-in documentation · Includes 1 year secure storage' },
+            'moveout': { price: 2900, type: 'moveout', name: 'Move-Out Pack', description: 'Move-out & deposit recovery · Includes 1 year secure storage' },
+            'bundle': { price: 3900, type: 'bundle', name: 'Full Bundle', description: 'Complete rental protection · Includes 1 year secure storage' }
         }
 
         const pack = packPricing[packType]
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
                         currency: 'eur',
                         product_data: {
                             name: `RentVault: ${pack.name}`,
-                            description: caseId ? `For rental ${caseId}` : 'New rental protection',
+                            description: pack.description,
                         },
                         unit_amount: pack.price,
                     },
