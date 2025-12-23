@@ -563,11 +563,19 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                 throw new Error(saveData.error || 'Failed to save address')
             }
 
-            // Update local state
+            // Update local state - handle all three possible state sources
             if (editableAnalysis) {
                 const newAnalysis = JSON.parse(JSON.stringify(editableAnalysis)) as ContractAnalysis
                 newAnalysis.property_address = { value: extractedAddress, confidence: 'high', source_excerpt: 'AI extracted' }
                 setEditableAnalysis(newAnalysis)
+            } else if (savedContract) {
+                // Update savedContract when contract is already applied
+                const newAnalysis = JSON.parse(JSON.stringify(savedContract.analysis)) as ContractAnalysis
+                newAnalysis.property_address = { value: extractedAddress, confidence: 'high', source_excerpt: 'AI extracted' }
+                setSavedContract({
+                    ...savedContract,
+                    analysis: newAnalysis
+                })
             } else if (scanResult) {
                 const newResult = JSON.parse(JSON.stringify(scanResult)) as ContractAnalysis
                 newResult.property_address = { value: extractedAddress, confidence: 'high', source_excerpt: 'AI extracted' }
