@@ -505,6 +505,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 caseId={caseId}
                 phase="check-in"
                 isLocked={isLocked}
+                isPaid={hasPack}
                 existingVideo={existingVideo}
                 onVideoUploaded={() => loadData(caseId)}
                 onVideoDeleted={() => loadData(caseId)}

@@ -8,6 +8,7 @@ interface WalkthroughVideoUploadProps {
     caseId: string
     phase: 'check-in' | 'handover'
     isLocked: boolean
+    isPaid: boolean
     existingVideo?: {
         assetId: string
         fileName: string
@@ -23,6 +24,7 @@ export function WalkthroughVideoUpload({
     caseId,
     phase,
     isLocked,
+    isPaid,
     existingVideo,
     onVideoUploaded,
     onVideoDeleted
@@ -202,6 +204,28 @@ export function WalkthroughVideoUpload({
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) handleUpload(file)
+    }
+
+    // Paywall for unpaid users
+    if (!isPaid) {
+        return (
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-dashed border-slate-200 rounded-xl p-6 text-center">
+                <div className="w-12 h-12 bg-slate-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Lock className="text-slate-400" size={24} />
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Walkthrough video upload</h3>
+                <p className="text-sm text-slate-500 mb-4 max-w-xs mx-auto">
+                    Record a timestamped walkthrough video to document the property condition. Available with full access.
+                </p>
+                <a
+                    href={`/vault/case/${caseId}/exports`}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors"
+                >
+                    <Video size={16} />
+                    Unlock video upload
+                </a>
+            </div>
+        )
     }
 
     // Locked state - show recorded video

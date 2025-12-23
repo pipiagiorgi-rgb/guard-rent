@@ -928,6 +928,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 caseId={caseId}
                 phase="handover"
                 isLocked={!!handover.completedAt}
+                isPaid={hasPack}
                 existingVideo={existingVideo}
                 onVideoUploaded={() => loadData(caseId)}
                 onVideoDeleted={() => loadData(caseId)}
