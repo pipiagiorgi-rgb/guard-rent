@@ -40,13 +40,15 @@ export default async function MyRentalsPage() {
                         <h1 className="text-2xl font-bold">My Rentals</h1>
                         <p className="text-slate-600 text-sm mt-1">Create and manage your rentals.</p>
                     </div>
-                    <Link
-                        href="/vault/new"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors sm:w-auto w-full"
-                    >
-                        <Plus size={18} />
-                        New rental
-                    </Link>
+                    {rentals && rentals.length > 0 && (
+                        <Link
+                            href="/vault/new"
+                            className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors sm:w-auto w-full"
+                        >
+                            <Plus size={18} />
+                            New rental
+                        </Link>
+                    )}
                 </div>
 
                 {/* Unpaid Rentals Banner */}
