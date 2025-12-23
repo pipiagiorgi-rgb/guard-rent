@@ -91,7 +91,7 @@ export async function POST(request: Request) {
 
         // Create signed upload URL
         const { data: signedUrl, error: signedError } = await supabase.storage
-            .from('assets')
+            .from('guard-rent')
             .createSignedUploadUrl(storagePath)
 
         if (signedError || !signedUrl) {

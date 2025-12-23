@@ -55,7 +55,7 @@ export async function DELETE(request: Request) {
 
         // Delete from storage
         const { error: storageError } = await supabase.storage
-            .from('assets')
+            .from('guard-rent')
             .remove([asset.storage_path])
 
         if (storageError) {
