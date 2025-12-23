@@ -89,6 +89,14 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
                         </Link>
                     )
                 })}
+                {/* Feedback button for mobile */}
+                <button
+                    onClick={() => setFeedbackOpen(true)}
+                    className="flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-medium transition-colors min-h-[64px] justify-center bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                >
+                    <MessageSquarePlus size={20} />
+                    <span className="text-center leading-tight">Feedback</span>
+                </button>
             </nav>
 
             {/* Desktop Navigation: Vertical list */}

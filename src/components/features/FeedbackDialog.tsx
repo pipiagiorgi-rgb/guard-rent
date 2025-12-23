@@ -14,10 +14,9 @@ import { usePathname } from 'next/navigation'
 interface FeedbackDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    children?: React.ReactNode
 }
 
-export function FeedbackDialog({ open, onOpenChange, children }: FeedbackDialogProps) {
+export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
     const [type, setType] = useState<'bug' | 'feature' | 'general'>('general')
     const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
@@ -44,8 +43,6 @@ export function FeedbackDialog({ open, onOpenChange, children }: FeedbackDialogP
 
             if (error) throw error
 
-            // 2. Send email notification (optional, can be added later via Edge Function)
-
             setSuccess(true)
             toast.success('Feedback sent! Thank you for helping us improve.')
 
@@ -70,7 +67,6 @@ export function FeedbackDialog({ open, onOpenChange, children }: FeedbackDialogP
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            {children}
             <DialogContent className="sm:max-w-[425px]">
                 {!success ? (
                     <>
@@ -92,8 +88,8 @@ export function FeedbackDialog({ open, onOpenChange, children }: FeedbackDialogP
                                         key={t.id}
                                         onClick={() => setType(t.id as any)}
                                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${type === t.id
-                                                ? 'bg-white text-slate-900 shadow-sm'
-                                                : 'text-slate-500 hover:text-slate-700'
+                                            ? 'bg-white text-slate-900 shadow-sm'
+                                            : 'text-slate-500 hover:text-slate-700'
                                             }`}
                                     >
                                         <t.icon size={16} />
