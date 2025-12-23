@@ -1,45 +1,53 @@
 'use client'
 
 import Link from 'next/link'
-import { Check, FileText, Shield, Clock, Eye } from 'lucide-react'
-import { FAQAccordion } from '@/components/ui/FAQAccordion'
+import { Check, FileText, Shield, Clock, Eye, ChevronDown, Video } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Footer } from '@/components/layout/Footer'
 
+// FAQ items - updated with required questions
 const faqItems = [
+    {
+        question: "What do I get for free?",
+        answer: "You can explore RentVault for free in preview mode. This includes uploading and scanning contracts, asking up to 3 questions, requesting 1 translation, and uploading up to 3 photos per rental. Preview results are temporary and cleared on refresh."
+    },
+    {
+        question: "What changes when I buy a pack?",
+        answer: "Purchasing a pack removes all limits and saves your data permanently. You get unlimited contract questions and translations, unlimited photos, deadline reminder emails, official PDF reports, and 12 months of secure storage."
+    },
+    {
+        question: "Is this legal advice?",
+        answer: "No. RentVault helps you understand and organise your rental documents, but it does not provide legal advice. If you need legal guidance, consult a qualified professional in your jurisdiction."
+    },
+    {
+        question: "Are records timestamped and preserved?",
+        answer: "Yes. All uploaded files receive system-generated timestamps. Once you complete a phase (check-in or handover), records are locked and cannot be modified, preserving the state at that moment."
+    },
+    {
+        question: "Can I export a PDF to share?",
+        answer: "Yes. With a paid pack, you can generate official PDF reports that include your photos, timestamps, and lease summary. These are formatted for sharing with landlords or deposit schemes if needed."
+    },
+    {
+        question: "How long is data stored?",
+        answer: "Your documents are stored securely for 12 months from the date of purchase. This covers most rental periods and deposit dispute timelines."
+    },
+    {
+        question: "Can I extend storage?",
+        answer: "Yes. Before your 12-month retention period ends, you'll receive a reminder. You can extend storage for another 12 months for €9, or download your files and let the data expire."
+    },
     {
         question: "Can I use RentVault if I'm already renting?",
         answer: "Yes. RentVault is useful whether you're preparing to move or already renting. You can store your contract, track notice dates, set reminders, and keep everything organised so nothing important is missed later."
-    },
-    {
-        question: "Can I try RentVault before paying?",
-        answer: "Yes. You can explore preview features for free — including 3 contract questions, 1 translation, and 3 photos per rental. Preview results are temporary and cleared on refresh. Purchasing a pack unlocks unlimited access and saves everything permanently."
     },
     {
         question: "Is RentVault a subscription?",
         answer: "No. RentVault uses one-time payments. You pay once for the pack you need, and your data is stored securely for 12 months. No recurring charges."
     },
     {
-        question: "What happens after 12 months?",
-        answer: "Your documents are securely stored for 12 months from the date of purchase. Before the retention period ends, you'll receive a reminder. You can extend storage for another 12 months for €9, or download your files and let the data expire."
-    },
-    {
-        question: "What's included in Preview mode?",
-        answer: "Preview mode lets you upload contracts, scan for key dates, ask up to 3 questions, request 1 translation, and upload up to 3 photos per rental. Preview results are not saved — they're cleared when you refresh. Unlocking a pack saves everything permanently and removes limits."
-    },
-    {
         question: "Can I delete my data at any time?",
         answer: "Yes. You can delete individual rentals or your entire account at any time directly from the application. We respect your right to control your data."
-    },
-    {
-        question: "What is the Deposit Recovery Pack?",
-        answer: "It's a downloadable PDF that includes your move-in and move-out photos with timestamps, organised by room. Useful if you need to document the apartment's condition for deposit discussions."
-    },
-    {
-        question: "Is the contract analysis legal advice?",
-        answer: "No. RentVault helps you understand and organise your rental documents, but it does not provide legal advice. If you need legal guidance, consult a qualified professional in your jurisdiction."
     },
     {
         question: "How are my documents stored?",
@@ -55,9 +63,30 @@ const faqItems = [
     }
 ]
 
+// Simple FAQ Accordion component
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+    const [isOpen, setIsOpen] = useState(false)
+
+    return (
+        <div className="border-b border-slate-200 last:border-b-0">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full py-4 flex items-center justify-between text-left hover:bg-slate-50 -mx-4 px-4 rounded-lg transition-colors"
+            >
+                <span className="font-medium text-slate-900">{question}</span>
+                <ChevronDown size={18} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isOpen && (
+                <div className="pb-4 text-slate-600 text-sm leading-relaxed">
+                    {answer}
+                </div>
+            )}
+        </div>
+    )
+}
+
 export default function PricingPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const [loading, setLoading] = useState<string | null>(null)
     const router = useRouter()
 
     useEffect(() => {
@@ -69,12 +98,10 @@ export default function PricingPage() {
         checkAuth()
     }, [])
 
-    const handleGetStarted = (packType: 'checkin' | 'bundle' | 'moveout') => {
+    const handleGetStarted = () => {
         if (!isLoggedIn) {
-            // Not logged in - send to login
             router.push('/login')
         } else {
-            // Logged in - send to app to select rental
             router.push('/vault')
         }
     }
@@ -87,6 +114,9 @@ export default function PricingPage() {
                     <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Simple, transparent pricing</h1>
                     <p className="text-lg text-slate-600 max-w-xl mx-auto">
                         No subscriptions. Pay only when you need protection.
+                    </p>
+                    <p className="text-sm text-slate-500 mt-3">
+                        Free to explore. Pay only when you need official exports or extended retention.
                     </p>
                 </div>
 
@@ -106,7 +136,7 @@ export default function PricingPage() {
                     </div>
                 </div>
 
-                {/* Pricing Cards */}
+                {/* Pricing Cards - OUTCOME-FOCUSED BULLETS */}
                 <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                     {/* Check-In Pack */}
                     <div className="bg-white p-6 md:p-8 rounded-2xl border-2 border-slate-200 hover:border-slate-300 transition-all flex flex-col">
@@ -123,23 +153,19 @@ export default function PricingPage() {
                         <ul className="space-y-3 mb-8 flex-1">
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Unlimited contract questions &amp; translations</span>
+                                <span>Evidence record for move-in (photos + timestamps)</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Check-in photo documentation</span>
+                                <span>Lease summary for reference</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Check-in report (PDF)</span>
-                            </li>
-                            <li className="flex items-start gap-3 text-sm">
-                                <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Data saved for 12 months</span>
+                                <span>12 months secure record retention</span>
                             </li>
                         </ul>
                         <button
-                            onClick={() => handleGetStarted('checkin')}
+                            onClick={handleGetStarted}
                             className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
                         >
                             Select
@@ -164,27 +190,27 @@ export default function PricingPage() {
                         <ul className="space-y-3 mb-8 flex-1">
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                                <span>Everything in the Check-In Pack</span>
+                                <span>Complete rental evidence record (check-in → handover)</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                                <span>Deadline reminders</span>
+                                <span>Immutable records with timestamps</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                                <span>Move-out photo documentation</span>
+                                <span>One complete dispute-ready PDF</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                                <span>Deposit recovery pack (PDF)</span>
+                                <span>Deadline reminder emails</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                                <span>Data saved for 12 months</span>
+                                <span>12 months secure retention</span>
                             </li>
                         </ul>
                         <button
-                            onClick={() => handleGetStarted('bundle')}
+                            onClick={handleGetStarted}
                             className="w-full py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all"
                         >
                             Select
@@ -209,23 +235,23 @@ export default function PricingPage() {
                         <ul className="space-y-3 mb-8 flex-1">
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Unlimited contract questions &amp; translations</span>
+                                <span>Before/after comparison (move-in vs move-out)</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Move-out photo documentation</span>
+                                <span>Locked handover record</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Deposit recovery pack (PDF)</span>
+                                <span>Deposit recovery evidence PDF</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Data saved for 12 months</span>
+                                <span>12 months secure retention</span>
                             </li>
                         </ul>
                         <button
-                            onClick={() => handleGetStarted('moveout')}
+                            onClick={handleGetStarted}
                             className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
                         >
                             Select
@@ -236,6 +262,12 @@ export default function PricingPage() {
                     </div>
                 </div>
 
+                {/* Walkthrough Video Note */}
+                <div className="max-w-3xl mx-auto mt-8 flex items-center justify-center gap-2 text-sm text-slate-500">
+                    <Video size={16} />
+                    <span>Optional walkthrough video evidence can be uploaded and referenced in exports.</span>
+                </div>
+
                 {/* Footnote */}
                 <div className="text-center mt-10 md:mt-12 space-y-1 text-sm text-slate-500">
                     <p>Delete your data at any time.</p>
@@ -244,7 +276,7 @@ export default function PricingPage() {
 
                 {/* Feature Comparison Table */}
                 <div className="max-w-3xl mx-auto mt-12">
-                    <h3 className="text-lg font-semibold mb-6 text-center text-slate-900">What's included</h3>
+                    <h3 className="text-lg font-semibold mb-6 text-center text-slate-900">Preview vs Paid</h3>
 
                     {/* Desktop Table */}
                     <div className="hidden sm:block overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -264,18 +296,18 @@ export default function PricingPage() {
                                 </tr>
                                 <tr>
                                     <td className="py-3.5 px-5 text-sm text-slate-700">Ask questions about the contract</td>
-                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">Limited</td>
-                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">3 max</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">Unlimited</span></td>
                                 </tr>
                                 <tr>
                                     <td className="py-3.5 px-5 text-sm text-slate-700">Contract translation</td>
-                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">Preview only</td>
-                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">1 max</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">Unlimited</span></td>
                                 </tr>
                                 <tr>
                                     <td className="py-3.5 px-5 text-sm text-slate-700">Add photos (check-in / handover)</td>
-                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">Preview only</td>
-                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                    <td className="py-3.5 px-4 text-center text-sm text-slate-400">3 per rental</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">Unlimited</span></td>
                                 </tr>
                                 <tr>
                                     <td className="py-3.5 px-5 text-sm text-slate-700">Data saved securely</td>
@@ -293,12 +325,17 @@ export default function PricingPage() {
                                     <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
                                 </tr>
                                 <tr>
-                                    <td className="py-3.5 px-5 text-sm text-slate-700">Evidence preserved for records</td>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Locked, immutable evidence</td>
                                     <td className="py-3.5 px-4 text-center text-slate-300">—</td>
                                     <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
                                 </tr>
                                 <tr>
                                     <td className="py-3.5 px-5 text-sm text-slate-700">12-month secure retention</td>
+                                    <td className="py-3.5 px-4 text-center text-slate-300">—</td>
+                                    <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3.5 px-5 text-sm text-slate-700">Walkthrough video upload</td>
                                     <td className="py-3.5 px-4 text-center text-slate-300">—</td>
                                     <td className="py-3.5 px-4 text-center bg-emerald-50/50"><span className="text-emerald-600">✓</span></td>
                                 </tr>
@@ -317,12 +354,16 @@ export default function PricingPage() {
                                     <span className="text-slate-700">Upload and scan contracts</span>
                                 </li>
                                 <li className="flex items-center gap-3">
-                                    <span className="text-slate-400 text-xs font-medium bg-slate-100 px-2 py-0.5 rounded">Limited</span>
+                                    <span className="text-slate-400 text-xs font-medium bg-slate-100 px-2 py-0.5 rounded">3 max</span>
                                     <span className="text-slate-700">Ask questions</span>
                                 </li>
                                 <li className="flex items-center gap-3">
-                                    <span className="text-slate-400 text-xs font-medium bg-slate-100 px-2 py-0.5 rounded">Preview</span>
-                                    <span className="text-slate-700">Translation & photos</span>
+                                    <span className="text-slate-400 text-xs font-medium bg-slate-100 px-2 py-0.5 rounded">1 max</span>
+                                    <span className="text-slate-700">Translation</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="text-slate-400 text-xs font-medium bg-slate-100 px-2 py-0.5 rounded">3/rental</span>
+                                    <span className="text-slate-700">Photos</span>
                                 </li>
                             </ul>
                             <p className="text-xs text-slate-400 mt-4 pt-3 border-t border-slate-100">Results are temporary.</p>
@@ -338,7 +379,7 @@ export default function PricingPage() {
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <span className="text-emerald-600 text-base">✓</span>
-                                    <span className="text-slate-700">Unlimited photos</span>
+                                    <span className="text-slate-700">Unlimited photos & videos</span>
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <span className="text-emerald-600 text-base">✓</span>
@@ -354,7 +395,7 @@ export default function PricingPage() {
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <span className="text-emerald-600 text-base">✓</span>
-                                    <span className="text-slate-700">Evidence preserved</span>
+                                    <span className="text-slate-700">Locked, immutable evidence</span>
                                 </li>
                             </ul>
                             <p className="text-xs text-emerald-700 mt-4 pt-3 border-t border-emerald-200">One payment. No subscription.</p>
@@ -374,10 +415,25 @@ export default function PricingPage() {
                     </p>
                 </div>
 
-                {/* FAQ Section */}
+                {/* Guides Link for Trust */}
+                <div className="max-w-xl mx-auto mt-8 text-center">
+                    <p className="text-sm text-slate-500">
+                        New to renting? Read our{' '}
+                        <Link href="/guides" className="text-slate-700 underline hover:text-slate-900">
+                            free guides for tenants
+                        </Link>
+                        .
+                    </p>
+                </div>
+
+                {/* FAQ Section - Collapsible */}
                 <div className="max-w-2xl mx-auto mt-16 md:mt-20">
                     <h2 className="text-2xl font-bold text-center mb-8">Frequently asked questions</h2>
-                    <FAQAccordion items={faqItems} />
+                    <div className="bg-white rounded-xl border border-slate-200 p-6">
+                        {faqItems.map((item, index) => (
+                            <FAQItem key={index} question={item.question} answer={item.answer} />
+                        ))}
+                    </div>
                 </div>
             </main>
 

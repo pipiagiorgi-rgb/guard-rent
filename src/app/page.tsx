@@ -1,27 +1,27 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { FileText, Clock, Lock, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check } from 'lucide-react'
+import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-    title: 'RentVault | Protect Your Rental Deposit — Document & Organise Your Tenancy',
-    description: 'A secure vault for tenants to store contracts, photos, and key dates. Document property condition at move-in, get deadline reminders, and protect your deposit with timestamped evidence.',
-    keywords: 'rental deposit protection, tenant documentation, move-in photos, rental contract storage, deposit dispute evidence, tenancy organiser, expat rental, property condition report',
+    title: 'RentVault | Protect Your Rental Deposit — Organise Documents, Photos & Deadlines',
+    description: 'A secure, private vault for tenants to organise rental documents, move-in and move-out photos, and key notice dates. Evidence-based protection before disputes arise.',
+    keywords: 'rental deposit protection, tenant documentation, move-in photos, rental contract storage, deposit dispute evidence, tenancy organiser, expat rental, property condition report, notice period reminders',
     alternates: {
         canonical: 'https://rentvault.ai'
     },
     openGraph: {
         title: 'RentVault | Protect Your Rental Deposit',
-        description: 'A secure vault for tenants to store contracts, photos, and key dates. Document property condition and protect your deposit.',
+        description: 'A secure, private vault for tenants to organise rental documents, move-in photos, and key notice dates — before disputes arise.',
         url: 'https://rentvault.ai',
         siteName: 'RentVault',
         type: 'website',
-        locale: 'en_US',
+        locale: 'en_GB',
     },
     twitter: {
         card: 'summary_large_image',
         title: 'RentVault | Protect Your Rental Deposit',
-        description: 'A secure vault for tenants to store contracts, photos, and key dates.',
+        description: 'A secure vault for tenants to organise rental documents, photos, and key dates.',
     },
     robots: {
         index: true,
@@ -35,7 +35,7 @@ export default function Home() {
         '@context': 'https://schema.org',
         '@type': 'WebApplication',
         name: 'RentVault',
-        description: 'A secure vault for tenants to store contracts, photos, and key dates. Document property condition and protect your deposit.',
+        description: 'A secure vault for tenants to organise rental documents, photos, and key dates. Evidence-based protection before disputes arise.',
         url: 'https://rentvault.ai',
         applicationCategory: 'UtilitiesApplication',
         operatingSystem: 'Web',
@@ -44,11 +44,6 @@ export default function Home() {
             price: '0',
             priceCurrency: 'EUR',
             description: 'Free to explore. Pay only if you export.'
-        },
-        aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '4.8',
-            ratingCount: '50'
         }
     }
 
@@ -76,9 +71,9 @@ export default function Home() {
                             </span>
                         </h1>
 
-                        {/* Subheadline */}
+                        {/* Subheadline - IMPROVED: Outcome-focused, no hype */}
                         <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed px-4 animate-fade-in-up opacity-0 delay-200">
-                            A secure vault for tenants to store contracts, photos, and key dates — all in one place.
+                            A secure, private vault for tenants to organise rental documents, move-in and move-out photos, and key notice dates — before disputes arise.
                         </p>
 
                         {/* CTA Buttons */}
@@ -99,7 +94,7 @@ export default function Home() {
                         </div>
 
                         <p className="text-sm text-slate-500 animate-fade-in-up opacity-0 delay-400">
-                            Free to explore. Pay only if you export your data.
+                            Free to explore. Pay only when you need official exports or extended retention.
                         </p>
 
                         {/* Trust Strip */}
@@ -126,13 +121,61 @@ export default function Home() {
                     </div>
                 </section>
 
+                {/* Why This Matters - MOVED UP, with source footnote */}
+                <section className="py-16 md:py-20 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
+                    <div className="max-w-[900px] mx-auto">
+                        <div className="text-center mb-10">
+                            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                                Why this matters
+                            </h2>
+                        </div>
+                        <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10 shadow-sm">
+                            <div className="space-y-6">
+                                <p className="text-slate-700 leading-relaxed text-base md:text-lg">
+                                    Formal rental-deposit dispute systems handle tens of thousands of cases each year
+                                    across major jurisdictions. In England & Wales alone, tenancy-deposit schemes processed
+                                    nearly <strong className="text-slate-900">47,000 disputes requiring adjudication</strong> in 2024/25.<sup className="text-slate-400">*</sup>
+                                </p>
+                                <p className="text-slate-700 leading-relaxed text-base md:text-lg">
+                                    These processes are <strong className="text-slate-900">evidence-based and deadline-driven</strong>.
+                                    Clear records, accurate timestamps, and preserved files can make a material difference.
+                                </p>
+                                <div className="pt-4 border-t border-slate-100">
+                                    <p className="text-slate-600 leading-relaxed">
+                                        RentVault helps tenants keep rental documents, photos, and key dates organised,
+                                        with system-generated timestamps and locked records that preserve what was recorded at the time.
+                                    </p>
+                                </div>
+                            </div>
+                            {/* Source footnote */}
+                            <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-slate-100">
+                                <sup>*</sup> Source:{' '}
+                                <a
+                                    href="https://www.tenancydepositscheme.com/resources/statistics/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline hover:text-slate-600"
+                                >
+                                    Tenancy Deposit Scheme statistics 2024/25
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Features Section */}
-                <section className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
+                <section className="py-20 md:py-28 px-4 md:px-6">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-14">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything in one place</h2>
                             <p className="text-slate-600 text-lg max-w-xl mx-auto">Tools to protect your deposit and stay organised.</p>
                         </div>
+
+                        {/* Differentiator line */}
+                        <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+                            Most rental tools are built for landlords or general contract management.
+                            RentVault is designed specifically for tenants to organise records, evidence, and deadlines throughout a rental.
+                        </p>
 
                         <div className="grid md:grid-cols-3 gap-6 md:gap-8">
                             {/* Contract clarity */}
@@ -172,7 +215,7 @@ export default function Home() {
                 </section>
 
                 {/* How it Works */}
-                <section className="py-20 md:py-28 px-4 md:px-6">
+                <section className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-14">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">How it works</h2>
@@ -229,6 +272,30 @@ export default function Home() {
                     </div>
                 </section>
 
+                {/* Guides for Tenants - NEW SECTION */}
+                <section className="py-12 md:py-16 px-4 md:px-6">
+                    <div className="max-w-[720px] mx-auto text-center">
+                        <div className="flex items-center justify-center gap-2 mb-6">
+                            <BookOpen size={20} className="text-slate-500" />
+                            <h2 className="text-xl font-semibold text-slate-900">Guides for tenants</h2>
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+                            <Link href="/guides/move-in-photos" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+                                Why move-in photos matter
+                            </Link>
+                            <Link href="/guides/notice-periods" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+                                Understanding notice periods
+                            </Link>
+                            <Link href="/guides/renting-abroad" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+                                Renting abroad: what to watch for
+                            </Link>
+                            <Link href="/guides/deposit-protection" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+                                How to protect your deposit
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Who it's for */}
                 <section className="py-16 md:py-20 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
                     <div className="max-w-[720px] mx-auto">
@@ -251,42 +318,12 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Why This Matters - EEAT with Statistics */}
-                <section className="py-16 md:py-20 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
-                    <div className="max-w-[900px] mx-auto">
-                        <div className="text-center mb-10">
-                            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                                Why this matters
-                            </h2>
-                        </div>
-                        <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10 shadow-sm">
-                            <div className="space-y-6">
-                                <p className="text-slate-700 leading-relaxed text-base md:text-lg">
-                                    Formal rental-deposit dispute systems process tens of thousands of cases every year
-                                    across major jurisdictions. In England & Wales alone, tenancy-deposit schemes handled
-                                    nearly <strong className="text-slate-900">47,000 disputes requiring adjudication</strong> in 2024/25.
-                                </p>
-                                <p className="text-slate-700 leading-relaxed text-base md:text-lg">
-                                    These processes are <strong className="text-slate-900">evidence-based and deadline-driven</strong>.
-                                    Keeping clear, organised records can make a material difference.
-                                </p>
-                                <div className="pt-4 border-t border-slate-100">
-                                    <p className="text-slate-600 leading-relaxed">
-                                        RentVault helps tenants keep rental documents, photos, and key dates organised,
-                                        with system-generated timestamps and locked records that preserve what was recorded at the time.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
                 {/* Final CTA */}
                 <section className="py-20 md:py-28 px-4 md:px-6">
                     <div className="max-w-[720px] mx-auto text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to get organised?</h2>
                         <p className="text-slate-600 mb-10 text-lg">
-                            Start for free. Pay only if you want to export your data.
+                            Start for free. Pay only when you need official exports or extended retention.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link
@@ -322,10 +359,29 @@ export default function Home() {
                     </div>
                 </section>
 
+                {/* AI Disclosure - Small FAQ clarification */}
+                <section className="py-8 px-4 md:px-6 border-t border-slate-100">
+                    <div className="max-w-[720px] mx-auto">
+                        <details className="group">
+                            <summary className="text-sm font-medium text-slate-600 cursor-pointer hover:text-slate-900 list-none flex items-center gap-2">
+                                <span className="text-slate-400 group-open:rotate-90 transition-transform">▶</span>
+                                Does RentVault use automated assistance?
+                            </summary>
+                            <div className="mt-3 text-sm text-slate-600 pl-5">
+                                <p className="mb-2">
+                                    Yes. RentVault uses automated assistance to help identify key dates and summarise rental documents.
+                                </p>
+                                <p className="text-slate-500">
+                                    Your uploaded files and timestamps remain the authoritative record. Not legal advice.
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </section>
+
                 {/* Footer */}
                 <Footer />
             </div>
         </>
     )
 }
-
