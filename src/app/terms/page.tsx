@@ -126,7 +126,7 @@ export default function TermsPage() {
                             For privacy-related requests:
                         </p>
                         <p className="text-slate-600">
-                            <a href="mailto:support@rentvault.ai" className="text-slate-900 underline hover:no-underline">support@rentvault.ai</a>
+                            <a href="mailto:contact@rentvault.ai" className="text-slate-900 underline hover:no-underline">contact@rentvault.ai</a>
                         </p>
                     </section>
                 </div>
