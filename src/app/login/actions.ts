@@ -48,7 +48,7 @@ export async function verifyOtp(email: string, token: string) {
     const { error } = await supabase.auth.verifyOtp({
         email,
         token: cleanToken,
-        type: 'email'
+        type: 'magiclink'
     })
 
     if (error) {
