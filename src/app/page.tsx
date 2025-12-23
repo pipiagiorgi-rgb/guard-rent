@@ -122,7 +122,7 @@ export default function Home() {
                 </section>
 
                 {/* Why This Matters - Urgency + SEO keywords */}
-                <section className="py-12 md:py-16 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
+                <section className="py-8 md:py-10 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
                     <div className="max-w-[900px] mx-auto">
                         <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10 shadow-sm">
                             <h2 className="text-2xl md:text-3xl font-bold mb-6 text-slate-900">
@@ -160,7 +160,7 @@ export default function Home() {
                 </section>
 
                 {/* Features Section */}
-                <section className="py-12 md:py-16 px-4 md:px-6">
+                <section className="py-8 md:py-10 px-4 md:px-6">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-8">
                             <h2 className="text-3xl md:text-4xl font-bold mb-3">Everything in one place</h2>
@@ -211,7 +211,7 @@ export default function Home() {
                 </section>
 
                 {/* How it Works */}
-                <section className="py-12 md:py-16 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
+                <section className="py-8 md:py-10 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-8">
                             <h2 className="text-3xl md:text-4xl font-bold mb-3">How it works</h2>
