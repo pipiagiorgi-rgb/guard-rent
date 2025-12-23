@@ -48,14 +48,34 @@ Return this exact JSON structure:
   "jurisdiction": { "value": "...", "confidence": "high/medium/low", "source": "..." }
 }
 
-=== ADDRESS EXTRACTION (HIGHEST PRIORITY) ===
-The property address is CRITICAL. Search THOROUGHLY for it:
-- Look for: "Lieu loué", "Objet du bail", "Désignation du bien", "situé à", "sis à"
-- Look for street patterns: "rue", "avenue", "boulevard", "place" + number
-- Look for postal codes: 4-5 digit numbers (1000, 75001, 1050, etc.)
-- The address is usually near the TOP of the contract or in a "DÉSIGNATION" section
-- Extract the FULL address: Street + Number + Postal Code + City
-- Do NOT confuse with landlord/tenant personal addresses (those appear in party sections)
+=== PROPERTY ADDRESS EXTRACTION (ABSOLUTE FIRST PRIORITY) ===
+The property address is THE MOST IMPORTANT field. NEVER return "not found" unless truly impossible.
+
+STEP 1 - SEARCH FOR ADDRESS HEADERS (common in all EU languages):
+- French: "Lieu loué", "Objet du bail", "Désignation du bien", "situé à", "sis à", "L'appartement/La maison"
+- German: "Mietobjekt", "Wohnung", "gelegen in", "Anschrift des Mietobjekts"
+- Dutch: "Gehuurde", "Woning gelegen", "Adres van het gehuurde"  
+- Spanish: "Vivienda", "Inmueble arrendado", "sito en"
+- Italian: "Immobile locato", "sito in", "ubicato"
+
+STEP 2 - SEARCH FOR STREET NAME PATTERNS:
+- "rue", "avenue", "boulevard", "place", "allée", "chemin" (French)
+- "Straße", "Strasse", "Weg", "Platz", "Gasse" (German)
+- "straat", "weg", "laan", "plein" (Dutch)
+- "calle", "avenida", "plaza" (Spanish)
+- "via", "viale", "piazza" (Italian)
+
+STEP 3 - SEARCH FOR POSTAL CODE PATTERNS:
+- 4-5 digits: 1000, 75001, 1050, 69001, 20000
+- Pattern: number + city name
+
+STEP 4 - EXCLUDE THESE (they are party addresses, NOT property):
+- Addresses appearing in "LE BAILLEUR" / "LANDLORD" sections
+- Addresses appearing in "LE LOCATAIRE" / "TENANT" sections
+- Anything marked as "domicile" or "representing"
+
+The property address is ALWAYS in the "DÉSIGNATION" or "OBJET DU BAIL" section!
+Extract the FULL address: Street Number + Street Name + Postal Code + City
 
 === TERMINATION RULES ===
 - "date anniversaire", "à l'échéance" → notice_condition = "anniversary only"

@@ -67,6 +67,19 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: result.error || 'Failed to send email' }, { status: 500 })
         }
 
+        // 5. Audit Log: Email Sent
+        await supabase.from('audit_logs').insert({
+            case_id: caseId,
+            user_id: user.id,
+            action: 'email_sent',
+            details: {
+                recipient: user.email,
+                pack_type: packType,
+                pdf_url: pdfUrl,
+                timestamp: new Date().toISOString()
+            }
+        })
+
         return NextResponse.json({
             success: true,
             message: 'Email sent successfully'

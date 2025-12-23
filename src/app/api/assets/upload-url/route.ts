@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json()
-        const { caseId, filename, mimeType, type, roomId } = body
+        const { caseId, filename, mimeType, type, roomId, fileHash } = body
 
         if (!caseId || !filename || !type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -46,8 +46,25 @@ export async function POST(request: Request) {
                 storage_path: storagePath,
                 mime_type: mimeType,
                 size_bytes: 0,
-                room_id: roomId || null, // Link to room if provided
+                room_id: roomId || null,
+                file_hash: fileHash || null // Integrity hash
             })
+
+        // 2. Audit Log (Evidence Integrity)
+        if (!dbError) {
+            await supabase.from('audit_logs').insert({
+                case_id: caseId,
+                user_id: user.id,
+                action: 'upload_initiated',
+                details: {
+                    asset_id: assetId,
+                    type,
+                    filename,
+                    room_id: roomId,
+                    file_hash: fileHash
+                }
+            })
+        }
 
         if (dbError) {
             console.error('DB Insert Error:', dbError)

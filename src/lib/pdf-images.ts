@@ -7,6 +7,8 @@ interface Asset {
     room_id: string | null
     type: string
     created_at: string
+    file_hash?: string
+    file_hash_server?: string
 }
 
 interface RoomPhotos {
@@ -16,15 +18,15 @@ interface RoomPhotos {
     handoverPhotos: Asset[]
 }
 
-// Constants for layout
-const THUMBNAIL_WIDTH = 120
-const THUMBNAIL_HEIGHT = 90
-const PHOTOS_PER_ROW = 4
-const MAX_PHOTOS_PER_PHASE = 4
-const MARGIN = 50
-const LABEL_HEIGHT = 14
-const TIMESTAMP_HEIGHT = 10
-const ROW_SPACING = 20
+// Constants for COURT-GRADE layout (dense, utilitarian)
+const THUMBNAIL_WIDTH = 160   // Larger for better evidence visibility
+const THUMBNAIL_HEIGHT = 120  // 4:3 ratio
+const PHOTOS_PER_ROW = 3      // Denser grid
+const MAX_PHOTOS_PER_PHASE = 9 // Show more evidence
+const MARGIN = 40             // Reduced margins
+const LABEL_HEIGHT = 12
+const TIMESTAMP_HEIGHT = 9
+const ROW_SPACING = 8         // Minimal spacing between rows
 
 /**
  * Fetch image bytes from Supabase Storage
@@ -116,7 +118,7 @@ export async function getPhotosGroupedByRoom(caseId: string): Promise<RoomPhotos
     // Fetch all photos
     const { data: assets } = await supabase
         .from('assets')
-        .select('asset_id, storage_path, room_id, type, created_at')
+        .select('asset_id, storage_path, room_id, type, created_at, file_hash, file_hash_server')
         .eq('case_id', caseId)
         .in('type', ['checkin_photo', 'photo', 'handover_photo'])
         .order('created_at')
@@ -204,12 +206,15 @@ export async function drawPhotoGrid(
             )
 
             // Draw timestamp below
-            const timestamp = new Date(photo.created_at).toLocaleString('en-GB', {
+            const timestamp = `Uploaded: ${new Date(photo.created_at).toLocaleString('en-GB', {
+                timeZone: 'UTC',
                 day: '2-digit',
                 month: 'short',
+                year: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit'
-            })
+                minute: '2-digit',
+                hour12: false
+            })} (UTC)`
             page.drawText(timestamp, {
                 x: xPos,
                 y: yPos - THUMBNAIL_HEIGHT - TIMESTAMP_HEIGHT - 2,
@@ -273,31 +278,31 @@ export async function drawComparisonGrid(
         font: fontBold,
         color: rgb(0.12, 0.14, 0.17),
     })
-    yPos -= 20
+    yPos -= 15
 
-    const halfWidth = (pageWidth - MARGIN * 2 - 20) / 2
-    const photosPerSide = 2 // 2 photos per phase in comparison mode
+    const halfWidth = (pageWidth - MARGIN * 2 - 15) / 2
+    const photosPerSide = 4 // Show more photos in comparison mode
 
     // Check-in column
     const checkinToShow = checkinPhotos.slice(0, photosPerSide)
     const handoverToShow = handoverPhotos.slice(0, photosPerSide)
 
-    // Draw column headers
-    page.drawText('Check-in', {
+    // Draw column headers (court-grade clarity)
+    page.drawText('Check-in (Move-in)', {
         x: MARGIN,
         y: yPos,
-        size: 10,
+        size: 9,
         font: fontBold,
-        color: rgb(0.4, 0.4, 0.4),
+        color: rgb(0.3, 0.3, 0.3),
     })
-    page.drawText('Handover', {
-        x: MARGIN + halfWidth + 20,
+    page.drawText('Handover (Move-out)', {
+        x: MARGIN + halfWidth + 15,
         y: yPos,
-        size: 10,
+        size: 9,
         font: fontBold,
-        color: rgb(0.4, 0.4, 0.4),
+        color: rgb(0.3, 0.3, 0.3),
     })
-    yPos -= 15
+    yPos -= 12
 
     // Draw photos side by side
     const maxPhotos = Math.max(checkinToShow.length, handoverToShow.length)
@@ -325,7 +330,7 @@ export async function drawComparisonGrid(
                     })
                     await embedImageInPdf(pdfDoc, page, imageBytes, xPos, yPos - thumbHeight, thumbWidth, thumbHeight)
 
-                    const ts = new Date(photo.created_at).toLocaleDateString('en-GB')
+                    const ts = `Uploaded: ${new Date(photo.created_at).toLocaleDateString('en-GB', { timeZone: 'UTC' })} (UTC)`
                     page.drawText(ts, { x: xPos, y: yPos - thumbHeight - 10, size: 6, font: fontRegular, color: rgb(0.5, 0.5, 0.5) })
                 }
             }
@@ -347,7 +352,7 @@ export async function drawComparisonGrid(
                     })
                     await embedImageInPdf(pdfDoc, page, imageBytes, xPos, yPos - thumbHeight, thumbWidth, thumbHeight)
 
-                    const ts = new Date(photo.created_at).toLocaleDateString('en-GB')
+                    const ts = `Uploaded: ${new Date(photo.created_at).toLocaleDateString('en-GB', { timeZone: 'UTC' })} (UTC)`
                     page.drawText(ts, { x: xPos, y: yPos - thumbHeight - 10, size: 6, font: fontRegular, color: rgb(0.5, 0.5, 0.5) })
                 }
             }
@@ -373,4 +378,69 @@ export async function drawComparisonGrid(
     }
 
     return yPos - 10
+}
+
+/**
+ * Draw File Integrity Appendix
+ */
+export async function drawHashAppendix(
+    pdfDoc: PDFDocument,
+    assets: Asset[],
+    fontBold: any,
+    fontRegular: any
+) {
+    if (assets.length === 0) return
+
+    const page = pdfDoc.addPage()
+    const { width, height } = page.getSize()
+    let yPos = height - 60
+
+    // Header
+    page.drawText('Appendix: File Integrity', {
+        x: MARGIN,
+        y: yPos,
+        size: 16,
+        font: fontBold,
+        color: rgb(0.12, 0.14, 0.17),
+    })
+    yPos -= 30
+
+    page.drawText('The following digital fingerprints (hashes) can be used to verify that the evidence records have not been altered.', {
+        x: MARGIN,
+        y: yPos,
+        size: 10,
+        font: fontRegular,
+        color: rgb(0.3, 0.3, 0.3),
+    })
+    yPos -= 30
+
+    // Table Header
+    page.drawText('Date (UTC)', { x: MARGIN, y: yPos, size: 9, font: fontBold })
+    page.drawText('Type', { x: MARGIN + 100, y: yPos, size: 9, font: fontBold })
+    page.drawText('SHA-256 Hash', { x: MARGIN + 180, y: yPos, size: 9, font: fontBold })
+    yPos -= 15
+
+    for (const asset of assets) {
+        if (yPos < 50) {
+            const newPage = pdfDoc.addPage()
+            yPos = height - 60
+            page.drawText('Appendix: File Integrity (Cont.)', { x: MARGIN, y: yPos, size: 12, font: fontBold })
+            yPos -= 30
+        }
+
+        const date = new Date(asset.created_at).toLocaleString('en-GB', {
+            timeZone: 'UTC',
+            day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        })
+
+        const typeLabel = asset.type.replace('_photo', '').replace('_', ' ')
+        const hash = asset.file_hash_server || asset.file_hash || 'Pending verification'
+
+        page.drawText(date, { x: MARGIN, y: yPos, size: 8, font: fontRegular })
+        page.drawText(typeLabel, { x: MARGIN + 100, y: yPos, size: 8, font: fontRegular })
+        page.drawText(hash.substring(0, 64), { x: MARGIN + 180, y: yPos, size: 7, font: fontRegular }) // Truncate if somehow too long, though sha256 hex is 64 chars
+
+        yPos -= 14
+    }
 }

@@ -44,9 +44,9 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
             <div className="lg:hidden mb-4 flex items-center justify-between">
                 <Link
                     href="/vault"
-                    className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors py-2"
+                    className="inline-flex items-center gap-2 text-base font-semibold text-slate-700 hover:text-slate-900 transition-colors py-2"
                 >
-                    <ChevronLeft size={16} />
+                    <ChevronLeft size={20} />
                     All rentals
                 </Link>
                 <span className="font-semibold text-slate-900 truncate max-w-[180px]">{caseLabel}</span>
@@ -56,9 +56,9 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
             <div className="mb-4 hidden lg:block">
                 <Link
                     href="/vault"
-                    className="text-xs text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1 mb-2"
+                    className="text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1.5 mb-3"
                 >
-                    <ChevronLeft size={14} />
+                    <ChevronLeft size={16} />
                     All rentals
                 </Link>
                 <h2 className="font-semibold text-slate-900 truncate">{caseLabel}</h2>

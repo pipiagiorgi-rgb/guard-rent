@@ -1,6 +1,7 @@
 -- =================================================================
 -- RENTVAULT - COMPLETE CORRECTED SCHEMA
 -- Includes Security Fixes for 'Unrestricted' Warnings
+-- Includes Evidence Integrity & Dispute-Ready Features
 -- Safe to run multiple times (idempotent)
 -- =================================================================
 
@@ -68,6 +69,7 @@ CREATE TABLE IF NOT EXISTS cases (
   expiry_notified_at TIMESTAMPTZ,
   final_expiry_notified_at TIMESTAMPTZ,
   extension_count INT DEFAULT 0,
+  pdf_customization JSONB,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -116,6 +118,8 @@ CREATE TABLE IF NOT EXISTS assets (
   storage_path TEXT NOT NULL,
   mime_type TEXT,
   size_bytes BIGINT,
+  file_hash TEXT,
+  file_hash_server TEXT,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -251,7 +255,96 @@ ON deletion_audit FOR INSERT
 WITH CHECK (case_id IN (SELECT case_id FROM cases WHERE user_id = auth.uid()));
 
 -- =========================
--- 11. AUTO-CREATE PROFILE TRIGGER
+-- 11. AUDIT LOGS (Evidence Integrity)
+-- =========================
+CREATE TABLE IF NOT EXISTS audit_logs (
+  log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  case_id UUID REFERENCES cases(case_id) ON DELETE SET NULL,
+  user_id UUID REFERENCES profiles(user_id) ON DELETE CASCADE,
+  action TEXT NOT NULL,
+  details JSONB,
+  ip_address TEXT,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own audit logs" ON audit_logs;
+CREATE POLICY "Users can view own audit logs"
+ON audit_logs FOR SELECT
+USING (user_id = auth.uid());
+
+DROP POLICY IF EXISTS "Users can insert audit logs" ON audit_logs;
+CREATE POLICY "Users can insert audit logs"
+ON audit_logs FOR INSERT
+WITH CHECK (auth.uid() = user_id);
+
+-- =========================
+-- 12. EVIDENCE LOCKING POLICIES
+-- =========================
+-- Prevent delete of locked evidence (Check-in OR Handover)
+DROP POLICY IF EXISTS "Prevent delete of locked evidence" ON assets;
+CREATE POLICY "Prevent delete of locked evidence"
+ON assets FOR DELETE
+USING (
+  auth.uid() = user_id 
+  AND (
+    -- Check-in Locking
+    (
+        assets.type IN ('checkin_photo', 'photo') AND
+        NOT EXISTS (SELECT 1 FROM cases WHERE cases.case_id = assets.case_id AND cases.checkin_completed_at IS NOT NULL)
+    )
+    OR
+    -- Handover Locking
+    (
+        assets.type IN ('handover_photo') AND
+        NOT EXISTS (SELECT 1 FROM cases WHERE cases.case_id = assets.case_id AND cases.handover_completed_at IS NOT NULL)
+    )
+    OR
+    -- Other types
+    assets.type NOT IN ('checkin_photo', 'photo', 'handover_photo')
+  )
+);
+
+-- Prevent update of locked evidence
+DROP POLICY IF EXISTS "Prevent update of locked evidence" ON assets;
+CREATE POLICY "Prevent update of locked evidence"
+ON assets FOR UPDATE
+USING (
+  auth.uid() = user_id 
+  AND (
+    (
+        assets.type IN ('checkin_photo', 'photo') AND
+        NOT EXISTS (SELECT 1 FROM cases WHERE cases.case_id = assets.case_id AND cases.checkin_completed_at IS NOT NULL)
+    )
+    OR
+    (
+        assets.type IN ('handover_photo') AND
+        NOT EXISTS (SELECT 1 FROM cases WHERE cases.case_id = assets.case_id AND cases.handover_completed_at IS NOT NULL)
+    )
+    OR
+    assets.type NOT IN ('checkin_photo', 'photo', 'handover_photo')
+  )
+)
+WITH CHECK (
+  auth.uid() = user_id 
+  AND (
+    (
+        assets.type IN ('checkin_photo', 'photo') AND
+        NOT EXISTS (SELECT 1 FROM cases WHERE cases.case_id = assets.case_id AND cases.checkin_completed_at IS NOT NULL)
+    )
+    OR
+    (
+        assets.type IN ('handover_photo') AND
+        NOT EXISTS (SELECT 1 FROM cases WHERE cases.case_id = assets.case_id AND cases.handover_completed_at IS NOT NULL)
+    )
+    OR
+    assets.type NOT IN ('checkin_photo', 'photo', 'handover_photo')
+  )
+);
+
+-- =========================
+-- 13. AUTO-CREATE PROFILE TRIGGER
 -- =========================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$

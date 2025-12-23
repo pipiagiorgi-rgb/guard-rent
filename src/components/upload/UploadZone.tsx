@@ -24,6 +24,12 @@ export default function UploadZone({ caseId, type, onUploadComplete, label = "Ad
         setSuccess(false)
 
         try {
+            // 0. Compute SHA-256 Hash for Evidence Integrity
+            const buffer = await file.arrayBuffer()
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
+            const hashArray = Array.from(new Uint8Array(hashBuffer))
+            const fileHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+
             // 1. Request Signed URL
             const res = await fetch('/api/assets/upload-url', {
                 method: 'POST',
@@ -34,7 +40,8 @@ export default function UploadZone({ caseId, type, onUploadComplete, label = "Ad
                     caseId,
                     filename: file.name,
                     mimeType: file.type,
-                    type
+                    type,
+                    fileHash
                 })
             })
 
@@ -51,6 +58,13 @@ export default function UploadZone({ caseId, type, onUploadComplete, label = "Ad
             })
 
             if (!uploadRes.ok) throw new Error('Upload failed. Please try again.')
+
+            // 3. Confirm & Verify (Server-side)
+            await fetch('/api/assets/confirm-upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assetId, caseId })
+            })
 
             setSuccess(true)
             if (onUploadComplete) onUploadComplete(assetId)

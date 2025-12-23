@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Camera, Plus, Check, Loader2, Upload, Trash2, AlertCircle, Gauge, ChevronDown, ChevronUp, X, ImageIcon, Eye } from 'lucide-react'
+import { Camera, Plus, Check, Loader2, Upload, Trash2, AlertCircle, Gauge, ChevronDown, ChevronUp, X, ImageIcon, Eye, Lock, ShieldCheck } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import { canUploadPreviewPhoto, getPhotosRemaining, recordPreviewPhoto, isPurchased } from '@/lib/preview-limits'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
@@ -43,6 +43,8 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     const [newRoomName, setNewRoomName] = useState('')
     const [error, setError] = useState<string | null>(null)
     const [hasPack, setHasPack] = useState(false)
+    const [isLocked, setIsLocked] = useState(false)
+    const [locking, setLocking] = useState(false)
 
     // Meter readings state
     const [meterReadings, setMeterReadings] = useState<MeterReadings>({})
@@ -73,13 +75,14 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             // Fetch case data (meter readings and purchase status)
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('checkin_meter_readings, purchase_type')
+                .select('checkin_meter_readings, purchase_type, checkin_completed_at')
                 .eq('case_id', id)
                 .single()
 
             // Check if user has purchased a pack
             if (caseData) {
                 setHasPack(isPurchased(caseData.purchase_type))
+                setIsLocked(!!caseData.checkin_completed_at)
             }
 
             if (caseData?.checkin_meter_readings) {
@@ -283,6 +286,25 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
         }
     }
 
+    const handleLockCheckIn = async () => {
+        if (!confirm('Are you sure you want to complete and lock the check-in? Use this only when you have uploaded all evidence. This action cannot be undone.')) return
+        setLocking(true)
+        try {
+            const res = await fetch(`/api/cases/${caseId}/lock-checkin`, { method: 'POST' })
+            if (!res.ok) throw new Error('Failed to lock check-in')
+
+            setIsLocked(true)
+            await loadData(caseId)
+        } catch (err) {
+            console.error('Lock error:', err)
+            setError('Failed to lock check-in')
+        } finally {
+            setLocking(false)
+        }
+    }
+
+
+
     const removeMeterPhoto = async (type: keyof MeterReadings) => {
         const updated = {
             ...meterReadings,
@@ -388,6 +410,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     }
 
     const handleDeletePhoto = async (photo: Asset) => {
+        if (isLocked) return
         if (!confirm('Delete this photo?')) return
 
         try {
@@ -447,15 +470,40 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             )}
 
             {/* Status banner */}
-            {isComplete ? (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-                    <Check className="text-green-600" size={20} />
+            {isLocked ? (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-3">
+                    <div className="p-2 bg-slate-100 rounded-full">
+                        <ShieldCheck className="text-slate-700" size={24} />
+                    </div>
                     <div>
-                        <p className="font-medium text-green-900">Check-in evidence recorded</p>
-                        <p className="text-sm text-green-700">
-                            {totalPhotos} photos across {rooms.filter(r => r.checkin_photos > 0).length} rooms
+                        <p className="font-semibold text-slate-900">Check-in Evidence Locked</p>
+                        <p className="text-sm text-slate-600">
+                            Photos are sealed with system timestamps and cannot be changed.
                         </p>
                     </div>
+                </div>
+            ) : isComplete ? (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                        <Check className="text-green-600" size={20} />
+                        <div>
+                            <p className="font-medium text-green-900">Check-in evidence recorded</p>
+                            <p className="text-sm text-green-700">
+                                {totalPhotos} photos across {rooms.filter(r => r.checkin_photos > 0).length} rooms
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleLockCheckIn}
+                        disabled={locking}
+                        className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                    >
+                        {locking ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} />}
+                        Complete & Lock Check-in
+                    </button>
+                    <p className="text-xs text-green-600 mt-2 text-center">
+                        This seals your evidence with immutable timestamps.
+                    </p>
                 </div>
             ) : (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
@@ -490,7 +538,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                                     <span className="text-sm text-slate-500">{room.checkin_photos} photos</span>
                                 )}
                                 {(() => {
-                                    const canUpload = hasPack || canUploadPreviewPhoto(caseId)
+                                    const canUpload = !isLocked && (hasPack || canUploadPreviewPhoto(caseId))
                                     const isUploading = uploading === room.room_id
                                     return (
                                         <label className={`flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-medium transition-colors ${!canUpload || isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'
@@ -546,6 +594,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                                             >
                                                 <X size={14} />
                                             </button>
+
                                         </div>
                                     ))}
                                     {room.photos.length > 4 && (
@@ -583,7 +632,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                             <button onClick={() => setAddingRoom(false)} className="px-4 py-2 text-slate-600">Cancel</button>
                         </div>
                     ) : (
-                        <button onClick={() => setAddingRoom(true)} className="flex items-center gap-2 text-slate-500 hover:text-slate-700">
+                        <button onClick={() => setAddingRoom(true)} disabled={isLocked} className={`flex items-center gap-2 text-slate-500 hover:text-slate-700 ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
                             <Plus size={20} />
                             <span className="font-medium">Add another room</span>
                         </button>

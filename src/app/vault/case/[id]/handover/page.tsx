@@ -61,6 +61,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     const [hasPack, setHasPack] = useState(false)
     const [showEditWarning, setShowEditWarning] = useState(false)
     const [allowEdit, setAllowEdit] = useState(false)
+    const [depositProof, setDepositProof] = useState<Asset | null>(null)
 
     // Lightbox State
     const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -126,11 +127,14 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     .from('assets')
                     .select('*')
                     .eq('case_id', id)
-                    .eq('type', 'handover_photo')
+                    .in('type', ['handover_photo', 'deposit_proof'])
                     .order('created_at', { ascending: false })
 
+                const dp = assets?.find(a => a.type === 'deposit_proof') || null
+                setDepositProof(dp)
+
                 const roomsWithPhotos = roomsData.map(room => {
-                    const roomAssets = assets?.filter(a => a.room_id === room.room_id) || []
+                    const roomAssets = assets?.filter(a => a.room_id === room.room_id && a.type === 'handover_photo') || []
                     return {
                         ...room,
                         handover_photos: roomAssets.length,
@@ -266,6 +270,52 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
         }
     }
 
+    const handleDepositUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files
+        if (!files || files.length === 0) return
+        const file = files[0]
+        setUploading('deposit')
+        setError(null)
+
+        try {
+            const res = await fetch('/api/assets/upload-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    caseId,
+                    filename: file.name,
+                    mimeType: file.type,
+                    type: 'deposit_proof',
+                })
+            })
+
+            if (!res.ok) throw new Error('Failed to get upload URL')
+            const { signedUrl, assetId } = await res.json()
+
+            const uploadRes = await fetch(signedUrl, {
+                method: 'PUT',
+                body: file,
+                headers: { 'Content-Type': file.type }
+            })
+
+            if (!uploadRes.ok) throw new Error('Upload failed')
+
+            // Verify
+            await fetch('/api/assets/confirm-upload', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ assetId, caseId })
+            })
+
+            await loadData(caseId)
+
+        } catch (err: any) {
+            console.error('Deposit upload error:', err)
+            setError('Failed to upload proof of deposit')
+        } finally {
+            setUploading(null)
+            e.target.value = ''
+        }
+    }
+
     const removeMeterPhoto = async (type: keyof HandoverState['meterReadings']) => {
         setHandover(prev => {
             const current = prev.meterReadings[type]
@@ -328,34 +378,32 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     }
 
     const handleConfirmKeys = async () => {
+        if (!confirm('Confirm keys returned? This event will be logged securely.')) return
         setSaving(true)
         try {
-            const supabase = createClient()
-            const now = new Date().toISOString()
-            await supabase
-                .from('cases')
-                .update({ keys_returned_at: now })
-                .eq('case_id', caseId)
-            setHandover(prev => ({ ...prev, keysReturned: true, keysConfirmedAt: now }))
+            const res = await fetch(`/api/cases/${caseId}/confirm-keys`, { method: 'POST' })
+            if (!res.ok) throw new Error('Failed to confirm keys')
+            const { timestamp } = await res.json()
+            setHandover(prev => ({ ...prev, keysReturned: true, keysConfirmedAt: timestamp }))
         } catch (err) {
             console.error(err)
+            setError('Failed to confirm keys')
         } finally {
             setSaving(false)
         }
     }
 
     const handleMarkComplete = async () => {
+        if (!confirm('Are you sure you want to COMPLETE & LOCK handover? This seals your evidence and prevents further changes.')) return
         setSaving(true)
         try {
-            const supabase = createClient()
-            const now = new Date().toISOString()
-            await supabase
-                .from('cases')
-                .update({ handover_completed_at: now })
-                .eq('case_id', caseId)
-            setHandover(prev => ({ ...prev, completedAt: now }))
+            const res = await fetch(`/api/cases/${caseId}/lock-handover`, { method: 'POST' })
+            if (!res.ok) throw new Error('Failed to lock handover')
+            const { timestamp } = await res.json()
+            setHandover(prev => ({ ...prev, completedAt: timestamp }))
         } catch (err) {
             console.error(err)
+            setError('Failed to lock handover')
         } finally {
             setSaving(false)
         }
@@ -783,6 +831,37 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             </div>
 
             {/* ═══════════════════════════════════════════════════════════
+                STEP: DEPOSIT PROOF
+            ═══════════════════════════════════════════════════════════ */}
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${depositProof ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                            <FileText size={16} />
+                        </div>
+                        <div>
+                            <h2 className="font-medium">Deposit payment proof</h2>
+                            <p className="text-sm text-slate-500">
+                                {depositProof
+                                    ? `Uploaded ${new Date(depositProof.created_at).toLocaleDateString()}`
+                                    : 'Upload proof of deposit payment'}
+                            </p>
+                        </div>
+                    </div>
+                    {depositProof ? (
+                        <div className="flex items-center gap-2">
+                            <button onClick={() => handleDeletePhoto(depositProof)} className="text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 px-3 py-1 rounded-md">Remove</button>
+                        </div>
+                    ) : (
+                        <label className={`px-4 py-2 bg-white border border-slate-200 rounded-lg font-medium cursor-pointer hover:bg-slate-50 flex items-center gap-2 ${uploading === 'deposit' ? 'opacity-50' : ''}`}>
+                            <input type="file" onChange={handleDepositUpload} disabled={!!uploading} className="hidden" />
+                            {uploading === 'deposit' ? <Loader2 size={16} className="animate-spin" /> : 'Upload'}
+                        </label>
+                    )}
+                </div>
+            </div>
+
+            {/* ═══════════════════════════════════════════════════════════
                 STEP D: KEYS RETURNED
             ═══════════════════════════════════════════════════════════ */}
             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
@@ -816,24 +895,34 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             {/* ═══════════════════════════════════════════════════════════
                 COMPLETE HANDOVER BUTTON
             ═══════════════════════════════════════════════════════════ */}
+            {/* ═══════════════════════════════════════════════════════════
+                COMPLETE HANDOVER BUTTON
+            ═══════════════════════════════════════════════════════════ */}
             <div className="pt-4">
                 <button
                     onClick={handleMarkComplete}
                     disabled={!canComplete || saving}
-                    className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors ${canComplete
+                    className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${canComplete
                         ? 'bg-slate-900 text-white hover:bg-slate-800'
                         : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                         }`}
                 >
                     {saving ? (
-                        <Loader2 className="animate-spin mx-auto" size={24} />
+                        <Loader2 className="animate-spin" size={24} />
                     ) : (
-                        'Mark handover complete'
+                        <>
+                            <Lock size={20} />
+                            Complete & Lock Handover
+                        </>
                     )}
                 </button>
-                {!canComplete && (
+                {!canComplete ? (
                     <p className="text-sm text-slate-500 text-center mt-2">
                         Add at least one handover photo to complete
+                    </p>
+                ) : (
+                    <p className="text-xs text-slate-500 text-center mt-2">
+                        Seals evidence with immutable timestamps.
                     </p>
                 )}
             </div>

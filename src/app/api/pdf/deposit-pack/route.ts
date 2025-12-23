@@ -1,12 +1,181 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import { PDFDocument, StandardFonts, rgb, PDFPage } from 'pdf-lib'
 import { v4 as uuidv4 } from 'uuid'
 import { isAdminEmail } from '@/lib/admin'
-import { getPhotosGroupedByRoom, drawComparisonGrid, drawPhotoGrid } from '@/lib/pdf-images'
+import { getPhotosGroupedByRoom, drawComparisonGrid, drawPhotoGrid, drawHashAppendix } from '@/lib/pdf-images'
 
 const MARGIN = 50
 const FOOTER_TEXT = 'RentVault securely stores and organises your rental documents. Not legal advice.'
+
+interface CustomSections {
+    personalNotes?: string
+    propertyReview?: string
+    propertyRating?: number
+    customTitle?: string
+    customContent?: string
+    // Include toggles (default: true if not specified)
+    includePersonalNotes?: boolean
+    includePropertyReview?: boolean
+    includeCustomSection?: boolean
+}
+
+/**
+ * Draw page number footer
+ */
+function drawPageNumber(page: PDFPage, pageNum: number, totalPages: number, font: any) {
+    const { width } = page.getSize()
+    page.drawText(`Page ${pageNum} of ${totalPages}`, {
+        x: width - MARGIN - 60,
+        y: 40,
+        size: 9,
+        font,
+        color: rgb(0.5, 0.5, 0.5),
+    })
+}
+
+/**
+ * Simple text wrapping utility
+ */
+function wrapText(text: string, maxChars: number): string[] {
+    const lines: string[] = []
+    const paragraphs = text.split('\n')
+
+    for (const paragraph of paragraphs) {
+        const words = paragraph.split(' ')
+        let currentLine = ''
+
+        for (const word of words) {
+            if ((currentLine + ' ' + word).length > maxChars) {
+                if (currentLine) lines.push(currentLine)
+                currentLine = word
+            } else {
+                currentLine = currentLine ? currentLine + ' ' + word : word
+            }
+        }
+        if (currentLine) lines.push(currentLine)
+    }
+
+    return lines
+}
+
+/**
+ * Draw custom sections on a page, returns new Y position
+ */
+function drawCustomSections(
+    page: PDFPage,
+    customSections: CustomSections,
+    yPos: number,
+    fontBold: any,
+    fontRegular: any
+): number {
+    // Property Review with star rating (check include toggle)
+    const includeReview = customSections.includePropertyReview !== false
+    if (includeReview && (customSections.propertyRating || customSections.propertyReview)) {
+        yPos -= 30
+        page.drawText('Property Review (User-Provided)', {
+            x: MARGIN,
+            y: yPos,
+            size: 14,
+            font: fontBold,
+            color: rgb(0.12, 0.14, 0.17),
+        })
+        yPos -= 16
+        page.drawText('Subjective feedback provided by tenant', {
+            x: MARGIN,
+            y: yPos,
+            size: 8,
+            font: fontRegular,
+            color: rgb(0.5, 0.5, 0.5),
+        })
+        yPos -= 16
+
+        if (customSections.propertyRating) {
+            const stars = '★'.repeat(customSections.propertyRating) + '☆'.repeat(5 - customSections.propertyRating)
+            page.drawText(`Rating: ${stars}`, {
+                x: MARGIN,
+                y: yPos,
+                size: 12,
+                font: fontRegular,
+                color: rgb(0.85, 0.6, 0.1),
+            })
+            yPos -= 18
+        }
+
+        if (customSections.propertyReview) {
+            const reviewLines = wrapText(customSections.propertyReview, 80)
+            for (const line of reviewLines.slice(0, 6)) {
+                page.drawText(line, {
+                    x: MARGIN,
+                    y: yPos,
+                    size: 10,
+                    font: fontRegular,
+                })
+                yPos -= 14
+            }
+        }
+    }
+
+    // Personal Notes (check include toggle)
+    const includeNotes = customSections.includePersonalNotes !== false
+    if (includeNotes && customSections.personalNotes) {
+        yPos -= 20
+        page.drawText('Personal Notes (User-Provided)', {
+            x: MARGIN,
+            y: yPos,
+            size: 14,
+            font: fontBold,
+            color: rgb(0.12, 0.14, 0.17),
+        })
+        yPos -= 16
+        page.drawText('Notes provided by tenant for their records', {
+            x: MARGIN,
+            y: yPos,
+            size: 8,
+            font: fontRegular,
+            color: rgb(0.5, 0.5, 0.5),
+        })
+        yPos -= 16
+
+        const noteLines = wrapText(customSections.personalNotes, 80)
+        for (const line of noteLines.slice(0, 8)) {
+            page.drawText(line, {
+                x: MARGIN,
+                y: yPos,
+                size: 10,
+                font: fontRegular,
+            })
+            yPos -= 14
+        }
+    }
+
+    // Custom Section (check include toggle)
+    const includeCustom = customSections.includeCustomSection !== false
+    if (includeCustom && customSections.customTitle && customSections.customContent) {
+        yPos -= 20
+        page.drawText(customSections.customTitle, {
+            x: MARGIN,
+            y: yPos,
+            size: 14,
+            font: fontBold,
+            color: rgb(0.12, 0.14, 0.17),
+        })
+        yPos -= 20
+
+        const contentLines = wrapText(customSections.customContent, 80)
+        for (const line of contentLines.slice(0, 8)) {
+            page.drawText(line, {
+                x: MARGIN,
+                y: yPos,
+                size: 10,
+                font: fontRegular,
+            })
+            yPos -= 14
+        }
+    }
+
+    return yPos
+}
 
 export async function POST(request: Request) {
     const supabase = await createClient()
@@ -21,7 +190,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json()
-        const { caseId } = body
+        const { caseId, customSections = {} } = body as { caseId: string; customSections?: CustomSections }
 
         if (!caseId) {
             return NextResponse.json({ error: 'Missing Case ID' }, { status: 400 })
@@ -70,37 +239,45 @@ export async function POST(request: Request) {
         const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
         const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica)
 
+        // Track all pages for page numbering
+        const pages: PDFPage[] = []
+
         // === PAGE 1: COVER ===
         const coverPage = pdfDoc.addPage()
+        pages.push(coverPage)
         const { width, height } = coverPage.getSize()
 
-        // Header
-        coverPage.drawText('RentVault', {
+        // Formal document title (court-grade, not marketing)
+        coverPage.drawText('Rental Property Evidence Record', {
             x: MARGIN,
-            y: height - 60,
-            size: 28,
+            y: height - 50,
+            size: 18,
             font: helveticaBold,
-            color: rgb(0.12, 0.14, 0.17),
+            color: rgb(0.1, 0.1, 0.1),
         })
 
-        coverPage.drawText('Deposit Recovery Pack', {
+        // Subtitle with generation date
+        const generatedDate = new Date().toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        })
+        coverPage.drawText(`Generated: ${generatedDate}`, {
             x: MARGIN,
-            y: height - 100,
-            size: 22,
-            font: helveticaBold,
-            color: rgb(0.12, 0.14, 0.17),
+            y: height - 70,
+            size: 10,
+            font: helvetica,
+            color: rgb(0.4, 0.4, 0.4),
         })
 
-        // Divider
+        // Thin divider
         coverPage.drawLine({
-            start: { x: MARGIN, y: height - 120 },
-            end: { x: width - MARGIN, y: height - 120 },
-            thickness: 2,
-            color: rgb(0.12, 0.14, 0.17),
+            start: { x: MARGIN, y: height - 85 },
+            end: { x: width - MARGIN, y: height - 85 },
+            thickness: 0.5,
+            color: rgb(0.3, 0.3, 0.3),
         })
 
-        // Property details
-        let yPos = height - 160
+        // Property details - compact layout
+        let yPos = height - 110
 
         coverPage.drawText('Property Details', {
             x: MARGIN,
@@ -145,6 +322,9 @@ export async function POST(request: Request) {
 
         const evidence = [
             ['Check-in photos', `${totalCheckin} photos`],
+            ['Check-in sealed', rentalCase.checkin_completed_at
+                ? new Date(rentalCase.checkin_completed_at).toLocaleDateString('en-GB')
+                : 'Not sealed'],
             ['Handover photos', `${totalHandover} photos`],
             ['Rooms documented', `${roomPhotos.length} rooms`],
             ['Handover completed', rentalCase.handover_completed_at
@@ -187,9 +367,13 @@ export async function POST(request: Request) {
                     let displayValue: string
                     if (typeof reading === 'object' && reading !== null) {
                         const readingObj = reading as Record<string, unknown>
-                        displayValue = readingObj.value
-                            ? String(readingObj.value) + (readingObj.unit ? ` ${readingObj.unit}` : '')
-                            : JSON.stringify(reading)
+                        // Skip if no actual value recorded
+                        if (!readingObj.value || String(readingObj.value).trim() === '') {
+                            continue
+                        }
+                        displayValue = String(readingObj.value) + (readingObj.unit ? ` ${readingObj.unit}` : '')
+                    } else if (String(reading).trim() === '') {
+                        continue
                     } else {
                         displayValue = String(reading)
                     }
@@ -234,6 +418,11 @@ export async function POST(request: Request) {
             }
         }
 
+        // Custom sections from user
+        if (Object.keys(customSections).length > 0) {
+            yPos = drawCustomSections(coverPage, customSections, yPos, helveticaBold, helvetica)
+        }
+
         // Footer
         coverPage.drawText(FOOTER_TEXT, {
             x: MARGIN,
@@ -250,27 +439,28 @@ export async function POST(request: Request) {
 
             // Add a new page for this room
             let photoPage = pdfDoc.addPage()
-            let pageY = photoPage.getHeight() - 60
+            pages.push(photoPage)
+            let pageY = photoPage.getHeight() - 45
 
-            // Room header
-            photoPage.drawText('RentVault', {
+            // Simple page header with room name (no repeated branding)
+            photoPage.drawText(`Evidence: ${room.roomName}`, {
                 x: MARGIN,
-                y: photoPage.getHeight() - 40,
-                size: 14,
+                y: photoPage.getHeight() - 30,
+                size: 12,
                 font: helveticaBold,
-                color: rgb(0.5, 0.5, 0.5),
+                color: rgb(0.3, 0.3, 0.3),
             })
 
             if (hasBothPhases) {
-                // Side-by-side comparison
-                photoPage.drawText('Before / After Comparison', {
+                // Court-grade comparison header
+                photoPage.drawText('Condition Comparison', {
                     x: MARGIN,
                     y: pageY,
-                    size: 16,
+                    size: 14,
                     font: helveticaBold,
-                    color: rgb(0.12, 0.14, 0.17),
+                    color: rgb(0.1, 0.1, 0.1),
                 })
-                pageY -= 30
+                pageY -= 25
 
                 pageY = await drawComparisonGrid(
                     pdfDoc,
@@ -333,6 +523,16 @@ export async function POST(request: Request) {
                 color: rgb(0.5, 0.5, 0.5),
             })
         }
+
+        // === APPENDIX: FILE INTEGRITY ===
+        const allAssets = roomPhotos.flatMap(r => [...r.checkinPhotos, ...r.handoverPhotos])
+        await drawHashAppendix(pdfDoc, allAssets, helveticaBold, helvetica)
+
+        // Add page numbers to all pages
+        const totalPages = pages.length
+        pages.forEach((page, idx) => {
+            drawPageNumber(page, idx + 1, totalPages, helvetica)
+        })
 
         // Save PDF
         const pdfBytes = await pdfDoc.save()

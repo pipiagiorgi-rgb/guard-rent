@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
     FileText, Camera, Download, Lock, Check,
@@ -36,6 +36,10 @@ interface CustomSection {
     propertyRating: number
     customTitle: string
     customContent: string
+    // Include toggles (default: true)
+    includePersonalNotes: boolean
+    includePropertyReview: boolean
+    includeCustomSection: boolean
 }
 
 export default function ExportsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -72,7 +76,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         propertyReview: '',
         propertyRating: 0,
         customTitle: '',
-        customContent: ''
+        customContent: '',
+        includePersonalNotes: true,
+        includePropertyReview: true,
+        includeCustomSection: true
     })
 
     // PDF Preview State
@@ -81,14 +88,119 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const [previewType, setPreviewType] = useState<string | null>(null)
     const [previewing, setPreviewing] = useState<string | null>(null)
 
+    // Save status for PDF customization
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+    const [lastSavedAt, setLastSavedAt] = useState<string | null>(null)
+    const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const lastSavedRef = useRef<string>('')
+
     useEffect(() => {
         async function load() {
             const { id } = await params
             setCaseId(id)
             await loadEvidence(id)
+            await loadPdfCustomization(id)
         }
         load()
     }, [params])
+
+    // Autosave effect
+    useEffect(() => {
+        if (!caseId) return
+
+        const currentData = JSON.stringify(customSections)
+        if (currentData === lastSavedRef.current) return
+
+        // Clear existing timeout
+        if (saveTimeoutRef.current) {
+            clearTimeout(saveTimeoutRef.current)
+        }
+
+        // Debounce save
+        saveTimeoutRef.current = setTimeout(() => {
+            savePdfCustomization()
+        }, 800)
+
+        return () => {
+            if (saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current)
+            }
+        }
+    }, [customSections, caseId])
+
+    const loadPdfCustomization = async (id: string) => {
+        try {
+            const res = await fetch(`/api/cases/${id}/pdf-customization`)
+            if (res.ok) {
+                const { data, saved_at } = await res.json()
+                if (data) {
+                    setCustomSections({
+                        personalNotes: data.personal_notes || '',
+                        propertyReview: data.property_review || '',
+                        propertyRating: data.property_rating || 0,
+                        customTitle: data.custom_title || '',
+                        customContent: data.custom_content || '',
+                        includePersonalNotes: data.include_personal_notes !== false,
+                        includePropertyReview: data.include_property_review !== false,
+                        includeCustomSection: data.include_custom_section !== false
+                    })
+                    lastSavedRef.current = JSON.stringify({
+                        personalNotes: data.personal_notes || '',
+                        propertyReview: data.property_review || '',
+                        propertyRating: data.property_rating || 0,
+                        customTitle: data.custom_title || '',
+                        customContent: data.custom_content || '',
+                        includePersonalNotes: data.include_personal_notes !== false,
+                        includePropertyReview: data.include_property_review !== false,
+                        includeCustomSection: data.include_custom_section !== false
+                    })
+                    if (saved_at) {
+                        setLastSavedAt(saved_at)
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Failed to load PDF customization:', err)
+        }
+    }
+
+    const savePdfCustomization = async () => {
+        if (!caseId) return
+
+        setSaveStatus('saving')
+        try {
+            const res = await fetch(`/api/cases/${caseId}/pdf-customization`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    personal_notes: customSections.personalNotes || null,
+                    property_rating: customSections.propertyRating || null,
+                    property_review: customSections.propertyReview || null,
+                    custom_title: customSections.customTitle || null,
+                    custom_content: customSections.customContent || null,
+                    include_personal_notes: customSections.includePersonalNotes,
+                    include_property_review: customSections.includePropertyReview,
+                    include_custom_section: customSections.includeCustomSection
+                })
+            })
+
+            if (res.ok) {
+                const { saved_at } = await res.json()
+                lastSavedRef.current = JSON.stringify(customSections)
+                setSaveStatus('saved')
+                if (saved_at) {
+                    setLastSavedAt(saved_at)
+                }
+                // Reset to idle after 2 seconds
+                setTimeout(() => setSaveStatus('idle'), 2000)
+            } else {
+                setSaveStatus('error')
+            }
+        } catch (err) {
+            console.error('Failed to save PDF customization:', err)
+            setSaveStatus('error')
+        }
+    }
 
     const loadEvidence = async (id: string) => {
         setLoading(true)
@@ -251,6 +363,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             // Include custom sections if any are filled
             const hasCustomContent = customSections.personalNotes ||
                 customSections.propertyReview ||
+                customSections.propertyRating > 0 ||
                 customSections.customContent
 
             const res = await fetch(endpoint, {
@@ -613,16 +726,48 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                     >
                                         <PenLine size={16} />
                                         Customize PDF
+                                        {saveStatus === 'saving' && <Loader2 size={14} className="animate-spin text-slate-400" />}
+                                        {saveStatus === 'saved' && <Check size={14} className="text-green-500" />}
                                         {showCustomize === 'checkin_pack' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                     </button>
 
                                     {showCustomize === 'checkin_pack' && (
                                         <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-4">
+                                            {/* Save Status Indicator with UTC Timestamp */}
+                                            <div className="flex items-center justify-between text-xs text-slate-500">
+                                                <span>
+                                                    {lastSavedAt
+                                                        ? `Last saved: ${new Date(lastSavedAt).toLocaleString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} UTC`
+                                                        : 'Your changes are saved automatically'}
+                                                </span>
+                                                {saveStatus === 'saved' && (
+                                                    <span className="text-green-600 flex items-center gap-1">
+                                                        <Check size={12} /> Saved
+                                                    </span>
+                                                )}
+                                                {saveStatus === 'saving' && (
+                                                    <span className="text-slate-400 flex items-center gap-1">
+                                                        <Loader2 size={12} className="animate-spin" /> Saving...
+                                                    </span>
+                                                )}
+                                            </div>
+
                                             {/* Personal Notes */}
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                    Personal notes
-                                                </label>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <label className="block text-sm font-medium text-slate-700">
+                                                        Personal notes (user-provided)
+                                                    </label>
+                                                    <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={customSections.includePersonalNotes}
+                                                            onChange={(e) => setCustomSections(prev => ({ ...prev, includePersonalNotes: e.target.checked }))}
+                                                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                        />
+                                                        Include in PDF
+                                                    </label>
+                                                </div>
                                                 <textarea
                                                     value={customSections.personalNotes}
                                                     onChange={(e) => setCustomSections(prev => ({ ...prev, personalNotes: e.target.value }))}
@@ -634,9 +779,20 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
                                             {/* Property Review */}
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                    Property review (optional)
-                                                </label>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <label className="block text-sm font-medium text-slate-700">
+                                                        Property review (optional)
+                                                    </label>
+                                                    <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={customSections.includePropertyReview}
+                                                            onChange={(e) => setCustomSections(prev => ({ ...prev, includePropertyReview: e.target.checked }))}
+                                                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                        />
+                                                        Include in PDF
+                                                    </label>
+                                                </div>
                                                 <div className="flex items-center gap-2 mb-2">
                                                     {[1, 2, 3, 4, 5].map((star) => (
                                                         <button
@@ -665,9 +821,20 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
                                             {/* Custom Section */}
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                    Custom section (optional)
-                                                </label>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <label className="block text-sm font-medium text-slate-700">
+                                                        Custom section (optional)
+                                                    </label>
+                                                    <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={customSections.includeCustomSection}
+                                                            onChange={(e) => setCustomSections(prev => ({ ...prev, includeCustomSection: e.target.checked }))}
+                                                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                        />
+                                                        Include in PDF
+                                                    </label>
+                                                </div>
                                                 <input
                                                     type="text"
                                                     value={customSections.customTitle}
@@ -811,15 +978,32 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                     >
                                         <PenLine size={16} />
                                         Customize PDF
+                                        {saveStatus === 'saving' && <Loader2 size={14} className="animate-spin text-slate-400" />}
+                                        {saveStatus === 'saved' && <Check size={14} className="text-green-500" />}
                                         {showCustomize === 'deposit_pack' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                     </button>
 
                                     {showCustomize === 'deposit_pack' && (
                                         <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-4">
+                                            {/* Save Status Indicator */}
+                                            <div className="flex items-center justify-between text-xs text-slate-500">
+                                                <span>Your changes are saved automatically</span>
+                                                {saveStatus === 'saved' && (
+                                                    <span className="text-green-600 flex items-center gap-1">
+                                                        <Check size={12} /> Saved
+                                                    </span>
+                                                )}
+                                                {saveStatus === 'saving' && (
+                                                    <span className="text-slate-400 flex items-center gap-1">
+                                                        <Loader2 size={12} className="animate-spin" /> Saving...
+                                                    </span>
+                                                )}
+                                            </div>
+
                                             {/* Personal Notes */}
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                    Personal notes
+                                                    Personal notes (user-provided)
                                                 </label>
                                                 <textarea
                                                     value={customSections.personalNotes}
@@ -828,6 +1012,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                                     rows={2}
                                                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                                 />
+                                                <p className="text-xs text-slate-400 mt-1">Will appear in PDF labeled as user-provided notes</p>
                                             </div>
 
                                             {/* Property Review */}
