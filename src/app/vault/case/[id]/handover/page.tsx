@@ -510,6 +510,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     </p>
                     <div className="text-sm text-slate-500  space-y-1">
                         <p>✓ Unlimited handover photos</p>
+                        <p>✓ Walkthrough video upload</p>
                         <p>✓ Meter readings with photo proof</p>
                         <p>✓ Keys return confirmation</p>
                         <p>✓ Generate official Deposit Recovery Pack</p>
