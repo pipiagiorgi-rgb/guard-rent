@@ -655,3 +655,53 @@ export async function sendOtpEmail(to: string, code: string): Promise<{ success:
         tags: [{ name: 'type', value: 'otp' }]
     })
 }
+
+// ============================================================
+// STORAGE REMINDER EMAIL
+// ============================================================
+interface StorageReminderProps {
+    to: string
+    daysRemaining: number
+    caseLabel: string
+    renewalLink: string
+}
+
+export async function sendStorageReminderEmail({ to, daysRemaining, caseLabel, renewalLink }: StorageReminderProps) {
+    if (daysRemaining <= 0) return
+
+    const subject = `Action Required: Storage for "${caseLabel}" expires in ${daysRemaining} days`
+
+    // Determine urgency color
+    const color = daysRemaining <= 7 ? '#ef4444' : daysRemaining <= 30 ? '#f59e0b' : '#3b82f6'
+
+    await sendEmail({
+        to,
+        subject,
+        text: `Urgent: Storage for "${caseLabel}" expires in ${daysRemaining} days. Renew now: ${renewalLink}`,
+        html: `
+            ${emailTemplate({
+            title: 'Storage Expiry Warning',
+            previewText: `Storage for "${caseLabel}" expires in ${daysRemaining} days`,
+            bodyContent: `
+                <p style="color: #475569; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                    The secure storage for your rental <strong>${caseLabel}</strong> will expire in <span style="color: ${color}; font-weight: bold;">${daysRemaining} days</span>.
+                </p>
+
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                    <p style="margin: 0; color: #64748b; font-size: 14px;">
+                        <strong>What happens next?</strong><br>
+                        After expiry, your documents will be held for a 30-day grace period before being <strong>permanently deleted</strong>. You will lose access to all photos, contracts, and evidence.
+                    </p>
+                </div>
+
+                <p style="color: #94a3b8; font-size: 14px; text-align: center;">
+                    or <a href="${renewalLink}" style="color: #475569;">download your data</a> before it's gone.
+                </p>
+                `,
+            ctaText: 'Extend Storage',
+            ctaUrl: renewalLink
+        })}
+        `,
+        tags: [{ name: 'type', value: 'storage_reminder' }]
+    })
+}
