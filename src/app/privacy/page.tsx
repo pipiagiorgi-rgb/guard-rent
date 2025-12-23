@@ -40,7 +40,7 @@ export default function PrivacyPage() {
                             <li>Email address (for account authentication and notifications)</li>
                             <li>Rental information you provide (such as dates, addresses, and labels)</li>
                             <li>Documents and photos you upload</li>
-                            <li>Payment information (processed securely by Stripe — we do not store card details)</li>
+                            <li>Payment information (processed securely by Stripe; we do not store card details)</li>
                         </ul>
                         <p className="text-slate-600 mt-4">
                             We do not collect unnecessary personal data and do not use your information for advertising or tracking.

@@ -77,7 +77,7 @@ export default function Home() {
 
                         {/* Subheadline - IMPROVED: Outcome-focused, no hype */}
                         <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed px-4 animate-fade-in-up opacity-0 delay-200">
-                            A secure, private vault for tenants to organise rental documents, move-in and move-out photos, and key notice dates — before disputes arise.
+                            A secure, private vault for tenants to organise rental documents, move-in and move-out photos, and key notice dates, before disputes arise.
                         </p>
 
                         {/* CTA Buttons */}
@@ -148,7 +148,7 @@ export default function Home() {
                                 </p>
                                 <p className="text-slate-700 leading-relaxed text-base md:text-lg">
                                     RentVault helps tenants keep <strong className="text-slate-900">rental documents</strong>, <strong className="text-slate-900">photos</strong>,
-                                    and <strong className="text-slate-900">key dates</strong> organised — with system-generated timestamps and locked records
+                                    and <strong className="text-slate-900">key dates</strong> organised with system-generated timestamps and locked records
                                     that preserve what was recorded at the time.
                                 </p>
                             </div>
@@ -226,7 +226,7 @@ export default function Home() {
                                 </div>
                                 <h3 className="text-xl font-bold mb-3 group-hover:text-amber-600 transition-colors">Deadline alerts</h3>
                                 <p className="text-slate-600 text-sm leading-relaxed">
-                                    Choose exactly what to be reminded about—like contract renewal or termination dates.
+                                    Get reminded about contract renewal, termination dates, and other key deadlines.
                                 </p>
                             </div>
                         </div>

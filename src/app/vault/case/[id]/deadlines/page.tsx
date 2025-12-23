@@ -768,7 +768,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                         <div className="flex-1">
                             <h2 className="font-semibold text-lg text-slate-900">Custom reminders</h2>
                             <p className="text-slate-500 text-sm mt-1">
-                                Add reminders for any date — inspections, renewals, deposit follow-ups.
+                                Add reminders for any date: inspections, renewals, deposit follow-ups.
                             </p>
                         </div>
                     </div>

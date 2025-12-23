@@ -125,7 +125,7 @@ export default function DataRetentionClient({
                         onClick={() => setShowExtendModal(true)}
                         className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors"
                     >
-                        Keep records longer — €9/year
+                        Keep records longer: €9/year
                     </button>
                     <p className="text-xs text-slate-500 mt-2">
                         Adds 12 months. One-time payment per rental, no auto-renewal.

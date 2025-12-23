@@ -265,7 +265,7 @@ export default function StoragePage() {
                             <span className="text-slate-400 group-open:rotate-180 transition-transform">↓</span>
                         </summary>
                         <p className="mt-3 text-sm text-slate-600">
-                            No. Storage extensions are one-time purchases — no subscriptions or automatic charges. You choose if and when to extend.
+                            No. Storage extensions are one-time purchases with no subscriptions or automatic charges. You choose if and when to extend.
                         </p>
                     </details>
                 </div>

@@ -37,13 +37,13 @@ export default function NoticePeriodsGuide() {
                         Why this matters
                     </h2>
                     <p className="text-slate-600 mb-3">
-                        Many tenants only think about notice periods when they're ready to move — by which point
+                        Many tenants only think about notice periods when they're ready to move. By that point
                         it's often too late. A 3-month notice period means you need to decide to leave 3 months before
                         you actually want to move out.
                     </p>
                     <p className="text-slate-600">
                         Missing your deadline by even a single day can legally obligate you to pay rent for another
-                        full month (or more). This isn't about landlords being unreasonable — it's simply how contracts work.
+                        full month (or more). This isn't about landlords being unreasonable; it's simply how contracts work.
                     </p>
                 </section>
 
@@ -55,7 +55,7 @@ export default function NoticePeriodsGuide() {
                     </p>
                     <p className="text-slate-600">
                         If you don't give proper notice in time, you may be legally required to pay rent for
-                        additional months — even if you've already moved out.
+                        additional months, even if you've already moved out.
                     </p>
                 </section>
 
@@ -66,10 +66,10 @@ export default function NoticePeriodsGuide() {
                     </p>
                     <div className="bg-slate-50 rounded-xl p-6">
                         <ul className="space-y-3 text-slate-600">
-                            <li><strong>1 month</strong> — Common in the UK and some US states for month-to-month leases</li>
-                            <li><strong>2 months</strong> — Standard in many UK assured shorthold tenancies</li>
-                            <li><strong>3 months</strong> — Common in Germany, France, and other European countries</li>
-                            <li><strong>Fixed term</strong> — Some leases don't allow early termination; you're committed until the end date</li>
+                            <li><strong>1 month</strong>: Common in the UK and some US states for month-to-month leases</li>
+                            <li><strong>2 months</strong>: Standard in many UK assured shorthold tenancies</li>
+                            <li><strong>3 months</strong>: Common in Germany, France, and other European countries</li>
+                            <li><strong>Fixed term</strong>: Some leases don't allow early termination; you're committed until the end date</li>
                         </ul>
                     </div>
                     <p className="text-sm text-slate-500 mt-4">
@@ -113,22 +113,22 @@ export default function NoticePeriodsGuide() {
                     <div className="space-y-3 text-slate-700">
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Send notice by registered mail AND email</strong> — This gives you proof of delivery date
+                            <span><strong>Send notice by registered mail AND email</strong>. This gives you proof of delivery date
                                 that's hard to dispute.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>"Calendar months" often means end-of-month</strong> — In many countries,
+                            <span><strong>"Calendar months" often means end-of-month</strong>. In many countries,
                                 a 3-month notice given on March 15th means you leave June 30th, not June 15th.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Set a reminder 4+ months before you might want to leave</strong> — This gives you
+                            <span><strong>Set a reminder 4+ months before you might want to leave</strong>. This gives you
                                 time to decide without rushing.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Keep your notice confirmation forever</strong> — Landlords sometimes claim they
+                            <span><strong>Keep your notice confirmation forever</strong>. Landlords sometimes claim they
                                 never received it. Having proof protects you.</span>
                         </p>
                     </div>
@@ -145,7 +145,7 @@ export default function NoticePeriodsGuide() {
                         ready to move. If you wait until you've found a new place, you may already be past your deadline.
                     </p>
                     <p className="text-slate-600">
-                        Setting a reminder — whether in your calendar, phone, or a rental tracking tool — ensures
+                        Setting a reminder, whether in your calendar, phone, or a rental tracking tool, ensures
                         you have time to make decisions without being rushed.
                     </p>
                 </section>
@@ -157,7 +157,7 @@ export default function NoticePeriodsGuide() {
                         <h2 className="text-xl font-semibold">Tracking important dates</h2>
                     </div>
                     <p className="text-slate-600 mb-3">
-                        The challenge isn't just knowing your notice period — it's remembering to act on it at the right time.
+                        The challenge isn't just knowing your notice period. It's remembering to act on it at the right time.
                         Most tenants know their deadline exists somewhere in their contract, but don't have it written down
                         anywhere visible.
                     </p>

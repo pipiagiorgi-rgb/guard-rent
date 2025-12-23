@@ -37,20 +37,20 @@ export default function MoveInPhotosGuide() {
                         Why this matters
                     </h2>
                     <p className="text-slate-600 mb-3">
-                        Most tenants who lose part of their deposit didn't damage anything — they simply couldn't prove
+                        Most tenants who lose part of their deposit didn't damage anything. They simply couldn't prove
                         the damage was already there. Without move-in photos, there's no evidence that the scratched floor
                         or marked walls existed before you arrived.
                     </p>
                     <p className="text-slate-600">
-                        Taking 20 minutes on your first day to photograph everything can save you hours of frustration —
-                        and potentially hundreds of euros — when you move out.
+                        Taking 20 minutes on your first day to photograph everything can save you hours of frustration
+                        and potentially hundreds of euros when you move out.
                     </p>
                 </section>
 
                 <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">The problem with memory</h2>
                     <p className="text-slate-600 mb-4">
-                        When you sign a lease, you're usually focused on the excitement of a new place — not the small
+                        When you sign a lease, you're usually focused on the excitement of a new place, not the small
                         scratch on the kitchen counter or the scuff mark behind the door. But months or years later,
                         when you're moving out, those details matter.
                     </p>
@@ -66,13 +66,13 @@ export default function MoveInPhotosGuide() {
                         Be thorough. It takes 15–20 minutes on move-in day and can save you significant money later.
                     </p>
                     <ul className="space-y-2 text-slate-600">
-                        <li>• <strong>Every room</strong> — Wide shots showing the overall condition</li>
-                        <li>• <strong>Walls and floors</strong> — Capture any marks, stains, or damage</li>
-                        <li>• <strong>Appliances</strong> — Fridge, oven, washing machine, dishwasher</li>
-                        <li>• <strong>Bathroom fixtures</strong> — Tiles, grout, toilet, shower</li>
-                        <li>• <strong>Windows and doors</strong> — Check for cracks or damage</li>
-                        <li>• <strong>Existing damage</strong> — Close-ups of scratches, dents, or broken items</li>
-                        <li>• <strong>Meter readings</strong> — Electricity, gas, and water</li>
+                        <li>• <strong>Every room</strong>: Wide shots showing the overall condition</li>
+                        <li>• <strong>Walls and floors</strong>: Capture any marks, stains, or damage</li>
+                        <li>• <strong>Appliances</strong>: Fridge, oven, washing machine, dishwasher</li>
+                        <li>• <strong>Bathroom fixtures</strong>: Tiles, grout, toilet, shower</li>
+                        <li>• <strong>Windows and doors</strong>: Check for cracks or damage</li>
+                        <li>• <strong>Existing damage</strong>: Close-ups of scratches, dents, or broken items</li>
+                        <li>• <strong>Meter readings</strong>: Electricity, gas, and water</li>
                     </ul>
                 </section>
 
@@ -116,22 +116,22 @@ export default function MoveInPhotosGuide() {
                     <div className="space-y-3 text-slate-700">
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Email yourself the photos</strong> — This creates a third-party timestamp that's hard to dispute.
+                            <span><strong>Email yourself the photos</strong>. This creates a third-party timestamp that's hard to dispute.
                                 Subject line: "Move-in photos [address] [date]"</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Include a newspaper or phone screen showing today's date</strong> — Old-school but effective
+                            <span><strong>Include a newspaper or phone screen showing today's date</strong>. Old-school but effective
                                 for proving when photos were taken.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Don't just photograph damage — photograph clean, good condition too</strong> — This proves you
+                            <span><strong>Don't just photograph damage; photograph clean, good condition too</strong>. This proves you
                                 received the property in good shape and returned it the same way.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Take photos before AND after cleaning</strong> — If you clean on move-in day,
+                            <span><strong>Take photos before AND after cleaning</strong>. If you clean on move-in day,
                                 photograph the original state first.</span>
                         </p>
                     </div>
@@ -144,7 +144,7 @@ export default function MoveInPhotosGuide() {
                         <h2 className="text-xl font-semibold">Keeping photos organised</h2>
                     </div>
                     <p className="text-slate-600 mb-3">
-                        Taking photos is only half the battle — finding them 12 months later is the other half.
+                        Taking photos is only half the battle. Finding them 12 months later is the other half.
                         Many tenants take dozens of move-in photos, then lose them in their camera roll or forget
                         which folder they saved them to.
                     </p>
@@ -179,7 +179,7 @@ export default function MoveInPhotosGuide() {
                 <section className="bg-slate-900 text-white rounded-xl p-8 text-center">
                     <h2 className="text-2xl font-bold mb-3">Ready to protect your deposit?</h2>
                     <p className="text-slate-300 mb-6 max-w-md mx-auto">
-                        Start documenting your rental today. It's free to try — no credit card required.
+                        Start documenting your rental today. It's free to try, no credit card required.
                     </p>
                     <Link
                         href="/login"

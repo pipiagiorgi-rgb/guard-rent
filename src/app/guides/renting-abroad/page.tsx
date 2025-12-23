@@ -42,7 +42,7 @@ export default function RentingAbroadGuide() {
                         you may have already left the country.
                     </p>
                     <p className="text-slate-600">
-                        Expats and international students are disproportionately likely to lose deposits — not because
+                        Expats and international students are disproportionately likely to lose deposits. Not because
                         they're bad tenants, but because they didn't document or understand their situation fully.
                         Good organisation is your best protection.
                     </p>
@@ -76,7 +76,7 @@ export default function RentingAbroadGuide() {
                             differently than a month-to-month lease in the US.
                         </li>
                         <li>
-                            <strong>Verbal agreements.</strong> In some cultures, verbal agreements are common —
+                            <strong>Verbal agreements.</strong> In some cultures, verbal agreements are common,
                             but harder to enforce if things go wrong.
                         </li>
                         <li>
@@ -136,22 +136,22 @@ export default function RentingAbroadGuide() {
                     <div className="space-y-3 text-slate-700">
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Join local expat groups on Facebook/Reddit</strong> — Other expats share warnings about
+                            <span><strong>Join local expat groups on Facebook/Reddit</strong>. Other expats share warnings about
                                 problematic landlords and useful local tips.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Take a video walkthrough on move-in day</strong> — This captures everything at once and
+                            <span><strong>Take a video walkthrough on move-in day</strong>. This captures everything at once and
                                 is harder to fake than photos. Email it to yourself for a timestamp.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Get a local friend to review your lease</strong> — Even if they're not a lawyer,
+                            <span><strong>Get a local friend to review your lease</strong>. Even if they're not a lawyer,
                                 a native speaker can spot unusual clauses.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Resolve deposit disputes before you leave</strong> — It's much harder to fight
+                            <span><strong>Resolve deposit disputes before you leave</strong>. It's much harder to fight
                                 from your home country. Stay until it's resolved if possible.</span>
                         </p>
                     </div>
@@ -165,7 +165,7 @@ export default function RentingAbroadGuide() {
                     </div>
                     <p className="text-slate-600 mb-3">
                         When you're far from home, organisation becomes even more critical. You need your documents
-                        accessible from anywhere — not buried in a folder on a laptop you left behind.
+                        accessible from anywhere, not buried in a folder on a laptop you left behind.
                     </p>
                     <p className="text-slate-600">
                         Tools like RentVault are designed to help international tenants keep contracts, photos, and
@@ -199,7 +199,7 @@ export default function RentingAbroadGuide() {
                 <section className="bg-slate-900 text-white rounded-xl p-8 text-center">
                     <h2 className="text-2xl font-bold mb-3">Renting abroad? Stay organised.</h2>
                     <p className="text-slate-300 mb-6 max-w-md mx-auto">
-                        Keep your lease, photos, and key dates in one place — accessible from anywhere. Free to start.
+                        Keep your lease, photos, and key dates in one place accessible from anywhere. Free to start.
                     </p>
                     <Link
                         href="/login"

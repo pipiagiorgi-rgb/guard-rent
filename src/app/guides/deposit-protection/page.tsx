@@ -37,7 +37,7 @@ export default function DepositProtectionGuide() {
                         Why this matters
                     </h2>
                     <p className="text-slate-600 mb-3">
-                        Deposit disputes are rarely about whether damage exists — they're about whether you can prove
+                        Deposit disputes are rarely about whether damage exists. They're about whether you can prove
                         it wasn't your fault. Tenants lose money not because they damaged the property, but because
                         they didn't document its original condition.
                     </p>
@@ -51,7 +51,7 @@ export default function DepositProtectionGuide() {
                     <h2 className="text-xl font-semibold mb-4">Why deposit disputes happen</h2>
                     <p className="text-slate-600 mb-4">
                         Most deposit disputes come down to one thing: proof. When you move out, landlords may claim
-                        damage or poor condition — but without documentation from when you moved in, it's your word against theirs.
+                        damage or poor condition, but without documentation from when you moved in, it's your word against theirs.
                     </p>
                     <p className="text-slate-600">
                         The good news is that protecting yourself is straightforward. With a few simple habits at the
@@ -134,22 +134,22 @@ export default function DepositProtectionGuide() {
                     <div className="space-y-3 text-slate-700">
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Request a walkthrough with your landlord</strong> — Having both parties agree on
+                            <span><strong>Request a walkthrough with your landlord</strong>. Having both parties agree on
                                 the condition at move-in prevents disputes later.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Keep all communication in writing</strong> — Email instead of calling.
+                            <span><strong>Keep all communication in writing</strong>. Email instead of calling.
                                 Text confirmations count too.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Get receipts for professional cleaning</strong> — If you pay for end-of-tenancy cleaning,
+                            <span><strong>Get receipts for professional cleaning</strong>. If you pay for end-of-tenancy cleaning,
                                 keep the receipt as proof.</span>
                         </p>
                         <p className="flex items-start gap-2">
                             <span className="text-blue-500 font-bold">→</span>
-                            <span><strong>Don't admit fault for pre-existing damage</strong> — If something was already broken,
+                            <span><strong>Don't admit fault for pre-existing damage</strong>. If something was already broken,
                                 say "this was here when I arrived" and show your photos.</span>
                         </p>
                     </div>
@@ -164,7 +164,7 @@ export default function DepositProtectionGuide() {
                     <p className="text-slate-600 mb-3">
                         The advice above only works if you can actually find your documents when you need them.
                         Many tenants take photos and save contracts, but scatter them across phones, email attachments,
-                        and cloud folders — making them hard to retrieve months later.
+                        and cloud folders, making them hard to retrieve months later.
                     </p>
                     <p className="text-slate-600">
                         Tools like RentVault exist to help tenants keep everything in one place: contracts, photos,
