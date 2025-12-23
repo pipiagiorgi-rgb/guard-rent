@@ -126,6 +126,17 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
+            {/* Back to RentVault */}
+            <header className="p-4">
+                <a
+                    href="/"
+                    className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 font-medium transition-colors"
+                >
+                    <ArrowLeft size={16} />
+                    RentVault
+                </a>
+            </header>
+
             {/* Main Content */}
             <main className="flex-1 flex items-center justify-center p-6">
                 <div className="w-full max-w-[400px]">

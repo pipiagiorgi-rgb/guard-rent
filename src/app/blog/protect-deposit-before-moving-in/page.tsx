@@ -24,7 +24,7 @@ export default function BlogPost() {
                 headline="5 Things to Do Before Moving into a New Rental"
                 description="The first 24 hours in your new rental are crucial for protecting your deposit."
                 url="https://rentvault.ai/blog/protect-deposit-before-moving-in"
-                datePublished="2024-12-20"
+                datePublished="2025-01-20"
             />
             <BreadcrumbSchema
                 items={[
@@ -57,7 +57,7 @@ export default function BlogPost() {
                         <div className="flex items-center gap-5 text-sm text-slate-500">
                             <span className="flex items-center gap-2">
                                 <Calendar size={15} className="text-slate-400" />
-                                20 Dec 2024
+                                20 Jan 2025
                             </span>
                             <span className="flex items-center gap-2">
                                 <Clock size={15} className="text-slate-400" />
@@ -217,8 +217,8 @@ export default function BlogPost() {
                         <section className="space-y-4">
                             <h2 className="text-2xl font-bold text-slate-900 pt-4">The Bottom Line</h2>
                             <p className="text-slate-600 leading-relaxed">
-                                Spending 30 minutes documenting your rental on day one can save you hundreds
-                                (or thousands) when you move out. It's not about being paranoid; it's about
+                                Spending 30 minutes documenting your rental on day one can save you thousands
+                                when you move out. It's not about being paranoid; it's about
                                 having evidence if you need it.
                             </p>
                         </section>

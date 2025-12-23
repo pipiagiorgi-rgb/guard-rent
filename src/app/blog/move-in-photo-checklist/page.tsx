@@ -40,7 +40,7 @@ export default function BlogPost() {
                 headline="The Complete Move-In Photo Checklist"
                 description="A room-by-room guide to documenting your rental property on move-in day."
                 url="https://rentvault.ai/blog/move-in-photo-checklist"
-                datePublished="2024-12-10"
+                datePublished="2025-01-10"
             />
             <BreadcrumbSchema
                 items={[
@@ -71,7 +71,7 @@ export default function BlogPost() {
                         <div className="flex items-center gap-5 text-sm text-slate-500">
                             <span className="flex items-center gap-2">
                                 <Calendar size={15} className="text-slate-400" />
-                                10 Dec 2024
+                                10 Jan 2025
                             </span>
                             <span className="flex items-center gap-2">
                                 <Clock size={15} className="text-slate-400" />
@@ -83,7 +83,7 @@ export default function BlogPost() {
                     <div className="space-y-8">
                         <p className="text-xl text-slate-600 leading-relaxed font-light">
                             Taking 20 minutes to photograph your rental on move-in day could save you
-                            hundreds when you leave. Here's exactly what to capture, room by room.
+                            thousands when you leave. Here's exactly what to capture, room by room.
                         </p>
 
                         {/* Pro tip box */}

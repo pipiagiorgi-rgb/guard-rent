@@ -24,7 +24,7 @@ export default function BlogPost() {
                 headline="The 3 Most Expensive Notice Period Mistakes Tenants Make"
                 description="Missing your notice deadline by just one day can cost you thousands."
                 url="https://rentvault.ai/blog/rental-notice-period-mistakes"
-                datePublished="2024-12-15"
+                datePublished="2025-01-15"
             />
             <BreadcrumbSchema
                 items={[
@@ -57,7 +57,7 @@ export default function BlogPost() {
                         <div className="flex items-center gap-5 text-sm text-slate-500">
                             <span className="flex items-center gap-2">
                                 <Calendar size={15} className="text-slate-400" />
-                                15 Dec 2024
+                                15 Jan 2025
                             </span>
                             <span className="flex items-center gap-2">
                                 <Clock size={15} className="text-slate-400" />

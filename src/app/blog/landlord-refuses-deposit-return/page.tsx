@@ -38,7 +38,7 @@ export default function BlogPost() {
                 headline="What to Do When Your Landlord Won't Return Your Deposit"
                 description="Step-by-step guide to recovering your deposit when your landlord refuses to return it."
                 url="https://rentvault.ai/blog/landlord-refuses-deposit-return"
-                datePublished="2024-12-05"
+                datePublished="2025-01-05"
             />
             <BreadcrumbSchema
                 items={[
@@ -69,7 +69,7 @@ export default function BlogPost() {
                         <div className="flex items-center gap-5 text-sm text-slate-500">
                             <span className="flex items-center gap-2">
                                 <Calendar size={15} className="text-slate-400" />
-                                5 Dec 2024
+                                5 Jan 2025
                             </span>
                             <span className="flex items-center gap-2">
                                 <Clock size={15} className="text-slate-400" />
