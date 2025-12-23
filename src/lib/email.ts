@@ -106,7 +106,7 @@ function emailTemplate({
                                 <tr>
                                     <td style="padding: 20px;">
                                         <div style="font-size: 13px; color: #64748b; line-height: 1.5;">
-                                            <strong style="color: #475569;">Security Tip:</strong> RentVault will never ask for your password or bank details via email. If you have questions, reply to this email or visit our <a href="https://rentvault.ai/guides" style="color: #011246; text-decoration: underline;">Help Center</a>.
+                                            <strong style="color: #475569;">Security Tip:</strong> RentVault will never ask for your verification code, bank details, or payment information by email. If you have questions, reply to this email or visit our <a href="https://rentvault.ai/guides" style="color: #011246; text-decoration: underline;">Help Center</a>.
                                         </div>
                                     </td>
                                 </tr>
