@@ -615,3 +615,43 @@ export async function sendMagicLinkEmail(to: string, magicLink: string): Promise
         tags: [{ name: 'type', value: 'magic-link' }]
     })
 }
+
+// ============================================================
+// OTP CODE EMAIL (6-digit verification code)
+// ============================================================
+export async function sendOtpEmail(to: string, code: string): Promise<{ success: boolean; error?: string }> {
+    const subject = 'Your RentVault verification code'
+
+    const bodyContent = `
+        <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6;">
+            Enter this code on the sign-in page to access your RentVault account:
+        </p>
+        <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 24px; text-align: center; margin: 0 0 24px 0;">
+            <div style="font-family: 'SF Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 42px; font-weight: 700; color: #011246; letter-spacing: 0.4em; line-height: 1;">
+                ${code}
+            </div>
+            <p style="margin: 12px 0 0 0; font-size: 13px; color: #64748b;">
+                This code expires in 10 minutes
+            </p>
+        </div>
+        <p style="margin: 0; font-size: 14px; color: #64748b; line-height: 1.6;">
+            If you didn't request this code, you can safely ignore this email.
+        </p>
+    `
+
+    const text = `Your RentVault verification code\n\nEnter this code on the sign-in page: ${code}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this code, you can safely ignore this email.`
+
+    const html = emailTemplate({
+        title: 'Your verification code',
+        previewText: `Your RentVault code is ${code}`,
+        bodyContent
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'otp' }]
+    })
+}

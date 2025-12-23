@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { login, verifyOtp } from './actions'
-import { Loader2, CheckCircle2, ArrowLeft, Mail } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import { Loader2, Mail, ArrowLeft } from 'lucide-react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Footer } from '@/components/layout/Footer'
 
 export default function LoginPage() {
@@ -14,6 +13,7 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null)
     const [canRetry, setCanRetry] = useState(false)
     const searchParams = useSearchParams()
+    const router = useRouter()
     const urlError = searchParams.get('error')
 
     const handleSendCode = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,10 +27,16 @@ export default function LoginPage() {
         setEmail(emailValue)
 
         try {
-            const result = await login(formData)
+            const res = await fetch('/api/auth/otp/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailValue })
+            })
 
-            if (result.error) {
-                setError(result.error)
+            const data = await res.json()
+
+            if (!res.ok) {
+                setError(data.error || 'Failed to send code')
                 setLoading(false)
                 return
             }
@@ -55,15 +61,26 @@ export default function LoginPage() {
         setError(null)
 
         try {
-            const result = await verifyOtp(email, code)
+            const res = await fetch('/api/auth/otp/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code })
+            })
 
-            if (result?.error) {
-                setError(result.error)
+            const data = await res.json()
+
+            if (!res.ok) {
+                setError(data.error || 'Invalid code')
                 setLoading(false)
                 return
             }
 
-            // Success - redirect handled by server action
+            // Success - redirect to the magic link which will complete auth
+            if (data.redirectUrl) {
+                window.location.href = data.redirectUrl
+            } else {
+                router.push('/vault')
+            }
         } catch (err) {
             setError('Something went wrong. Please try again.')
             setLoading(false)
@@ -76,14 +93,17 @@ export default function LoginPage() {
         setCode('')
         setCanRetry(false)
 
-        const formData = new FormData()
-        formData.set('email', email)
-
         try {
-            const result = await login(formData)
+            const res = await fetch('/api/auth/otp/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            })
 
-            if (result.error) {
-                setError(result.error)
+            const data = await res.json()
+
+            if (!res.ok) {
+                setError(data.error || 'Failed to resend code')
             }
 
             // Start timer for retry
