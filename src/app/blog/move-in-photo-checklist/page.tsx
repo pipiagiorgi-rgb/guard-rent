@@ -17,6 +17,22 @@ export const metadata: Metadata = {
     },
 }
 
+const ChecklistSection = ({ title, items }: { title: string; items: string[] }) => (
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="bg-slate-50 px-5 py-3 border-b border-slate-200">
+            <h3 className="font-semibold text-slate-900">{title}</h3>
+        </div>
+        <ul className="p-5 space-y-3">
+            {items.map((item, i) => (
+                <li key={i} className="flex items-center gap-3 text-slate-600">
+                    <span className="w-5 h-5 border-2 border-slate-300 rounded flex-shrink-0"></span>
+                    <span className="text-sm">{item}</span>
+                </li>
+            ))}
+        </ul>
+    </div>
+)
+
 export default function BlogPost() {
     return (
         <>
@@ -33,49 +49,52 @@ export default function BlogPost() {
                     { name: 'Move-In Photo Checklist', url: 'https://rentvault.ai/blog/move-in-photo-checklist' },
                 ]}
             />
-            <main className="max-w-[700px] mx-auto px-4 md:px-6 py-12 md:py-16">
+            <main className="max-w-[680px] mx-auto px-4 md:px-6 py-12 md:py-16">
                 <article>
                     <Link
                         href="/blog"
-                        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-8"
+                        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-8 transition-colors"
                     >
                         <ArrowLeft size={16} />
                         Back to Blog
                     </Link>
 
-                    <header className="mb-10">
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                    <header className="mb-12">
+                        <div className="flex items-center gap-3 mb-5">
+                            <span className="px-3 py-1.5 bg-green-50 text-green-600 text-xs font-semibold rounded-full uppercase tracking-wide">
                                 Documentation
                             </span>
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+                        <h1 className="text-3xl md:text-4xl font-bold mb-5 leading-[1.2] text-slate-900">
                             The Complete Move-In Photo Checklist
                         </h1>
-                        <div className="flex items-center gap-4 text-sm text-slate-500">
-                            <span className="flex items-center gap-1.5">
-                                <Calendar size={14} />
+                        <div className="flex items-center gap-5 text-sm text-slate-500">
+                            <span className="flex items-center gap-2">
+                                <Calendar size={15} className="text-slate-400" />
                                 10 Dec 2024
                             </span>
-                            <span className="flex items-center gap-1.5">
-                                <Clock size={14} />
+                            <span className="flex items-center gap-2">
+                                <Clock size={15} className="text-slate-400" />
                                 6 min read
                             </span>
                         </div>
                     </header>
 
-                    <div className="prose prose-slate max-w-none">
-                        <p className="text-lg text-slate-600 leading-relaxed">
+                    <div className="space-y-8">
+                        <p className="text-xl text-slate-600 leading-relaxed font-light">
                             Taking 20 minutes to photograph your rental on move-in day could save you
                             hundreds when you leave. Here's exactly what to capture, room by room.
                         </p>
 
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-6 my-8">
-                            <div className="flex items-start gap-3">
-                                <Camera className="text-green-600 flex-shrink-0 mt-1" size={20} />
+                        {/* Pro tip box */}
+                        <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <Camera className="text-green-600" size={20} />
+                                </div>
                                 <div>
-                                    <h3 className="font-semibold text-green-900 mb-1">Before You Start</h3>
-                                    <p className="text-green-800 text-sm m-0">
+                                    <h3 className="font-bold text-green-900 mb-2">Before You Start</h3>
+                                    <p className="text-green-800 text-sm leading-relaxed">
                                         Take photos before any furniture arrives. Good lighting is essential.
                                         Open all blinds and turn on lights. Email photos to yourself immediately
                                         to create a timestamped backup.
@@ -84,175 +103,135 @@ export default function BlogPost() {
                             </div>
                         </div>
 
-                        <h2>General Tips for Every Room</h2>
-                        <ul>
-                            <li>Take at least 4 photos per room (one from each corner)</li>
-                            <li>Photograph floors, walls, ceilings, and windows</li>
-                            <li>Get close-ups of any existing damage</li>
-                            <li>Include a wide shot showing the overall condition</li>
-                            <li>Check that photos are in focus before moving on</li>
-                        </ul>
-
-                        <h2>Living Room / Main Rooms</h2>
-                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 my-4">
-                            <ul className="space-y-2 m-0">
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> All walls (check for marks, holes, scuffs)
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Floor condition (scratches, stains, wear)
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Windows and frames
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Light fixtures and switches
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Radiators or heating units
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Power sockets
-                                </li>
+                        {/* General Tips */}
+                        <section className="space-y-4">
+                            <h2 className="text-2xl font-bold text-slate-900 pt-4">General Tips for Every Room</h2>
+                            <ul className="space-y-3 pl-1">
+                                {[
+                                    'Take at least 4 photos per room (one from each corner)',
+                                    'Photograph floors, walls, ceilings, and windows',
+                                    'Get close-ups of any existing damage',
+                                    'Include a wide shot showing the overall condition',
+                                    'Check that photos are in focus before moving on'
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-slate-600">
+                                        <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
                             </ul>
+                        </section>
+
+                        {/* Room Checklists */}
+                        <div className="space-y-5 pt-4">
+                            <h2 className="text-2xl font-bold text-slate-900">Room-by-Room Checklists</h2>
+
+                            <ChecklistSection
+                                title="🛋️ Living Room / Main Rooms"
+                                items={[
+                                    'All walls (check for marks, holes, scuffs)',
+                                    'Floor condition (scratches, stains, wear)',
+                                    'Windows and frames',
+                                    'Light fixtures and switches',
+                                    'Radiators or heating units',
+                                    'Power sockets'
+                                ]}
+                            />
+
+                            <ChecklistSection
+                                title="🍳 Kitchen"
+                                items={[
+                                    'Countertops (scratches, stains, burns)',
+                                    'Inside all cabinets and drawers',
+                                    'Oven interior and stovetop',
+                                    'Inside fridge and freezer',
+                                    'Sink and taps (rust, stains)',
+                                    'Extractor fan and hood',
+                                    'Dishwasher interior (if applicable)'
+                                ]}
+                            />
+
+                            <ChecklistSection
+                                title="🚿 Bathroom"
+                                items={[
+                                    'Toilet (bowl, seat, tank)',
+                                    'Bath/shower (grout, sealant, tiles)',
+                                    'Sink and taps',
+                                    'Mirror and cabinet interiors',
+                                    'Tiles and grouting (mould, cracks)',
+                                    'Extractor fan'
+                                ]}
+                            />
+
+                            <ChecklistSection
+                                title="🛏️ Bedroom"
+                                items={[
+                                    'Wardrobes (inside and out)',
+                                    'Floor under where bed will go',
+                                    'Walls behind furniture areas',
+                                    'Windows and blinds/curtains'
+                                ]}
+                            />
+
+                            <ChecklistSection
+                                title="⚡ Utilities & Outside"
+                                items={[
+                                    'Electric meter reading',
+                                    'Gas meter reading',
+                                    'Water meter reading',
+                                    'Fuse box / electrical panel',
+                                    'Boiler settings and condition',
+                                    'Front door and locks',
+                                    'Balcony or garden (if applicable)'
+                                ]}
+                            />
                         </div>
 
-                        <h2>Kitchen</h2>
-                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 my-4">
-                            <ul className="space-y-2 m-0">
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Countertops (scratches, stains, burns)
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Inside all cabinets and drawers
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Oven interior and stovetop
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Inside fridge and freezer
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Sink and taps (rust, stains)
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Extractor fan and hood
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Dishwasher interior (if applicable)
-                                </li>
-                            </ul>
-                        </div>
-
-                        <h2>Bathroom</h2>
-                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 my-4">
-                            <ul className="space-y-2 m-0">
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Toilet (bowl, seat, tank)
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Bath/shower (grout, sealant, tiles)
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Sink and taps
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Mirror and cabinet interiors
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Tiles and grouting (mould, cracks)
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Extractor fan
-                                </li>
-                            </ul>
-                        </div>
-
-                        <h2>Bedroom</h2>
-                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 my-4">
-                            <ul className="space-y-2 m-0">
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Wardrobes (inside and out)
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Floor under where bed will go
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Walls behind furniture areas
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Windows and blinds/curtains
-                                </li>
-                            </ul>
-                        </div>
-
-                        <h2>Utilities & Outside</h2>
-                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 my-4">
-                            <ul className="space-y-2 m-0">
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Electric meter reading
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Gas meter reading
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Water meter reading
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Fuse box / electrical panel
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Boiler settings and condition
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Front door and locks
-                                </li>
-                                <li className="flex items-center gap-2 text-slate-700">
-                                    <span className="text-slate-400">□</span> Balcony or garden (if applicable)
-                                </li>
-                            </ul>
-                        </div>
-
-                        <h2>Don't Forget</h2>
-                        <ul>
-                            <li>Photograph any existing damage, no matter how small</li>
-                            <li>Take a photo with a newspaper or phone screen showing the date</li>
-                            <li>Email all photos to yourself and your landlord</li>
-                            <li>Store backups in at least two places</li>
-                        </ul>
+                        {/* Final reminders */}
+                        <section className="space-y-4 pt-4">
+                            <h2 className="text-2xl font-bold text-slate-900">Don't Forget</h2>
+                            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                                <ul className="space-y-2 text-blue-800 text-sm">
+                                    <li>📸 Photograph any existing damage, no matter how small</li>
+                                    <li>📰 Take a photo with a newspaper or phone screen showing the date</li>
+                                    <li>📧 Email all photos to yourself and your landlord</li>
+                                    <li>💾 Store backups in at least two places</li>
+                                </ul>
+                            </div>
+                        </section>
                     </div>
 
                     {/* CTA */}
-                    <div className="mt-12 p-6 bg-slate-900 text-white rounded-xl text-center">
-                        <h3 className="text-xl font-bold mb-2">Organize your move-in photos automatically</h3>
-                        <p className="text-slate-300 mb-4">
+                    <div className="mt-14 p-8 bg-slate-900 text-white rounded-2xl text-center">
+                        <h3 className="text-xl font-bold mb-3">Organize your move-in photos automatically</h3>
+                        <p className="text-slate-300 mb-5 max-w-md mx-auto">
                             RentVault lets you upload photos by room with automatic timestamps.
                         </p>
                         <Link
                             href="/login"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-colors"
                         >
                             Try it free
                             <ArrowRight size={16} />
                         </Link>
                     </div>
 
-                    <div className="mt-12 pt-8 border-t border-slate-200">
-                        <h3 className="text-lg font-semibold mb-4">Related Articles</h3>
-                        <div className="space-y-3">
+                    <div className="mt-14 pt-10 border-t border-slate-200">
+                        <h3 className="text-lg font-bold mb-5 text-slate-900">Related Articles</h3>
+                        <div className="space-y-4">
                             <Link
                                 href="/blog/protect-deposit-before-moving-in"
-                                className="block p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                className="block p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group"
                             >
-                                <span className="text-slate-900 font-medium">5 Things to Do Before Moving In</span>
-                                <span className="text-slate-500 text-sm block mt-1">Essential first-day tasks</span>
+                                <span className="text-slate-900 font-semibold group-hover:text-blue-600 transition-colors">5 Things to Do Before Moving In</span>
+                                <span className="text-slate-500 text-sm block mt-1.5">Essential first-day tasks</span>
                             </Link>
                             <Link
                                 href="/guides/move-in-photos"
-                                className="block p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                className="block p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group"
                             >
-                                <span className="text-slate-900 font-medium">Why Move-In Photos Matter</span>
-                                <span className="text-slate-500 text-sm block mt-1">The complete guide</span>
+                                <span className="text-slate-900 font-semibold group-hover:text-blue-600 transition-colors">Why Move-In Photos Matter</span>
+                                <span className="text-slate-500 text-sm block mt-1.5">The complete guide</span>
                             </Link>
                         </div>
                     </div>

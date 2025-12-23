@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Calendar, Clock, ArrowLeft, ArrowRight, Shield, AlertCircle } from 'lucide-react'
+import { Calendar, Clock, ArrowLeft, ArrowRight, Shield, AlertCircle, CheckCircle } from 'lucide-react'
 import { ArticleSchema, BreadcrumbSchema } from '@/lib/seo-schemas'
 
 export const metadata: Metadata = {
@@ -16,6 +16,20 @@ export const metadata: Metadata = {
         canonical: 'https://rentvault.ai/blog/landlord-refuses-deposit-return',
     },
 }
+
+const Step = ({ number, title, children }: { number: number; title: string; children: React.ReactNode }) => (
+    <section className="space-y-4">
+        <div className="flex items-center gap-3">
+            <span className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                {number}
+            </span>
+            <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+        </div>
+        <div className="pl-11 space-y-4">
+            {children}
+        </div>
+    </section>
+)
 
 export default function BlogPost() {
     return (
@@ -33,49 +47,52 @@ export default function BlogPost() {
                     { name: 'Landlord Refuses Deposit', url: 'https://rentvault.ai/blog/landlord-refuses-deposit-return' },
                 ]}
             />
-            <main className="max-w-[700px] mx-auto px-4 md:px-6 py-12 md:py-16">
+            <main className="max-w-[680px] mx-auto px-4 md:px-6 py-12 md:py-16">
                 <article>
                     <Link
                         href="/blog"
-                        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-8"
+                        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-8 transition-colors"
                     >
                         <ArrowLeft size={16} />
                         Back to Blog
                     </Link>
 
-                    <header className="mb-10">
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                    <header className="mb-12">
+                        <div className="flex items-center gap-3 mb-5">
+                            <span className="px-3 py-1.5 bg-red-50 text-red-600 text-xs font-semibold rounded-full uppercase tracking-wide">
                                 Disputes
                             </span>
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+                        <h1 className="text-3xl md:text-4xl font-bold mb-5 leading-[1.2] text-slate-900">
                             What to Do When Your Landlord Won't Return Your Deposit
                         </h1>
-                        <div className="flex items-center gap-4 text-sm text-slate-500">
-                            <span className="flex items-center gap-1.5">
-                                <Calendar size={14} />
+                        <div className="flex items-center gap-5 text-sm text-slate-500">
+                            <span className="flex items-center gap-2">
+                                <Calendar size={15} className="text-slate-400" />
                                 5 Dec 2024
                             </span>
-                            <span className="flex items-center gap-1.5">
-                                <Clock size={14} />
+                            <span className="flex items-center gap-2">
+                                <Clock size={15} className="text-slate-400" />
                                 7 min read
                             </span>
                         </div>
                     </header>
 
-                    <div className="prose prose-slate max-w-none">
-                        <p className="text-lg text-slate-600 leading-relaxed">
+                    <div className="space-y-8">
+                        <p className="text-xl text-slate-600 leading-relaxed font-light">
                             You've moved out, cleaned the property, and returned the keys. But weeks later,
                             your deposit hasn't appeared. Here's exactly what to do.
                         </p>
 
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-6 my-8">
-                            <div className="flex items-start gap-3">
-                                <AlertCircle className="text-red-600 flex-shrink-0 mt-1" size={20} />
+                        {/* Warning Box */}
+                        <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <AlertCircle className="text-red-600" size={20} />
+                                </div>
                                 <div>
-                                    <h3 className="font-semibold text-red-900 mb-1">Know Your Rights</h3>
-                                    <p className="text-red-800 text-sm m-0">
+                                    <h3 className="font-bold text-red-900 mb-2">Know Your Rights</h3>
+                                    <p className="text-red-800 text-sm leading-relaxed">
                                         In most countries, landlords must return deposits within a specific timeframe
                                         (often 10-30 days) or provide a detailed breakdown of deductions. Check
                                         your local laws for exact requirements.
@@ -84,95 +101,145 @@ export default function BlogPost() {
                             </div>
                         </div>
 
-                        <h2>Step 1: Check the Timeline</h2>
-                        <p>
-                            Before assuming the worst, check how long your landlord legally has to return
-                            your deposit:
-                        </p>
-                        <ul>
-                            <li><strong>UK:</strong> 10 days is common, but not legally mandated</li>
-                            <li><strong>Germany:</strong> Up to 6 months (Kautionsrückzahlung)</li>
-                            <li><strong>France:</strong> 2 months maximum</li>
-                            <li><strong>US:</strong> Varies by state (14-60 days typical)</li>
-                        </ul>
-                        <p>
-                            If the deadline hasn't passed, wait. If it has, move to step 2.
-                        </p>
+                        {/* Steps */}
+                        <div className="space-y-10 pt-4">
+                            <Step number={1} title="Check the Timeline">
+                                <p className="text-slate-600 leading-relaxed">
+                                    Before assuming the worst, check how long your landlord legally has to return
+                                    your deposit:
+                                </p>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {[
+                                        { country: '🇬🇧 UK', info: '10 days common' },
+                                        { country: '🇩🇪 Germany', info: 'Up to 6 months' },
+                                        { country: '🇫🇷 France', info: '2 months max' },
+                                        { country: '🇺🇸 US', info: '14-60 days (by state)' },
+                                    ].map((item, i) => (
+                                        <div key={i} className="bg-slate-50 rounded-lg p-3 text-center">
+                                            <div className="font-semibold text-slate-900 text-sm">{item.country}</div>
+                                            <div className="text-slate-500 text-xs">{item.info}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="text-slate-600 leading-relaxed text-sm">
+                                    If the deadline hasn't passed, wait. If it has, move to step 2.
+                                </p>
+                            </Step>
 
-                        <h2>Step 2: Send a Formal Written Request</h2>
-                        <p>
-                            Send your landlord a polite but firm letter or email requesting:
-                        </p>
-                        <ul>
-                            <li>Return of your full deposit within 14 days</li>
-                            <li>A detailed breakdown if any deductions are being made</li>
-                            <li>Receipts or quotes for any claimed damage</li>
-                        </ul>
-                        <p>
-                            Keep a copy of everything. If possible, send by recorded delivery or email
-                            with read receipt.
-                        </p>
+                            <Step number={2} title="Send a Formal Written Request">
+                                <p className="text-slate-600 leading-relaxed">
+                                    Send your landlord a polite but firm letter or email requesting:
+                                </p>
+                                <ul className="space-y-2">
+                                    {[
+                                        'Return of your full deposit within 14 days',
+                                        'A detailed breakdown if any deductions are being made',
+                                        'Receipts or quotes for any claimed damage'
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3 text-slate-600">
+                                            <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                                            <span className="text-sm">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                                    <p className="text-blue-800 text-sm">
+                                        Keep a copy of everything. If possible, send by recorded delivery or email
+                                        with read receipt.
+                                    </p>
+                                </div>
+                            </Step>
 
-                        <h2>Step 3: Gather Your Evidence</h2>
-                        <p>
-                            If your landlord claims damage, you'll need to disprove it. Collect:
-                        </p>
-                        <ul>
-                            <li>Move-in photos and videos with timestamps</li>
-                            <li>Move-out photos and videos</li>
-                            <li>Your original inventory or condition report</li>
-                            <li>Any written communication about property condition</li>
-                            <li>Proof of professional cleaning if applicable</li>
-                        </ul>
-                        <p>
-                            The more organized your evidence, the stronger your position.
-                        </p>
+                            <Step number={3} title="Gather Your Evidence">
+                                <p className="text-slate-600 leading-relaxed">
+                                    If your landlord claims damage, you'll need to disprove it. Collect:
+                                </p>
+                                <ul className="space-y-2">
+                                    {[
+                                        'Move-in photos and videos with timestamps',
+                                        'Move-out photos and videos',
+                                        'Your original inventory or condition report',
+                                        'Any written communication about property condition',
+                                        'Proof of professional cleaning if applicable'
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3 text-slate-600">
+                                            <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
+                                            <span className="text-sm">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </Step>
 
-                        <h2>Step 4: Challenge Unfair Deductions</h2>
-                        <p>
-                            Landlords cannot deduct for:
-                        </p>
-                        <ul>
-                            <li>Normal wear and tear (faded paint, worn carpets)</li>
-                            <li>Damage that existed before you moved in</li>
-                            <li>Problems outside your control (plumbing issues, appliance age)</li>
-                            <li>Improvements you made (unless specified in lease)</li>
-                        </ul>
-                        <p>
-                            Respond in writing, explaining why each deduction is unfair and providing
-                            your evidence.
-                        </p>
+                            <Step number={4} title="Challenge Unfair Deductions">
+                                <p className="text-slate-600 leading-relaxed">
+                                    Landlords <strong>cannot</strong> deduct for:
+                                </p>
+                                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                                    <ul className="space-y-2">
+                                        {[
+                                            'Normal wear and tear (faded paint, worn carpets)',
+                                            'Damage that existed before you moved in',
+                                            'Problems outside your control (plumbing issues, appliance age)',
+                                            'Improvements you made (unless specified in lease)'
+                                        ].map((item, i) => (
+                                            <li key={i} className="flex items-start gap-3 text-slate-700 text-sm">
+                                                <span className="text-red-500">✕</span>
+                                                <span>{item}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </Step>
 
-                        <h2>Step 5: Use Official Dispute Resolution</h2>
-                        <p>
-                            If your landlord won't budge, escalate to official channels:
-                        </p>
-                        <ul>
-                            <li><strong>UK:</strong> Deposit protection scheme's free dispute resolution</li>
-                            <li><strong>Germany:</strong> Mieterverein (tenants' association) or small claims</li>
-                            <li><strong>France:</strong> Commission départementale de conciliation</li>
-                            <li><strong>US:</strong> Small claims court (usually for disputes under $5,000-10,000)</li>
-                        </ul>
+                            <Step number={5} title="Use Official Dispute Resolution">
+                                <p className="text-slate-600 leading-relaxed">
+                                    If your landlord won't budge, escalate to official channels:
+                                </p>
+                                <ul className="space-y-2">
+                                    {[
+                                        { prefix: '🇬🇧 UK:', text: 'Deposit protection scheme\'s free dispute resolution' },
+                                        { prefix: '🇩🇪 Germany:', text: 'Mieterverein (tenants\' association) or small claims' },
+                                        { prefix: '🇫🇷 France:', text: 'Commission départementale de conciliation' },
+                                        { prefix: '🇺🇸 US:', text: 'Small claims court (usually under $5,000-10,000)' },
+                                    ].map((item, i) => (
+                                        <li key={i} className="text-slate-600 text-sm">
+                                            <strong>{item.prefix}</strong> {item.text}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </Step>
 
-                        <h2>Step 6: Small Claims Court</h2>
-                        <p>
-                            As a last resort, you can take your landlord to small claims court. This is:
-                        </p>
-                        <ul>
-                            <li>Usually inexpensive (€30-100 filing fee)</li>
-                            <li>No lawyer required</li>
-                            <li>Decided within a few weeks to months</li>
-                        </ul>
-                        <p>
-                            Bring all your evidence, be calm and factual, and let the documentation speak for itself.
-                        </p>
+                            <Step number={6} title="Small Claims Court">
+                                <p className="text-slate-600 leading-relaxed">
+                                    As a last resort, you can take your landlord to small claims court. This is:
+                                </p>
+                                <ul className="space-y-2">
+                                    {[
+                                        'Usually inexpensive (€30-100 filing fee)',
+                                        'No lawyer required',
+                                        'Decided within a few weeks to months'
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3 text-slate-600">
+                                            <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
+                                            <span className="text-sm">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className="text-slate-600 leading-relaxed text-sm">
+                                    Bring all your evidence, be calm and factual, and let the documentation speak for itself.
+                                </p>
+                            </Step>
+                        </div>
 
-                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 my-8">
-                            <div className="flex items-start gap-3">
-                                <Shield className="text-blue-600 flex-shrink-0 mt-1" size={20} />
+                        {/* Prevention tip */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mt-8">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <Shield className="text-blue-600" size={20} />
+                                </div>
                                 <div>
-                                    <h3 className="font-semibold text-blue-900 mb-1">Prevention is Better</h3>
-                                    <p className="text-blue-800 text-sm m-0">
+                                    <h3 className="font-bold text-blue-900 mb-2">Prevention is Better</h3>
+                                    <p className="text-blue-800 text-sm leading-relaxed">
                                         The best way to avoid deposit disputes is to document everything from
                                         day one. Take dated photos, keep all communication, and do a proper
                                         move-out walkthrough with your landlord.
@@ -181,47 +248,59 @@ export default function BlogPost() {
                             </div>
                         </div>
 
-                        <h2>Key Takeaways</h2>
-                        <ol>
-                            <li>Know your local deposit return timeline</li>
-                            <li>Always communicate in writing</li>
-                            <li>Keep organized evidence of property condition</li>
-                            <li>Challenge unfair deductions with documentation</li>
-                            <li>Use free dispute resolution before court</li>
-                        </ol>
+                        {/* Key Takeaways */}
+                        <section className="space-y-4 pt-4">
+                            <h2 className="text-2xl font-bold text-slate-900">Key Takeaways</h2>
+                            <ol className="space-y-3">
+                                {[
+                                    'Know your local deposit return timeline',
+                                    'Always communicate in writing',
+                                    'Keep organized evidence of property condition',
+                                    'Challenge unfair deductions with documentation',
+                                    'Use free dispute resolution before court'
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-slate-600">
+                                        <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 mt-0.5">
+                                            {i + 1}
+                                        </span>
+                                        <span className="leading-relaxed">{item}</span>
+                                    </li>
+                                ))}
+                            </ol>
+                        </section>
                     </div>
 
                     {/* CTA */}
-                    <div className="mt-12 p-6 bg-slate-900 text-white rounded-xl text-center">
-                        <h3 className="text-xl font-bold mb-2">Document your next rental properly</h3>
-                        <p className="text-slate-300 mb-4">
+                    <div className="mt-14 p-8 bg-slate-900 text-white rounded-2xl text-center">
+                        <h3 className="text-xl font-bold mb-3">Document your next rental properly</h3>
+                        <p className="text-slate-300 mb-5 max-w-md mx-auto">
                             RentVault helps you keep evidence organized so you never lose a deposit dispute.
                         </p>
                         <Link
                             href="/login"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-colors"
                         >
                             Get started free
                             <ArrowRight size={16} />
                         </Link>
                     </div>
 
-                    <div className="mt-12 pt-8 border-t border-slate-200">
-                        <h3 className="text-lg font-semibold mb-4">Related Articles</h3>
-                        <div className="space-y-3">
+                    <div className="mt-14 pt-10 border-t border-slate-200">
+                        <h3 className="text-lg font-bold mb-5 text-slate-900">Related Articles</h3>
+                        <div className="space-y-4">
                             <Link
                                 href="/guides/deposit-protection"
-                                className="block p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                className="block p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group"
                             >
-                                <span className="text-slate-900 font-medium">How to Protect Your Rental Deposit</span>
-                                <span className="text-slate-500 text-sm block mt-1">Comprehensive protection guide</span>
+                                <span className="text-slate-900 font-semibold group-hover:text-blue-600 transition-colors">How to Protect Your Rental Deposit</span>
+                                <span className="text-slate-500 text-sm block mt-1.5">Comprehensive protection guide</span>
                             </Link>
                             <Link
                                 href="/blog/protect-deposit-before-moving-in"
-                                className="block p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                className="block p-5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group"
                             >
-                                <span className="text-slate-900 font-medium">5 Things to Do Before Moving In</span>
-                                <span className="text-slate-500 text-sm block mt-1">Start protection from day one</span>
+                                <span className="text-slate-900 font-semibold group-hover:text-blue-600 transition-colors">5 Things to Do Before Moving In</span>
+                                <span className="text-slate-500 text-sm block mt-1.5">Start protection from day one</span>
                             </Link>
                         </div>
                     </div>

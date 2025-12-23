@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Calendar, Clock, ArrowRight, FileText } from 'lucide-react'
+import { Calendar, Clock, ArrowRight, Sparkles } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'Blog | RentVault - Rental Tips, Updates & Tenant Advice',
@@ -20,35 +20,39 @@ const blogPosts = [
     {
         slug: 'protect-deposit-before-moving-in',
         title: '5 Things to Do Before Moving into a New Rental',
-        excerpt: 'The first 24 hours in your new rental are crucial for protecting your deposit. Here\'s exactly what you should document before unpacking a single box.',
+        excerpt: 'The first 24 hours in your new rental are crucial for protecting your deposit. Here\'s exactly what you should document before unpacking.',
         date: '2024-12-20',
-        readTime: '5 min read',
+        readTime: '5 min',
         category: 'Deposit Protection',
+        categoryColor: 'blue',
         featured: true,
     },
     {
         slug: 'rental-notice-period-mistakes',
-        title: 'The 3 Most Expensive Notice Period Mistakes Tenants Make',
-        excerpt: 'Missing your notice deadline by just one day can cost you thousands. Learn from these common mistakes before they cost you money.',
+        title: 'The 3 Most Expensive Notice Period Mistakes',
+        excerpt: 'Missing your notice deadline by just one day can cost you thousands. Learn from these common mistakes.',
         date: '2024-12-15',
-        readTime: '4 min read',
+        readTime: '4 min',
         category: 'Legal',
+        categoryColor: 'amber',
     },
     {
         slug: 'move-in-photo-checklist',
         title: 'The Complete Move-In Photo Checklist',
         excerpt: 'A room-by-room guide to documenting your rental property. Print this checklist and use it on your first day.',
         date: '2024-12-10',
-        readTime: '6 min read',
+        readTime: '6 min',
         category: 'Documentation',
+        categoryColor: 'green',
     },
     {
         slug: 'landlord-refuses-deposit-return',
         title: 'What to Do When Your Landlord Won\'t Return Your Deposit',
-        excerpt: 'Your tenancy has ended but your landlord is holding onto your deposit. Here\'s a step-by-step guide to getting your money back.',
+        excerpt: 'Your tenancy has ended but your landlord is holding onto your deposit. Here\'s how to get it back.',
         date: '2024-12-05',
-        readTime: '7 min read',
+        readTime: '7 min',
         category: 'Disputes',
+        categoryColor: 'red',
     },
 ]
 
@@ -60,49 +64,68 @@ function formatDate(dateString: string) {
     })
 }
 
+const categoryStyles: Record<string, string> = {
+    blue: 'bg-blue-50 text-blue-600',
+    amber: 'bg-amber-50 text-amber-600',
+    green: 'bg-green-50 text-green-600',
+    red: 'bg-red-50 text-red-600',
+}
+
 export default function BlogPage() {
     const featuredPost = blogPosts.find(post => post.featured)
     const regularPosts = blogPosts.filter(post => !post.featured)
 
     return (
-        <main className="max-w-[900px] mx-auto px-4 md:px-6 py-12 md:py-16">
+        <main className="max-w-[800px] mx-auto px-4 md:px-6 py-12 md:py-16">
             {/* Header */}
-            <header className="mb-12">
-                <h1 className="text-3xl md:text-4xl font-bold mb-4">Blog</h1>
-                <p className="text-lg text-slate-600 max-w-2xl">
-                    Tips, guides, and updates to help tenants protect their deposits and navigate the rental process.
+            <header className="mb-14 text-center">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">Blog</h1>
+                <p className="text-lg text-slate-500 max-w-lg mx-auto">
+                    Practical tips and guides to help tenants protect deposits and navigate renting.
                 </p>
             </header>
 
             {/* Featured Post */}
             {featuredPost && (
-                <section className="mb-12">
+                <section className="mb-14">
                     <Link
                         href={`/blog/${featuredPost.slug}`}
                         className="block group"
                     >
-                        <article className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 md:p-8 border border-slate-200 hover:border-slate-300 transition-colors">
-                            <div className="flex items-center gap-3 mb-4">
-                                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                                    Featured
-                                </span>
-                                <span className="text-sm text-slate-500">{featuredPost.category}</span>
-                            </div>
-                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-4">
-                                {featuredPost.title}
-                            </h2>
-                            <p className="text-slate-600 text-lg mb-6 leading-relaxed">
-                                {featuredPost.excerpt}
-                            </p>
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
-                                <span className="flex items-center gap-1.5">
-                                    <Calendar size={14} />
-                                    {formatDate(featuredPost.date)}
-                                </span>
-                                <span className="flex items-center gap-1.5">
-                                    <Clock size={14} />
-                                    {featuredPost.readTime}
-                                </span>
+                        <article className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 md:p-10 text-white relative overflow-hidden">
+                            {/* Decorative element */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
+
+                            <div className="relative">
+                                <div className="flex items-center gap-3 mb-5">
+                                    <span className="px-3 py-1.5 bg-white/10 text-white/90 text-xs font-semibold rounded-full flex items-center gap-1.5">
+                                        <Sparkles size={12} />
+                                        Featured
+                                    </span>
+                                    <span className="text-sm text-white/60">{featuredPost.category}</span>
+                                </div>
+                                <h2 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-blue-300 transition-colors">
+                                    {featuredPost.title}
+                                </h2>
+                                <p className="text-slate-300 text-lg mb-6 leading-relaxed max-w-xl">
+                                    {featuredPost.excerpt}
+                                </p>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4 text-sm text-slate-400">
+                                        <span className="flex items-center gap-1.5">
+                                            <Calendar size={14} />
+                                            {formatDate(featuredPost.date)}
+                                        </span>
+                                        <span className="flex items-center gap-1.5">
+                                            <Clock size={14} />
+                                            {featuredPost.readTime}
+                                        </span>
+                                    </div>
+                                    <span className="flex items-center gap-2 text-sm font-medium text-blue-300 group-hover:gap-3 transition-all">
+                                        Read article
+                                        <ArrowRight size={16} />
+                                    </span>
+                                </div>
                             </div>
                         </article>
                     </Link>
@@ -111,41 +134,41 @@ export default function BlogPage() {
 
             {/* All Posts */}
             <section>
-                <h2 className="text-xl font-semibold mb-6 text-slate-900">Recent Articles</h2>
-                <div className="space-y-6">
+                <h2 className="text-xl font-bold mb-6 text-slate-900">All Articles</h2>
+                <div className="space-y-4">
                     {regularPosts.map((post) => (
                         <Link
                             key={post.slug}
                             href={`/blog/${post.slug}`}
                             className="block group"
                         >
-                            <article className="p-5 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                            <article className="p-6 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-md transition-all">
+                                <div className="flex items-start justify-between gap-6">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${categoryStyles[post.categoryColor]}`}>
                                                 {post.category}
                                             </span>
                                         </div>
-                                        <h3 className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
                                             {post.title}
                                         </h3>
-                                        <p className="text-sm text-slate-600 line-clamp-2">
+                                        <p className="text-slate-500 text-sm leading-relaxed mb-4">
                                             {post.excerpt}
                                         </p>
-                                        <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
-                                            <span className="flex items-center gap-1">
+                                        <div className="flex items-center gap-4 text-xs text-slate-400">
+                                            <span className="flex items-center gap-1.5">
                                                 <Calendar size={12} />
                                                 {formatDate(post.date)}
                                             </span>
-                                            <span className="flex items-center gap-1">
+                                            <span className="flex items-center gap-1.5">
                                                 <Clock size={12} />
                                                 {post.readTime}
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex-shrink-0 w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
-                                        <ArrowRight size={16} />
+                                    <div className="flex-shrink-0 w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                                        <ArrowRight size={18} />
                                     </div>
                                 </div>
                             </article>
@@ -155,15 +178,14 @@ export default function BlogPage() {
             </section>
 
             {/* CTA Section */}
-            <section className="mt-16 bg-slate-900 text-white rounded-2xl p-8 md:p-10 text-center">
-                <FileText className="mx-auto mb-4 text-slate-400" size={32} />
-                <h2 className="text-2xl font-bold mb-3">Ready to protect your deposit?</h2>
-                <p className="text-slate-300 mb-6 max-w-md mx-auto">
+            <section className="mt-16 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-2xl p-8 md:p-10 text-center">
+                <h2 className="text-2xl font-bold mb-3 text-slate-900">Ready to protect your deposit?</h2>
+                <p className="text-slate-500 mb-6 max-w-md mx-auto">
                     Start documenting your rental today. Free to use, no credit card required.
                 </p>
                 <Link
                     href="/login"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition-colors"
                 >
                     Get started for free
                     <ArrowRight size={18} />
