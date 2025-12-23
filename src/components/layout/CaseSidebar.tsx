@@ -11,8 +11,11 @@ import {
     Download,
     Database,
     HardDrive,
-    ChevronLeft
+    ChevronLeft,
+    MessageSquarePlus
 } from 'lucide-react'
+import { useState } from 'react'
+import { FeedbackDialog } from '@/components/features/FeedbackDialog'
 
 interface CaseSidebarProps {
     caseId: string
@@ -21,6 +24,7 @@ interface CaseSidebarProps {
 
 export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
     const pathname = usePathname()
+    const [feedbackOpen, setFeedbackOpen] = useState(false)
 
     const navItems = [
         { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
@@ -106,7 +110,19 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
                         </Link>
                     )
                 })}
+
+                <div className="pt-4 mt-2 border-t border-slate-200">
+                    <button
+                        onClick={() => setFeedbackOpen(true)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+                    >
+                        <MessageSquarePlus size={18} />
+                        Give Feedback
+                    </button>
+                </div>
             </nav>
+
+            <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
         </aside>
     )
 }
