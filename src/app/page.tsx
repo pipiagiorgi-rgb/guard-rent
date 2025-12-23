@@ -166,13 +166,13 @@ export default function Home() {
                 {/* Features Section */}
                 <section className="py-12 md:py-16 px-4 md:px-6">
                     <div className="max-w-[1120px] mx-auto">
-                        <div className="text-center mb-14">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything in one place</h2>
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-3">Everything in one place</h2>
                             <p className="text-slate-600 text-lg max-w-xl mx-auto">Tools to protect your deposit and stay organised.</p>
                         </div>
 
                         {/* Differentiator line */}
-                        <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+                        <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
                             Most rental tools are built for landlords or general contract management.
                             RentVault is designed specifically for tenants to organise records, evidence, and deadlines throughout a rental.
                         </p>
@@ -217,8 +217,8 @@ export default function Home() {
                 {/* How it Works */}
                 <section className="py-12 md:py-16 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
                     <div className="max-w-[1120px] mx-auto">
-                        <div className="text-center mb-14">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4">How it works</h2>
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-3">How it works</h2>
                             <p className="text-slate-600 text-lg max-w-xl mx-auto">Four steps to keep your rental organised.</p>
                         </div>
 
