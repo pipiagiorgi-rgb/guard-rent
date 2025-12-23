@@ -124,15 +124,15 @@ export default function StoragePage() {
 
                 {/* Current Status Card */}
                 <div className={`bg-white rounded-2xl border p-6 mb-6 ${storageInfo?.status === 'expired' ? 'border-red-200 bg-red-50' :
-                        storageInfo?.status === 'critical' ? 'border-red-200' :
-                            storageInfo?.status === 'warning' ? 'border-amber-200' :
-                                'border-slate-200'
+                    storageInfo?.status === 'critical' ? 'border-red-200' :
+                        storageInfo?.status === 'warning' ? 'border-amber-200' :
+                            'border-slate-200'
                     }`}>
                     <div className="flex items-start gap-4">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${storageInfo?.status === 'expired' ? 'bg-red-100' :
-                                storageInfo?.status === 'critical' ? 'bg-red-100' :
-                                    storageInfo?.status === 'warning' ? 'bg-amber-100' :
-                                        'bg-green-100'
+                            storageInfo?.status === 'critical' ? 'bg-red-100' :
+                                storageInfo?.status === 'warning' ? 'bg-amber-100' :
+                                    'bg-green-100'
                             }`}>
                             {storageInfo?.status === 'expired' || storageInfo?.status === 'critical' ? (
                                 <AlertTriangle className="text-red-600" size={24} />
@@ -165,8 +165,8 @@ export default function StoragePage() {
                                 <div className="w-full bg-slate-100 rounded-full h-2 mb-3">
                                     <div
                                         className={`h-2 rounded-full transition-all ${storageInfo.status === 'critical' ? 'bg-red-500' :
-                                                storageInfo.status === 'warning' ? 'bg-amber-500' :
-                                                    'bg-green-500'
+                                            storageInfo.status === 'warning' ? 'bg-amber-500' :
+                                                'bg-green-500'
                                             }`}
                                         style={{ width: `${Math.min(100, Math.max(0, (storageInfo.daysRemaining / 365) * 100))}%` }}
                                     />
@@ -205,9 +205,9 @@ export default function StoragePage() {
 
                     <div className="grid gap-3">
                         {[
-                            { years: 1, price: 9, label: '1 Year', sublabel: 'Most popular' },
-                            { years: 2, price: 18, label: '2 Years', sublabel: 'Save time' },
-                            { years: 3, price: 27, label: '3 Years', sublabel: 'Best value' }
+                            { years: 1, price: 9, label: '1 Year', sublabel: null },
+                            { years: 2, price: 16, label: '2 Years', sublabel: 'Save €2' },
+                            { years: 3, price: 21, label: '3 Years', sublabel: 'Save €6 · Best value' }
                         ].map((option) => (
                             <button
                                 key={option.years}
@@ -221,7 +221,7 @@ export default function StoragePage() {
                                     </div>
                                     <div className="text-left">
                                         <span className="font-semibold text-slate-900">{option.label}</span>
-                                        {option.years === 1 && (
+                                        {option.sublabel && (
                                             <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
                                                 {option.sublabel}
                                             </span>

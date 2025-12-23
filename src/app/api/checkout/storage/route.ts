@@ -2,15 +2,13 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2024-11-20.acacia'
-})
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
-// Storage extension prices
+// Storage extension prices (with progressive discount)
 const STORAGE_PRICES: Record<number, number> = {
-    1: 900,  // €9.00
-    2: 1800, // €18.00
-    3: 2700  // €27.00
+    1: 900,   // €9.00
+    2: 1600,  // €16.00 (save €2)
+    3: 2100   // €21.00 (save €6)
 }
 
 export async function POST(request: Request) {
