@@ -9,7 +9,7 @@ function getResendClient(): Resend | null {
 }
 
 // Email sender address
-const FROM_EMAIL = process.env.FROM_EMAIL || 'RentVault <contact@rentvault.ai>'
+const FROM_EMAIL = process.env.FROM_EMAIL || 'RentVault <noreply@rentvault.com>'
 
 // ============================================================
 // HTML EMAIL TEMPLATE (Supabase-inspired minimal design)
