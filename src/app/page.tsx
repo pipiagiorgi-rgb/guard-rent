@@ -251,31 +251,31 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* SEO Section: Rental Documentation & Deposit Protection - Content Refined */}
-                <section className="py-16 md:py-20 px-4 md:px-6">
+                {/* Why This Matters - EEAT with Statistics */}
+                <section className="py-16 md:py-20 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
                     <div className="max-w-[900px] mx-auto">
-                        <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
-                            Rental documentation for tenants
-                        </h2>
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-slate-900">Why accurate records matter</h3>
-                                <p className="text-slate-600 leading-relaxed">
-                                    Disputes about apartment condition often happen because of missing evidence.
-                                    It can be hard to remember the exact state of a property years after moving in.
+                        <div className="text-center mb-10">
+                            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                                Why this matters
+                            </h2>
+                        </div>
+                        <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10 shadow-sm">
+                            <div className="space-y-6">
+                                <p className="text-slate-700 leading-relaxed text-base md:text-lg">
+                                    Formal rental-deposit dispute systems process tens of thousands of cases every year
+                                    across major jurisdictions. In England & Wales alone, tenancy-deposit schemes handled
+                                    nearly <strong className="text-slate-900">47,000 disputes requiring adjudication</strong> in 2024/25.
                                 </p>
-                                <p className="text-slate-600 leading-relaxed">
-                                    Keeping organised records of your lease and photos helps you answer questions if they come up later.
+                                <p className="text-slate-700 leading-relaxed text-base md:text-lg">
+                                    These processes are <strong className="text-slate-900">evidence-based and deadline-driven</strong>.
+                                    Keeping clear, organised records can make a material difference.
                                 </p>
-                            </div>
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-slate-900">What RentVault does</h3>
-                                <p className="text-slate-600 leading-relaxed">
-                                    RentVault is a secure place to store your contract, photos, and dates.
-                                </p>
-                                <p className="text-slate-600 leading-relaxed">
-                                    Instead of searching through emails or camera rolls, your rental history is kept together.
-                                </p>
+                                <div className="pt-4 border-t border-slate-100">
+                                    <p className="text-slate-600 leading-relaxed">
+                                        RentVault helps tenants keep rental documents, photos, and key dates organised,
+                                        with system-generated timestamps and locked records that preserve what was recorded at the time.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
