@@ -122,7 +122,7 @@ export default function Home() {
                 </section>
 
                 {/* Why This Matters - MOVED UP, with source footnote */}
-                <section className="py-16 md:py-20 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
+                <section className="py-12 md:py-16 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
                     <div className="max-w-[900px] mx-auto">
                         <div className="text-center mb-10">
                             <h2 className="text-2xl md:text-3xl font-bold mb-4">
@@ -164,7 +164,7 @@ export default function Home() {
                 </section>
 
                 {/* Features Section */}
-                <section className="py-20 md:py-28 px-4 md:px-6">
+                <section className="py-12 md:py-16 px-4 md:px-6">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-14">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything in one place</h2>
@@ -215,7 +215,7 @@ export default function Home() {
                 </section>
 
                 {/* How it Works */}
-                <section className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
+                <section className="py-12 md:py-16 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-14">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">How it works</h2>
@@ -297,7 +297,7 @@ export default function Home() {
                 </section>
 
                 {/* Who it's for */}
-                <section className="py-16 md:py-20 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
+                <section className="py-10 md:py-14 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
                     <div className="max-w-[720px] mx-auto">
                         <div className="feature-card text-center py-10 px-8">
                             <div className="w-16 h-16 bg-gradient-to-br from-slate-900 to-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -318,8 +318,40 @@ export default function Home() {
                     </div>
                 </section>
 
+                {/* Pricing Teaser */}
+                <section className="py-10 md:py-14 px-4 md:px-6">
+                    <div className="max-w-[900px] mx-auto">
+                        <div className="bg-slate-50 rounded-2xl p-8 md:p-10 text-center">
+                            <h2 className="text-xl md:text-2xl font-bold mb-3">Simple pricing</h2>
+                            <p className="text-slate-600 mb-6 max-w-lg mx-auto">
+                                One-time payment. No subscriptions. Choose what fits your needs.
+                            </p>
+                            <div className="flex flex-wrap justify-center gap-4 mb-6">
+                                <div className="bg-white rounded-xl px-5 py-3 border border-slate-200">
+                                    <span className="text-2xl font-bold">€19</span>
+                                    <span className="text-slate-500 text-sm ml-1">Check-in</span>
+                                </div>
+                                <div className="bg-white rounded-xl px-5 py-3 border border-slate-200">
+                                    <span className="text-2xl font-bold">€29</span>
+                                    <span className="text-slate-500 text-sm ml-1">Move-out</span>
+                                </div>
+                                <div className="bg-slate-900 text-white rounded-xl px-5 py-3">
+                                    <span className="text-2xl font-bold">€39</span>
+                                    <span className="text-slate-300 text-sm ml-1">Full bundle</span>
+                                </div>
+                            </div>
+                            <Link
+                                href="/pricing"
+                                className="text-sm text-slate-600 hover:text-slate-900 underline underline-offset-2"
+                            >
+                                See full pricing details →
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Final CTA */}
-                <section className="py-20 md:py-28 px-4 md:px-6">
+                <section className="py-14 md:py-20 px-4 md:px-6">
                     <div className="max-w-[720px] mx-auto text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to get organised?</h2>
                         <p className="text-slate-600 mb-10 text-lg">
