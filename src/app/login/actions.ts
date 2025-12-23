@@ -10,41 +10,52 @@ export async function login(formData: FormData) {
 
     // Validate email
     if (!email || !email.includes('@')) {
-        redirect('/login?error=Invalid email address')
+        return { error: 'Invalid email address' }
     }
 
-    // Get the site URL - use VERCEL_URL in production, or localhost for dev
-    const vercelUrl = process.env.VERCEL_URL;
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
-    let origin: string;
-    if (siteUrl) {
-        origin = siteUrl;
-    } else if (vercelUrl) {
-        origin = `https://${vercelUrl}`;
-    } else {
-        origin = 'http://localhost:3000';
-    }
-
-    // For RentVault specifically, always use the custom domain
-    if (vercelUrl?.includes('guard-rent') || vercelUrl?.includes('vercel.app')) {
-        origin = 'https://rentvault.ai';
-    }
-
-    console.log('[DEBUG] Magic link config:', { origin, emailRedirectTo: `${origin}/auth/callback`, vercelUrl, siteUrl });
-
+    // Use OTP mode (no emailRedirectTo = sends 6-digit code instead of magic link)
     const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-            emailRedirectTo: `${origin}/auth/callback`,
+            // No emailRedirectTo means Supabase sends OTP code instead of magic link
+            shouldCreateUser: true,
         },
     })
 
     if (error) {
         console.error("Login error:", error.message, error.status, JSON.stringify(error));
-        redirect(`/login?error=${encodeURIComponent(error.message || 'Could not send magic link')}`)
+        return { error: error.message || 'Could not send verification code' }
+    }
+
+    return { success: true, email }
+}
+
+export async function verifyOtp(email: string, token: string) {
+    const supabase = await createClient()
+
+    // Validate inputs
+    if (!email || !token) {
+        return { error: 'Missing email or verification code' }
+    }
+
+    // Clean the token (remove spaces)
+    const cleanToken = token.replace(/\s/g, '')
+
+    if (cleanToken.length !== 6) {
+        return { error: 'Verification code must be 6 digits' }
+    }
+
+    const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: cleanToken,
+        type: 'email'
+    })
+
+    if (error) {
+        console.error("OTP verification error:", error.message);
+        return { error: error.message || 'Invalid or expired code' }
     }
 
     revalidatePath('/', 'layout')
-    redirect('/login?message=Check your email for the login link!')
+    redirect('/vault')
 }
