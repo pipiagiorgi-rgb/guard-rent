@@ -152,15 +152,14 @@ export default function BlogPost() {
 
                             <Step number={3} title="Gather Your Evidence">
                                 <p className="text-slate-600 leading-relaxed">
-                                    If your landlord claims damage, you'll need to disprove it. Collect:
+                                    If your landlord claims damage, you'll need to disprove it. You should have:
                                 </p>
                                 <ul className="space-y-2">
                                     {[
                                         'Move-in photos and videos with timestamps',
                                         'Move-out photos and videos',
                                         'Your original inventory or condition report',
-                                        'Any written communication about property condition',
-                                        'Proof of professional cleaning if applicable'
+                                        'Any written communication about property condition'
                                     ].map((item, i) => (
                                         <li key={i} className="flex items-start gap-3 text-slate-600">
                                             <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
@@ -168,6 +167,13 @@ export default function BlogPost() {
                                         </li>
                                     ))}
                                 </ul>
+                                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                                    <p className="text-blue-800 text-sm">
+                                        💡 <Link href="/login" className="text-blue-600 underline hover:text-blue-700">RentVault</Link> organizes
+                                        all your evidence by phase (check-in, handover) and can generate a PDF Deposit Recovery Pack
+                                        with timestamped photos ready for dispute resolution.
+                                    </p>
+                                </div>
                             </Step>
 
                             <Step number={4} title="Challenge Unfair Deductions">
@@ -240,9 +246,9 @@ export default function BlogPost() {
                                 <div>
                                     <h3 className="font-bold text-blue-900 mb-2">Prevention is Better</h3>
                                     <p className="text-blue-800 text-sm leading-relaxed">
-                                        The best way to avoid deposit disputes is to document everything from
-                                        day one. Take dated photos, keep all communication, and do a proper
-                                        move-out walkthrough with your landlord.
+                                        The best way to avoid deposit disputes is to use <Link href="/login" className="text-blue-600 underline hover:text-blue-700">RentVault</Link> from
+                                        day one. Upload your contract, take timestamped photos of every room, and generate
+                                        evidence reports when you need them.
                                     </p>
                                 </div>
                             </div>

@@ -96,8 +96,8 @@ export default function BlogPost() {
                                     <h3 className="font-bold text-green-900 mb-2">Before You Start</h3>
                                     <p className="text-green-800 text-sm leading-relaxed">
                                         Take photos before any furniture arrives. Good lighting is essential.
-                                        Open all blinds and turn on lights. Email photos to yourself immediately
-                                        to create a timestamped backup.
+                                        Open all blinds and turn on lights. Use <Link href="/login" className="text-green-700 underline hover:text-green-800">RentVault</Link> to
+                                        upload directly to your secure vault with automatic timestamps.
                                     </p>
                                 </div>
                             </div>
@@ -193,9 +193,9 @@ export default function BlogPost() {
                             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
                                 <ul className="space-y-2 text-blue-800 text-sm">
                                     <li>📸 Photograph any existing damage, no matter how small</li>
-                                    <li>📰 Take a photo with a newspaper or phone screen showing the date</li>
-                                    <li>📧 Email all photos to yourself and your landlord</li>
-                                    <li>💾 Store backups in at least two places</li>
+                                    <li>📱 Use <Link href="/login" className="text-blue-600 underline hover:text-blue-700">RentVault</Link> to organize photos by room with automatic timestamps</li>
+                                    <li>📄 Generate a PDF evidence report to share with your landlord</li>
+                                    <li>🔒 All photos are securely stored and accessible when you need them</li>
                                 </ul>
                             </div>
                         </section>

@@ -108,9 +108,9 @@ export default function BlogPost() {
                             </div>
                             <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
                                 <p className="text-green-800 text-sm">
-                                    <strong>How to avoid it:</strong> Check your lease for the exact wording. It might say
-                                    "three calendar months" or "the end of the third month following notice." Ask your
-                                    landlord to confirm your exact leave date in writing before you commit.
+                                    <strong>How to avoid it:</strong> Check your lease for the exact wording.
+                                    <Link href="/login" className="text-green-700 underline hover:text-green-800">RentVault</Link> can
+                                    scan your contract and calculate your exact leave date based on the notice rules.
                                 </p>
                             </div>
                         </section>
@@ -155,9 +155,9 @@ export default function BlogPost() {
                             </div>
                             <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
                                 <p className="text-green-800 text-sm">
-                                    <strong>How to avoid it:</strong> Set a reminder 4+ months before your lease ends (or
-                                    before you want to move). This gives you time to decide, give notice, and then search
-                                    for a new place during your notice period.
+                                    <strong>How to avoid it:</strong> <Link href="/login" className="text-green-700 underline hover:text-green-800">RentVault</Link> automatically
+                                    sets reminders 90 days before your notice deadline. You'll get email alerts so you never
+                                    miss the window to give notice.
                                 </p>
                             </div>
                         </section>
@@ -185,8 +185,9 @@ export default function BlogPost() {
                                 ))}
                             </ol>
                             <p className="text-slate-600 leading-relaxed pt-2">
-                                None of this is complicated. It just requires a few minutes of attention now instead of
-                                thousands of euros later.
+                                <Link href="/login" className="text-blue-600 underline hover:text-blue-700">RentVault</Link> handles
+                                all of this automatically. Just upload your lease and we'll extract the deadlines, calculate
+                                your leave date, and send you reminders.
                             </p>
                         </section>
                     </div>

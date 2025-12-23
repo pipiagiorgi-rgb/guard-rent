@@ -115,8 +115,9 @@ export default function BlogPost() {
                             </ul>
                             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
                                 <p className="text-blue-800 text-sm font-medium">
-                                    💡 Pro tip: Email these photos to yourself immediately. This creates a third-party
-                                    timestamp that's almost impossible to dispute.
+                                    💡 Pro tip: Use <Link href="/login" className="text-blue-600 underline hover:text-blue-700">RentVault</Link> to
+                                    upload photos by room with automatic timestamps. This creates undisputable evidence
+                                    that's organized and easy to find when you need it.
                                 </p>
                             </div>
                         </section>
@@ -164,16 +165,29 @@ export default function BlogPost() {
                                     <span>How the deposit is protected</span>
                                 </li>
                             </ul>
+                            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                                <p className="text-blue-800 text-sm font-medium">
+                                    💡 Pro tip: <Link href="/login" className="text-blue-600 underline hover:text-blue-700">RentVault's contract scanner</Link> can
+                                    extract key dates like notice deadlines automatically and set up reminders so you never miss them.
+                                </p>
+                            </div>
                         </section>
 
                         {/* Section 6 */}
                         <section className="space-y-4">
                             <h2 className="text-2xl font-bold text-slate-900 pt-4">5. Store Everything in One Place</h2>
                             <p className="text-slate-600 leading-relaxed">
-                                Create a single folder (digital or physical) for all your rental documents: lease,
-                                photos, meter readings, correspondence with your landlord. In 12 months when you're
-                                moving out, you'll thank yourself.
+                                Keep all your rental documents in one secure location: lease, photos, meter readings,
+                                and any correspondence with your landlord. In 12 months when you're moving out,
+                                you'll thank yourself.
                             </p>
+                            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                                <p className="text-blue-800 text-sm font-medium">
+                                    💡 <Link href="/login" className="text-blue-600 underline hover:text-blue-700">RentVault</Link> is built exactly for this.
+                                    Upload your contract, photos, and meter readings in one secure vault. When you need to generate
+                                    an evidence report for a deposit dispute, everything is organized and ready.
+                                </p>
+                            </div>
                         </section>
 
                         {/* Checklist Box */}
