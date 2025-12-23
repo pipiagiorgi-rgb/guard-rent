@@ -361,7 +361,7 @@ export async function POST(request: Request) {
             yPos -= 18
         }
 
-        // Evidence handling - factual explanation
+        // Evidence handling - factual explanation (conditional on actual sealed states)
         yPos -= 25
         coverPage.drawText('Evidence handling', {
             x: MARGIN,
@@ -372,11 +372,24 @@ export async function POST(request: Request) {
         })
         yPos -= 16
 
-        const explanationLines = [
+        // Build explanation dynamically based on actual sealed states
+        const explanationLines: string[] = [
             'Photos and documents in this record were uploaded to RentVault and timestamped using system time (UTC).',
-            'Check-in and handover photo sets were locked after completion and cannot be modified.',
-            'This report is a snapshot of the stored records at the time of generation.',
         ]
+
+        // Only mention locked photo sets if they are actually locked
+        const checkinSealed = !!rentalCase.checkin_completed_at
+        const handoverSealed = !!rentalCase.handover_completed_at
+
+        if (checkinSealed && handoverSealed) {
+            explanationLines.push('Check-in and handover photo sets were locked after completion and cannot be modified.')
+        } else if (checkinSealed) {
+            explanationLines.push('Check-in photo set was locked after completion and cannot be modified.')
+        } else if (handoverSealed) {
+            explanationLines.push('Handover photo set was locked after completion and cannot be modified.')
+        }
+
+        explanationLines.push('This report is a snapshot of the stored records at the time of generation.')
 
         for (const line of explanationLines) {
             coverPage.drawText(line, {

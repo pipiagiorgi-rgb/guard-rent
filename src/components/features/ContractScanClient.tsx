@@ -553,10 +553,15 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
         }
 
         if (!field || !field.value || field.value.toLowerCase() === 'not found' || field.value === '...') {
+            // Use appropriate fallback text based on field type
+            const fallbackText = fieldKey === 'property_address'
+                ? 'Address not stated in lease'
+                : 'Not extracted from lease'
+
             return (
                 <div className="bg-white p-5 rounded-xl border border-slate-200 text-slate-400 italic">
                     <p className="text-sm text-slate-500 mb-1">{label}</p>
-                    Not found
+                    {fallbackText}
                 </div>
             )
         }
