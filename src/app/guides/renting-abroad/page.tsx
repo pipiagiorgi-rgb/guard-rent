@@ -1,12 +1,13 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Globe, Folder, MapPin } from 'lucide-react'
+import { Globe, Folder, MapPin, Lightbulb, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'Tips for Tenants Renting Abroad | RentVault',
-    description: 'A guide for expats and international tenants on renting in a foreign country. Tips on contracts, language barriers, deposits, and documentation.',
+    description: 'Essential guide for expats and international tenants on renting in a foreign country. Expert tips on contracts, language barriers, deposits, and documentation to protect yourself abroad.',
+    keywords: 'renting abroad, expat rental, international tenant, rental deposit abroad, foreign lease',
     openGraph: {
-        title: 'Tips for Tenants Renting Abroad',
+        title: 'Tips for Tenants Renting Abroad | RentVault',
         description: 'Essential advice for expats and international students renting in a foreign country.',
     },
 }
@@ -126,6 +127,36 @@ export default function RentingAbroadGuide() {
                     </div>
                 </section>
 
+                {/* Pro Tips Section */}
+                <section className="mb-10 bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl p-6 border border-blue-100">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Lightbulb size={20} className="text-blue-600" />
+                        <h2 className="text-xl font-semibold text-blue-900">Pro tips from expat renters</h2>
+                    </div>
+                    <div className="space-y-3 text-slate-700">
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Join local expat groups on Facebook/Reddit</strong> — Other expats share warnings about
+                                problematic landlords and useful local tips.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Take a video walkthrough on move-in day</strong> — This captures everything at once and
+                                is harder to fake than photos. Email it to yourself for a timestamp.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Get a local friend to review your lease</strong> — Even if they're not a lawyer,
+                                a native speaker can spot unusual clauses.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Resolve deposit disputes before you leave</strong> — It's much harder to fight
+                                from your home country. Stay until it's resolved if possible.</span>
+                        </p>
+                    </div>
+                </section>
+
                 {/* Soft RentVault Relevance */}
                 <section className="bg-slate-50 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
@@ -143,7 +174,7 @@ export default function RentingAbroadGuide() {
                     </p>
                 </section>
 
-                <section>
+                <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">Related guides</h2>
                     <ul className="space-y-2">
                         <li>
@@ -162,6 +193,21 @@ export default function RentingAbroadGuide() {
                             </Link>
                         </li>
                     </ul>
+                </section>
+
+                {/* CTA Section */}
+                <section className="bg-slate-900 text-white rounded-xl p-8 text-center">
+                    <h2 className="text-2xl font-bold mb-3">Renting abroad? Stay organised.</h2>
+                    <p className="text-slate-300 mb-6 max-w-md mx-auto">
+                        Keep your lease, photos, and key dates in one place — accessible from anywhere. Free to start.
+                    </p>
+                    <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-colors"
+                    >
+                        Get started for free
+                        <ArrowRight size={18} />
+                    </Link>
                 </section>
             </article>
         </main>

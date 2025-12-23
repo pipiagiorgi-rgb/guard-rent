@@ -1,13 +1,14 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Clock, Folder, Calendar } from 'lucide-react'
+import { Clock, Folder, Calendar, Lightbulb, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'Understanding Rental Notice Periods | RentVault',
-    description: 'Learn about rental notice periods, how they work, and how to avoid missing important deadlines. A guide for tenants on termination notices and timing.',
+    description: 'Learn about rental notice periods, how they work, and how to avoid missing important deadlines. Essential guide for tenants on termination notices, timing, and avoiding extra rent payments.',
+    keywords: 'rental notice period, termination notice, lease termination, tenant notice, rental deadline',
     openGraph: {
-        title: 'Understanding Rental Notice Periods',
-        description: 'What tenants need to know about rental termination notices and timing.',
+        title: 'Understanding Rental Notice Periods | RentVault',
+        description: 'Missing a notice deadline can cost you months of extra rent. Here\'s what every tenant needs to know.',
     },
 }
 
@@ -103,7 +104,37 @@ export default function NoticePeriodsGuide() {
                     </div>
                 </section>
 
-                {/* Softened note - no amber/warning styling */}
+                {/* Pro Tips Section */}
+                <section className="mb-10 bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl p-6 border border-blue-100">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Lightbulb size={20} className="text-blue-600" />
+                        <h2 className="text-xl font-semibold text-blue-900">Pro tips from experienced renters</h2>
+                    </div>
+                    <div className="space-y-3 text-slate-700">
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Send notice by registered mail AND email</strong> — This gives you proof of delivery date
+                                that's hard to dispute.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>"Calendar months" often means end-of-month</strong> — In many countries,
+                                a 3-month notice given on March 15th means you leave June 30th, not June 15th.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Set a reminder 4+ months before you might want to leave</strong> — This gives you
+                                time to decide without rushing.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Keep your notice confirmation forever</strong> — Landlords sometimes claim they
+                                never received it. Having proof protects you.</span>
+                        </p>
+                    </div>
+                </section>
+
+                {/* Softened note */}
                 <section className="bg-slate-100 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
                         <Clock className="text-slate-600" size={22} />
@@ -136,7 +167,7 @@ export default function NoticePeriodsGuide() {
                     </p>
                 </section>
 
-                <section>
+                <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">Related guides</h2>
                     <ul className="space-y-2">
                         <li>
@@ -155,6 +186,21 @@ export default function NoticePeriodsGuide() {
                             </Link>
                         </li>
                     </ul>
+                </section>
+
+                {/* CTA Section */}
+                <section className="bg-slate-900 text-white rounded-xl p-8 text-center">
+                    <h2 className="text-2xl font-bold mb-3">Never miss an important deadline</h2>
+                    <p className="text-slate-300 mb-6 max-w-md mx-auto">
+                        RentVault extracts key dates from your lease and reminds you before deadlines. Free to start.
+                    </p>
+                    <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-colors"
+                    >
+                        Get started for free
+                        <ArrowRight size={18} />
+                    </Link>
                 </section>
             </article>
         </main>

@@ -1,13 +1,14 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Shield, Check, Folder } from 'lucide-react'
+import { Shield, Check, Folder, Lightbulb, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'How to Protect Your Rental Deposit | RentVault',
-    description: 'Learn how to protect your rental deposit with proper documentation. Tips for tenants on move-in photos, contract review, and avoiding deposit disputes.',
+    description: 'Learn how to protect your rental deposit with proper documentation. Expert tips on move-in photos, contract review, meter readings, and avoiding costly deposit disputes when you move out.',
+    keywords: 'rental deposit protection, security deposit, tenant rights, deposit disputes, move-out documentation',
     openGraph: {
-        title: 'How to Protect Your Rental Deposit',
-        description: 'Tips for tenants on avoiding deposit disputes with proper documentation.',
+        title: 'How to Protect Your Rental Deposit | RentVault',
+        description: 'Simple steps every tenant can take to avoid deposit disputes and keep their money.',
     },
 }
 
@@ -124,6 +125,36 @@ export default function DepositProtectionGuide() {
                     </div>
                 </section>
 
+                {/* Pro Tips Section */}
+                <section className="mb-10 bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl p-6 border border-blue-100">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Lightbulb size={20} className="text-blue-600" />
+                        <h2 className="text-xl font-semibold text-blue-900">Pro tips from experienced renters</h2>
+                    </div>
+                    <div className="space-y-3 text-slate-700">
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Request a walkthrough with your landlord</strong> — Having both parties agree on
+                                the condition at move-in prevents disputes later.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Keep all communication in writing</strong> — Email instead of calling.
+                                Text confirmations count too.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Get receipts for professional cleaning</strong> — If you pay for end-of-tenancy cleaning,
+                                keep the receipt as proof.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Don't admit fault for pre-existing damage</strong> — If something was already broken,
+                                say "this was here when I arrived" and show your photos.</span>
+                        </p>
+                    </div>
+                </section>
+
                 {/* Soft RentVault Relevance */}
                 <section className="bg-slate-50 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
@@ -141,7 +172,7 @@ export default function DepositProtectionGuide() {
                     </p>
                 </section>
 
-                <section>
+                <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">Related guides</h2>
                     <ul className="space-y-2">
                         <li>
@@ -160,6 +191,21 @@ export default function DepositProtectionGuide() {
                             </Link>
                         </li>
                     </ul>
+                </section>
+
+                {/* CTA Section */}
+                <section className="bg-slate-900 text-white rounded-xl p-8 text-center">
+                    <h2 className="text-2xl font-bold mb-3">Start protecting your deposit today</h2>
+                    <p className="text-slate-300 mb-6 max-w-md mx-auto">
+                        Document your rental, organise your evidence, and avoid costly disputes. Free to start.
+                    </p>
+                    <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-colors"
+                    >
+                        Get started for free
+                        <ArrowRight size={18} />
+                    </Link>
                 </section>
             </article>
         </main>

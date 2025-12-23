@@ -1,13 +1,14 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Camera, Folder, ImageIcon } from 'lucide-react'
+import { Camera, Folder, ImageIcon, Lightbulb, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
     title: 'Why Move-in Photos Matter | RentVault',
-    description: 'Learn why taking photos when you move into a rental is essential for protecting your deposit. Tips on what to photograph and how to organise your evidence.',
+    description: 'Learn why taking photos when you move into a rental is essential for protecting your deposit. Professional tips on what to photograph, how to organise evidence, and avoiding costly disputes.',
+    keywords: 'move-in photos, rental documentation, deposit protection, tenant evidence, property condition report',
     openGraph: {
-        title: 'Why Move-in Photos Matter',
-        description: 'Essential tips for documenting your rental apartment on move-in day.',
+        title: 'Why Move-in Photos Matter | RentVault',
+        description: 'The 20 minutes you spend photographing your new apartment could save you hundreds when you move out.',
     },
 }
 
@@ -106,6 +107,36 @@ export default function MoveInPhotosGuide() {
                     </div>
                 </section>
 
+                {/* Pro Tips Section */}
+                <section className="mb-10 bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl p-6 border border-blue-100">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Lightbulb size={20} className="text-blue-600" />
+                        <h2 className="text-xl font-semibold text-blue-900">Pro tips from experienced renters</h2>
+                    </div>
+                    <div className="space-y-3 text-slate-700">
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Email yourself the photos</strong> — This creates a third-party timestamp that's hard to dispute.
+                                Subject line: "Move-in photos [address] [date]"</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Include a newspaper or phone screen showing today's date</strong> — Old-school but effective
+                                for proving when photos were taken.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Don't just photograph damage — photograph clean, good condition too</strong> — This proves you
+                                received the property in good shape and returned it the same way.</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                            <span className="text-blue-500 font-bold">→</span>
+                            <span><strong>Take photos before AND after cleaning</strong> — If you clean on move-in day,
+                                photograph the original state first.</span>
+                        </p>
+                    </div>
+                </section>
+
                 {/* Soft RentVault Relevance */}
                 <section className="bg-slate-50 rounded-xl p-6 mb-10">
                     <div className="flex items-center gap-3 mb-4">
@@ -123,7 +154,7 @@ export default function MoveInPhotosGuide() {
                     </p>
                 </section>
 
-                <section>
+                <section className="mb-10">
                     <h2 className="text-xl font-semibold mb-4">Related guides</h2>
                     <ul className="space-y-2">
                         <li>
@@ -142,6 +173,21 @@ export default function MoveInPhotosGuide() {
                             </Link>
                         </li>
                     </ul>
+                </section>
+
+                {/* CTA Section */}
+                <section className="bg-slate-900 text-white rounded-xl p-8 text-center">
+                    <h2 className="text-2xl font-bold mb-3">Ready to protect your deposit?</h2>
+                    <p className="text-slate-300 mb-6 max-w-md mx-auto">
+                        Start documenting your rental today. It's free to try — no credit card required.
+                    </p>
+                    <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-colors"
+                    >
+                        Get started for free
+                        <ArrowRight size={18} />
+                    </Link>
                 </section>
             </article>
         </main>
