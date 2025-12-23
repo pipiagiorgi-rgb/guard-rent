@@ -5,6 +5,10 @@ import { Shield, Camera, Clock, Globe, ArrowRight } from 'lucide-react'
 export const metadata: Metadata = {
     title: 'Tenant Guides | RentVault',
     description: 'Helpful guides for tenants on deposit protection, move-in documentation, notice periods, and renting abroad.',
+    icons: {
+        icon: '/favicon.png',
+        apple: '/apple-icon.png',
+    },
     openGraph: {
         title: 'Tenant Guides | RentVault',
         description: 'Practical advice for tenants on protecting deposits and documenting rentals.',

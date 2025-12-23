@@ -7,6 +7,10 @@ export const metadata: Metadata = {
     title: 'RentVault | Protect Your Rental Deposit — Organise Documents, Photos & Deadlines',
     description: 'A secure, private vault for tenants to organise rental documents, move-in and move-out photos, and key notice dates. Evidence-based protection before disputes arise.',
     keywords: 'rental deposit protection, tenant documentation, move-in photos, rental contract storage, deposit dispute evidence, tenancy organiser, expat rental, property condition report, notice period reminders',
+    icons: {
+        icon: '/favicon.png',
+        apple: '/apple-icon.png',
+    },
     alternates: {
         canonical: 'https://rentvault.ai'
     },
