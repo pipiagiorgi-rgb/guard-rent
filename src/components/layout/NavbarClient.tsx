@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, BookOpen } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Logo } from '@/components/brand/Logo';
 
@@ -43,11 +43,11 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
             {/* Header: sticky on all screen sizes */}
             <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
                 <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-                    {/* Fixed-height flex container for the header */}
-                    <div className="h-[72px] flex items-center justify-between">
-                        {/* Logo wrapper */}
+                    {/* Fixed-height flex container - matches guides layout */}
+                    <div className="h-16 flex items-center justify-between">
+                        {/* Logo wrapper - uses canonical size="md" */}
                         <Link href="/" className="h-full flex items-center flex-shrink-0">
-                            <Logo size="lg" />
+                            <Logo size="md" />
                         </Link>
 
                         {/* Desktop Nav - right aligned */}
@@ -99,7 +99,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
             </header>
 
             {/* ═══════════════════════════════════════════════════════════════
-                MOBILE MENU - PREMIUM ANIMATED MODAL
+                MOBILE MENU - COMPLETE, PREMIUM, TRUST-FIRST
             ═══════════════════════════════════════════════════════════════ */}
             {mobileMenuOpen && (
                 <div
@@ -115,68 +115,86 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                     />
 
                     {/* Menu panel - slides in from right */}
-                    <div className="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl animate-in slide-in-from-right duration-300 ease-out">
-                        <div className="h-full flex flex-col">
-                            {/* TOP ROW: Logo + Close */}
-                            <div className="flex-shrink-0 px-5 h-[72px] flex items-center justify-between border-b border-slate-100">
+                    <div className="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl animate-in slide-in-from-right duration-300 ease-out flex flex-col">
+
+                        {/* ────────────────────────────────────────────────────
+                            HEADER: Logo + Close (matches guides layout exactly)
+                        ──────────────────────────────────────────────────── */}
+                        <div className="flex-shrink-0 px-5 h-16 flex items-center justify-between border-b border-slate-100">
+                            <Link
+                                href="/"
+                                onClick={handleNavClick}
+                                className="h-full flex items-center"
+                            >
+                                <Logo size="md" />
+                            </Link>
+                            <button
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                                aria-label="Close menu"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* ────────────────────────────────────────────────────
+                            PRIMARY NAVIGATION
+                        ──────────────────────────────────────────────────── */}
+                        <div className="flex-1 px-5 py-6 overflow-y-auto">
+                            <nav className="space-y-1">
                                 <Link
-                                    href="/"
+                                    href="/pricing"
                                     onClick={handleNavClick}
-                                    className="h-full flex items-center"
+                                    className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
                                 >
-                                    <Logo size="lg" />
+                                    Pricing
                                 </Link>
-                                <button
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="flex items-center justify-center h-10 w-10 -mr-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                                    aria-label="Close menu"
-                                >
-                                    <X size={24} />
-                                </button>
-                            </div>
 
-                            {/* NAVIGATION LINKS */}
-                            <div className="flex-1 px-5 py-6 overflow-y-auto">
-                                <nav className="space-y-1">
-                                    <Link
-                                        href="/pricing"
-                                        onClick={handleNavClick}
-                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
-                                    >
-                                        Pricing
-                                    </Link>
-
-                                    {isLoggedIn ? (
-                                        <Link
-                                            href="/vault"
-                                            onClick={handleNavClick}
-                                            className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
-                                        >
-                                            Dashboard
-                                        </Link>
-                                    ) : (
-                                        <Link
-                                            href="/login"
-                                            onClick={handleNavClick}
-                                            className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
-                                        >
-                                            Log in
-                                        </Link>
-                                    )}
-                                </nav>
-                            </div>
-
-                            {/* PRIMARY CTA - Bottom */}
-                            <div className="flex-shrink-0 px-5 py-6 border-t border-slate-100 bg-white">
                                 {isLoggedIn ? (
                                     <Link
                                         href="/vault"
                                         onClick={handleNavClick}
-                                        className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl text-[17px] font-semibold hover:bg-slate-800 transition-colors"
+                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
                                     >
-                                        Go to Dashboard
+                                        Dashboard
                                     </Link>
                                 ) : (
+                                    <Link
+                                        href="/login"
+                                        onClick={handleNavClick}
+                                        className="block py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
+                                    >
+                                        Log in
+                                    </Link>
+                                )}
+
+                                {/* Guides link */}
+                                <Link
+                                    href="/guides"
+                                    onClick={handleNavClick}
+                                    className="flex items-center gap-3 py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
+                                >
+                                    <BookOpen size={20} className="text-slate-400" />
+                                    Guides
+                                </Link>
+                            </nav>
+                        </div>
+
+                        {/* ────────────────────────────────────────────────────
+                            CTA + TRUST LINKS (Sticky Bottom)
+                        ──────────────────────────────────────────────────── */}
+                        <div className="flex-shrink-0 px-5 py-6 border-t border-slate-100 bg-white">
+                            {/* Primary CTA */}
+                            {isLoggedIn ? (
+                                <Link
+                                    href="/vault"
+                                    onClick={handleNavClick}
+                                    className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl text-[17px] font-semibold hover:bg-slate-800 transition-colors"
+                                >
+                                    Go to Dashboard
+                                </Link>
+                            ) : (
+                                <div>
                                     <Link
                                         href="/login"
                                         onClick={handleNavClick}
@@ -184,7 +202,30 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                     >
                                         Start now
                                     </Link>
-                                )}
+                                    {/* CTA Subtext */}
+                                    <p className="text-center text-sm text-slate-500 mt-3">
+                                        Free to explore. No credit card required.
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Trust/Legal Links */}
+                            <div className="flex items-center justify-center gap-4 mt-6 pt-4 border-t border-slate-100">
+                                <Link
+                                    href="/privacy"
+                                    onClick={handleNavClick}
+                                    className="text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                                >
+                                    Privacy Policy
+                                </Link>
+                                <span className="text-slate-300">·</span>
+                                <Link
+                                    href="/terms"
+                                    onClick={handleNavClick}
+                                    className="text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                                >
+                                    Terms of Service
+                                </Link>
                             </div>
                         </div>
                     </div>
