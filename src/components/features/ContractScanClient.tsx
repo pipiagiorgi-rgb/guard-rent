@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Loader2, CheckCircle, CheckCircle2, Info, Check, Upload, FileText, AlertCircle, Globe, Languages, Copy, ChevronDown, ChevronUp, Download, MessageCircle, Send, HelpCircle, Lock } from 'lucide-react'
+import { Loader2, CheckCircle, CheckCircle2, Info, Check, Upload, FileText, AlertCircle, Globe, Languages, Copy, ChevronDown, ChevronUp, Download, MessageCircle, Send, HelpCircle, Lock, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import {
     getQuestionsRemaining,
@@ -89,6 +89,7 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
     const [qaAnswer, setQaAnswer] = useState('')
     const [qaLoading, setQaLoading] = useState(false)
     const [qaError, setQaError] = useState<string | null>(null)
+    const [extractingAddress, setExtractingAddress] = useState(false)
 
     // Preview limits state
     const [questionsRemaining, setQuestionsRemaining] = useState(PREVIEW_QUESTION_LIMIT)
@@ -518,6 +519,73 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
         }
     }
 
+    // Extract address using targeted Q&A
+    const handleExtractAddress = async () => {
+        if (extractingAddress) return
+
+        setExtractingAddress(true)
+        setError(null)
+
+        try {
+            // Use Q&A API with targeted address question
+            const res = await fetch('/api/ai/contract-qa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    caseId,
+                    question: 'What is the full property address that is being rented? Include street number, street name, postal code, and city. Only give me the address, nothing else.'
+                })
+            })
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to extract address')
+
+            const extractedAddress = data.answer?.trim()
+
+            // Check if we got a valid address (not empty, not "not found", etc.)
+            if (!extractedAddress ||
+                extractedAddress.toLowerCase().includes('not found') ||
+                extractedAddress.toLowerCase().includes('unable to') ||
+                extractedAddress.toLowerCase().includes('cannot find') ||
+                extractedAddress.length < 10) {
+                throw new Error('Could not find property address in the contract')
+            }
+
+            // Save to database directly
+            const saveRes = await fetch(`/api/contracts/${caseId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: extractedAddress })
+            })
+
+            if (!saveRes.ok) {
+                const saveData = await saveRes.json()
+                throw new Error(saveData.error || 'Failed to save address')
+            }
+
+            // Update local state
+            if (editableAnalysis) {
+                const newAnalysis = JSON.parse(JSON.stringify(editableAnalysis)) as ContractAnalysis
+                newAnalysis.property_address = { value: extractedAddress, confidence: 'high', source_excerpt: 'AI extracted' }
+                setEditableAnalysis(newAnalysis)
+            } else if (scanResult) {
+                const newResult = JSON.parse(JSON.stringify(scanResult)) as ContractAnalysis
+                newResult.property_address = { value: extractedAddress, confidence: 'high', source_excerpt: 'AI extracted' }
+                setScanResult(newResult)
+            }
+
+            // Show success toast
+            setToastMessage(`Address extracted: ${extractedAddress}`)
+            setShowToast(true)
+            setTimeout(() => setShowToast(false), 4000)
+
+        } catch (err: any) {
+            setError(err.message || 'Failed to extract address')
+        } finally {
+            setExtractingAddress(false)
+        }
+    }
+
     const updateField = (key: keyof ContractAnalysis, value: string) => {
         if (!editableAnalysis) return
         const newAnalysis = JSON.parse(JSON.stringify(editableAnalysis)) as ContractAnalysis
@@ -637,7 +705,31 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="sm:col-span-2">
-                            {renderField('Property address', 'property_address')}
+                            <div className="relative">
+                                {renderField('Property address', 'property_address')}
+                                {/* Extract Address button - show if address not found */}
+                                {(!result?.property_address?.value ||
+                                    result?.property_address?.value.toLowerCase() === 'not found' ||
+                                    result?.property_address?.value === '...') && savedContract?.extractedText && (
+                                        <button
+                                            onClick={handleExtractAddress}
+                                            disabled={extractingAddress}
+                                            className="absolute top-2 right-2 px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                                        >
+                                            {extractingAddress ? (
+                                                <>
+                                                    <Loader2 size={12} className="animate-spin" />
+                                                    Extracting...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <MapPin size={12} />
+                                                    Extract Address
+                                                </>
+                                            )}
+                                        </button>
+                                    )}
+                            </div>
                         </div>
                         {renderField('Lease start', 'lease_start_date')}
                         {renderField('Initial lease end', 'lease_end_date')}

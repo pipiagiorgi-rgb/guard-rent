@@ -72,3 +72,48 @@ export async function GET(
         return NextResponse.json({ contract: null, contractApplied: false })
     }
 }
+
+// POST: Update extracted address
+export async function POST(
+    request: Request,
+    context: { params: Promise<{ caseId: string }> }
+) {
+    try {
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const { caseId } = await context.params
+        const body = await request.json()
+        const { address } = body
+
+        if (!address || typeof address !== 'string') {
+            return NextResponse.json({ error: 'Invalid address' }, { status: 400 })
+        }
+
+        // Update the cases.address field
+        const { error: updateError } = await supabase
+            .from('cases')
+            .update({
+                address: address.trim(),
+                last_activity_at: new Date().toISOString()
+            })
+            .eq('case_id', caseId)
+            .eq('user_id', user.id)
+
+        if (updateError) {
+            console.error('Failed to save address:', updateError)
+            return NextResponse.json({ error: 'Failed to save address' }, { status: 500 })
+        }
+
+        console.log('Address saved for case:', caseId, '->', address)
+        return NextResponse.json({ success: true, address })
+
+    } catch (err: any) {
+        console.error('Contract POST error:', err)
+        return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    }
+}
