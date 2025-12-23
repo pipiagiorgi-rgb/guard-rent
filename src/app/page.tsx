@@ -121,31 +121,27 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Why This Matters - MOVED UP, with source footnote */}
+                {/* Why This Matters - Urgency + SEO keywords */}
                 <section className="py-12 md:py-16 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
                     <div className="max-w-[900px] mx-auto">
-                        <div className="text-center mb-10">
-                            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                                Why this matters
-                            </h2>
-                        </div>
                         <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10 shadow-sm">
-                            <div className="space-y-6">
+                            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-slate-900">
+                                Don't lose part of your deposit over missing photos.
+                            </h2>
+                            <div className="space-y-5">
                                 <p className="text-slate-700 leading-relaxed text-base md:text-lg">
-                                    Formal rental-deposit dispute systems handle tens of thousands of cases each year
-                                    across major jurisdictions. In England & Wales alone, tenancy-deposit schemes processed
-                                    nearly <strong className="text-slate-900">47,000 disputes requiring adjudication</strong> in 2024/25.<sup className="text-slate-400">*</sup>
+                                    Every year, <strong className="text-slate-900">countless deposit disputes</strong> are
+                                    decided based on one thing: who has the evidence.
                                 </p>
                                 <p className="text-slate-700 leading-relaxed text-base md:text-lg">
-                                    These processes are <strong className="text-slate-900">evidence-based and deadline-driven</strong>.
-                                    Clear records, accurate timestamps, and preserved files can make a material difference.
+                                    In England & Wales alone, nearly <strong className="text-slate-900">47,000 rental disputes</strong> went
+                                    to adjudication last year.<sup className="text-slate-400">*</sup> If you don't have
+                                    clear move-in photos and dates, you're at a disadvantage.
                                 </p>
-                                <div className="pt-4 border-t border-slate-100">
-                                    <p className="text-slate-600 leading-relaxed">
-                                        RentVault helps tenants keep rental documents, photos, and key dates organised,
-                                        with system-generated timestamps and locked records that preserve what was recorded at the time.
-                                    </p>
-                                </div>
+                                <p className="text-slate-700 leading-relaxed text-base md:text-lg">
+                                    RentVault helps you document everything — rental contracts, property condition photos,
+                                    and key deadlines — with timestamps and locked records, so you're not scrambling later.
+                                </p>
                             </div>
                             {/* Source footnote */}
                             <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-slate-100">
