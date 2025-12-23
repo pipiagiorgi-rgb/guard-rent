@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, BookOpen } from 'lucide-react';
+import { Menu, X, BookOpen, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Logo } from '@/components/brand/Logo';
 
@@ -57,6 +57,12 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                 className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
                             >
                                 Pricing
+                            </Link>
+                            <Link
+                                href="/blog"
+                                className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
+                            >
+                                Blog
                             </Link>
 
                             {isLoggedIn ? (
@@ -176,6 +182,16 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                 >
                                     <BookOpen size={20} className="text-slate-400" />
                                     Guides
+                                </Link>
+
+                                {/* Blog link */}
+                                <Link
+                                    href="/blog"
+                                    onClick={handleNavClick}
+                                    className="flex items-center gap-3 py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
+                                >
+                                    <FileText size={20} className="text-slate-400" />
+                                    Blog
                                 </Link>
                             </nav>
                         </div>
