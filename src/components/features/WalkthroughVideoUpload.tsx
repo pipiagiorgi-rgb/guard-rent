@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
-import { Video, Upload, Trash2, Loader2, CheckCircle, Lock, AlertCircle } from 'lucide-react'
+import { Video, Upload, Trash2, Loader2, CheckCircle, Lock, AlertCircle, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 interface WalkthroughVideoUploadProps {
@@ -29,6 +29,7 @@ export function WalkthroughVideoUpload({
 }: WalkthroughVideoUploadProps) {
     const [uploading, setUploading] = useState(false)
     const [deleting, setDeleting] = useState(false)
+    const [downloading, setDownloading] = useState(false)
     const [progress, setProgress] = useState(0)
     const [error, setError] = useState<string | null>(null)
     const [dragOver, setDragOver] = useState(false)
@@ -159,6 +160,37 @@ export function WalkthroughVideoUpload({
         }
     }
 
+    const handleDownload = async () => {
+        if (!existingVideo || downloading) return
+
+        setDownloading(true)
+        setError(null)
+
+        try {
+            const res = await fetch('/api/assets/download-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assetId: existingVideo.assetId })
+            })
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to get download link')
+
+            // Trigger download
+            const link = document.createElement('a')
+            link.href = data.signedUrl
+            link.download = existingVideo.fileName || 'walkthrough-video.mp4'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+
+        } catch (err: any) {
+            setError(err.message || 'Download failed')
+        } finally {
+            setDownloading(false)
+        }
+    }
+
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault()
         setDragOver(false)
@@ -195,17 +227,30 @@ export function WalkthroughVideoUpload({
                             })} UTC
                         </p>
                     </div>
+                    <button
+                        onClick={handleDownload}
+                        disabled={downloading}
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                        title="Download video"
+                    >
+                        {downloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                    </button>
                 </div>
                 {existingVideo.fileHash && (
                     <p className="text-xs text-slate-400 font-mono truncate">
                         SHA-256: {existingVideo.fileHash.substring(0, 16)}...
                     </p>
                 )}
+                {error && (
+                    <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                        <AlertCircle size={14} /> {error}
+                    </p>
+                )}
             </div>
         )
     }
 
-    // Existing video (not locked) - show with delete option
+    // Existing video (not locked) - show with delete and download options
     if (existingVideo && !isLocked) {
         return (
             <div className="bg-white border border-slate-200 rounded-xl p-4">
@@ -223,9 +268,18 @@ export function WalkthroughVideoUpload({
                         </p>
                     </div>
                     <button
+                        onClick={handleDownload}
+                        disabled={downloading}
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                        title="Download video"
+                    >
+                        {downloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                    </button>
+                    <button
                         onClick={handleDelete}
                         disabled={deleting}
                         className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                        title="Delete video"
                     >
                         {deleting ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
                     </button>
