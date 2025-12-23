@@ -361,9 +361,9 @@ export async function POST(request: Request) {
             yPos -= 18
         }
 
-        // About This Record - factual explanation
+        // Evidence handling - factual explanation
         yPos -= 25
-        coverPage.drawText('About This Record', {
+        coverPage.drawText('Evidence handling', {
             x: MARGIN,
             y: yPos,
             size: 12,
@@ -373,9 +373,9 @@ export async function POST(request: Request) {
         yPos -= 16
 
         const explanationLines = [
-            '• All timestamps are recorded in Coordinated Universal Time (UTC)',
-            '• Check-in and handover evidence is locked after completion to prevent modification',
-            '• This document is a point-in-time snapshot generated from stored records',
+            'Photos and documents in this record were uploaded to RentVault and timestamped using system time (UTC).',
+            'Check-in and handover photo sets were locked after completion and cannot be modified.',
+            'This report is a snapshot of the stored records at the time of generation.',
         ]
 
         for (const line of explanationLines) {
