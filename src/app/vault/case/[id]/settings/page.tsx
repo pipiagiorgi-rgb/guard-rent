@@ -14,6 +14,8 @@ interface DataState {
     photoCount: number
     retentionUntil: string | null
     createdAt: string
+    purchaseType: string | null
+    storageYears: number
 }
 
 export default function DataRetentionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,7 +28,9 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
         rentalLabel: '',
         photoCount: 0,
         retentionUntil: null,
-        createdAt: ''
+        createdAt: '',
+        purchaseType: null,
+        storageYears: 0
     })
     const router = useRouter()
 
@@ -46,7 +50,7 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
 
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('label, retention_until, created_at')
+                .select('label, retention_until, created_at, purchase_type, storage_years_purchased, storage_expires_at')
                 .eq('case_id', id)
                 .single()
 
@@ -59,8 +63,10 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                 setData({
                     rentalLabel: caseData.label,
                     photoCount: count || 0,
-                    retentionUntil: caseData.retention_until,
-                    createdAt: caseData.created_at
+                    retentionUntil: caseData.storage_expires_at || caseData.retention_until,
+                    createdAt: caseData.created_at,
+                    purchaseType: caseData.purchase_type,
+                    storageYears: caseData.storage_years_purchased || 0
                 })
             }
         } catch (err) {
@@ -209,25 +215,36 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                     <h2 className="font-semibold text-lg">Retention status</h2>
                 </div>
 
-                {data.retentionUntil ? (
+                {data.purchaseType ? (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                         <div className="flex items-center gap-2 text-green-700">
                             <Check size={18} />
                             <span className="font-medium">Secure retention active</span>
                         </div>
                         <p className="text-sm text-green-600 mt-1">
+                            {data.storageYears > 1 ? (
+                                <>
+                                    You have <span className="font-medium">{data.storageYears} years</span> of storage.{' '}
+                                </>
+                            ) : null}
                             Your data is securely stored until{' '}
                             <span className="font-medium">
-                                {new Date(data.retentionUntil).toLocaleDateString('en-GB', {
+                                {data.retentionUntil ? new Date(data.retentionUntil).toLocaleDateString('en-GB', {
                                     day: 'numeric', month: 'long', year: 'numeric'
-                                })}
+                                }) : 'your retention period ends'}
                             </span>
                         </p>
                     </div>
                 ) : (
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                        <p className="text-amber-800">
-                            Your data is stored temporarily. Purchase a pack in Exports to extend secure retention for 12 months.
+                        <div className="flex items-center gap-2 text-amber-700 mb-1">
+                            <Clock size={18} />
+                            <span className="font-medium">Preview mode</span>
+                        </div>
+                        <p className="text-sm text-amber-700">
+                            Your data is stored temporarily and may be deleted. Purchase a pack in{' '}
+                            <a href={`/vault/case/${caseId}/exports`} className="underline font-medium">Exports</a>{' '}
+                            to unlock 12-month secure retention.
                         </p>
                     </div>
                 )}
