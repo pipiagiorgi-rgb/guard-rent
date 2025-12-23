@@ -57,9 +57,9 @@ export default async function MyRentalsPage() {
                 {/* Rentals List */}
                 {!rentals || rentals.length === 0 ? (
                     <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-8 md:p-12 text-center">
-                        <div className="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <Link href="/vault/new" className="w-16 h-16 bg-slate-100 hover:bg-slate-200 rounded-xl flex items-center justify-center mx-auto mb-4 transition-colors cursor-pointer">
                             <Plus className="text-slate-400" size={32} />
-                        </div>
+                        </Link>
                         <h3 className="text-lg font-semibold mb-2">No rentals yet</h3>
                         <p className="text-slate-600 mb-6 max-w-sm mx-auto">
                             Create a rental to store your contract, photos, and key dates in one place.
