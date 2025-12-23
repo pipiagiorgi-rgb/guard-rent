@@ -6,7 +6,7 @@ import { isAdminEmail } from '@/lib/admin'
 import { getPhotosGroupedByRoom, drawPhotoGrid, drawHashAppendix } from '@/lib/pdf-images'
 
 const MARGIN = 50
-const FOOTER_TEXT = 'RentVault securely stores and organises your rental documents. Not legal advice.'
+const FOOTER_TEXT = '© RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.'
 
 interface CustomSections {
     personalNotes?: string
@@ -277,9 +277,19 @@ export async function POST(request: Request) {
             minute: '2-digit'
         })
 
+        // Address resolution hierarchy
+        let resolvedAddress: string
+        if (rentalCase.contract_analysis?.address) {
+            resolvedAddress = rentalCase.contract_analysis.address
+        } else if (rentalCase.address) {
+            resolvedAddress = rentalCase.address
+        } else {
+            resolvedAddress = `Not stated in lease (rental reference: ${rentalCase.label})`
+        }
+
         const details = [
             ['Rental', rentalCase.label],
-            ['Address', rentalCase.address || 'Address not provided'],
+            ['Address', resolvedAddress],
             ['Lease Start', rentalCase.lease_start || 'N/A'],
             ['Lease End', rentalCase.lease_end || 'N/A'],
             ['Generated', generatedDate],
@@ -309,8 +319,36 @@ export async function POST(request: Request) {
             yPos -= 18
         }
 
+        // About This Record - factual explanation
+        yPos -= 20
+        coverPage.drawText('About This Record', {
+            x: MARGIN,
+            y: yPos,
+            size: 12,
+            font: helveticaBold,
+            color: rgb(0.3, 0.3, 0.3),
+        })
+        yPos -= 16
+
+        const explanationLines = [
+            '• All timestamps are recorded in Coordinated Universal Time (UTC)',
+            '• Check-in evidence is locked after completion to prevent modification',
+            '• This document is a point-in-time snapshot generated from stored records',
+        ]
+
+        for (const line of explanationLines) {
+            coverPage.drawText(line, {
+                x: MARGIN,
+                y: yPos,
+                size: 9,
+                font: helvetica,
+                color: rgb(0.4, 0.4, 0.4),
+            })
+            yPos -= 13
+        }
+
         // Evidence summary
-        yPos -= 30
+        yPos -= 20
         coverPage.drawText('Evidence Summary', {
             x: MARGIN,
             y: yPos,

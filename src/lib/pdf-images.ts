@@ -396,7 +396,7 @@ export async function drawHashAppendix(
     let yPos = height - 60
 
     // Header
-    page.drawText('Appendix: File Integrity', {
+    page.drawText('Appendix — File Integrity', {
         x: MARGIN,
         y: yPos,
         size: 16,
@@ -424,7 +424,7 @@ export async function drawHashAppendix(
         if (yPos < 50) {
             const newPage = pdfDoc.addPage()
             yPos = height - 60
-            page.drawText('Appendix: File Integrity (Cont.)', { x: MARGIN, y: yPos, size: 12, font: fontBold })
+            page.drawText('Appendix — File Integrity (Cont.)', { x: MARGIN, y: yPos, size: 12, font: fontBold })
             yPos -= 30
         }
 
