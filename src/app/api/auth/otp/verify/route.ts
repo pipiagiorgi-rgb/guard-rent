@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
-import { createClient as createServerClient } from '@/lib/supabase/server'
 
 // Use service role for server-side operations
 const supabaseAdmin = createClient(
@@ -69,37 +68,35 @@ export async function POST(request: Request) {
             userId = newUser.user.id
         }
 
-        // Generate session for the user
-        const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
+        // Generate a magic link that includes tokens
+        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
             type: 'magiclink',
-            email: email.toLowerCase()
+            email: email.toLowerCase(),
+            options: {
+                redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'}/vault`
+            }
         })
 
-        if (sessionError) {
-            console.error('Failed to generate session link:', sessionError)
+        if (linkError || !linkData) {
+            console.error('Failed to generate link:', linkError)
             return NextResponse.json({ error: 'Failed to authenticate' }, { status: 500 })
         }
 
-        // Extract the token from the generated link and verify it
-        // The link contains a token that we can use to sign in
-        const linkUrl = new URL(sessionData.properties.hashed_token ?
-            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/verify?token=${sessionData.properties.hashed_token}&type=magiclink` :
-            sessionData.properties.action_link)
+        // The action_link contains the token - we need to redirect the user to this URL
+        // to properly set the auth cookies
+        console.log(`User ${email} verified successfully via OTP, redirecting to auth`)
 
-        // Use the server client to verify the token
-        const supabase = await createServerClient()
+        // Parse the action link to get token and redirect to our callback
+        const actionUrl = new URL(linkData.properties.action_link)
+        const token = actionUrl.searchParams.get('token')
+        const type = actionUrl.searchParams.get('type')
 
-        // Since we can't directly create a session, we'll use verifyOtp with the generated token
-        // Actually, let's use a different approach - sign in with magic link token
-
-        // For now, return success and let the client redirect to a callback that uses the magic link
-        // This is a workaround - the proper solution requires more complex session handling
-
-        console.log(`User ${email} verified successfully via OTP`)
+        // Build callback URL with token
+        const callbackUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'}/auth/callback?token_hash=${token}&type=${type}`
 
         return NextResponse.json({
             success: true,
-            redirectUrl: sessionData.properties.action_link
+            redirectUrl: callbackUrl
         })
 
     } catch (error: any) {
