@@ -709,6 +709,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Check size={16} className="text-green-600" />
+                                    <span>Walkthrough video upload</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check size={16} className="text-green-600" />
                                     <span>Contract summary</span>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -954,6 +958,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                 <div className="flex items-center gap-2">
                                     <Check size={16} className="text-green-600" />
                                     <span>Check-in + handover photo comparison</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check size={16} className="text-green-600" />
+                                    <span>Walkthrough video uploads</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Check size={16} className="text-green-600" />
