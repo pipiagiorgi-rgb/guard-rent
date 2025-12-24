@@ -789,7 +789,23 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             ═══════════════════════════════════════════════════════════ */}
             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <div className="px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                    <button
+                        onClick={async () => {
+                            if (!depositProof?.storage_path) return
+                            const supabase = createClient()
+                            const { data } = await supabase.storage.from('guard-rent').createSignedUrl(depositProof.storage_path, 3600)
+                            if (data?.signedUrl) {
+                                setLightboxImages([{
+                                    src: data.signedUrl,
+                                    caption: 'Deposit Payment Proof',
+                                    subcaption: `Uploaded ${new Date(depositProof.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                                }])
+                                setLightboxOpen(true)
+                            }
+                        }}
+                        className={`flex items-center gap-3 text-left ${depositProof ? 'hover:opacity-75 cursor-pointer' : 'cursor-default'}`}
+                        disabled={!depositProof}
+                    >
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${depositProof ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
                             <FileText size={16} />
                         </div>
@@ -797,19 +813,54 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                             <h2 className="font-medium">Deposit payment proof</h2>
                             <p className="text-sm text-slate-500">
                                 {depositProof
-                                    ? `Uploaded ${new Date(depositProof.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                                    ? `Uploaded ${new Date(depositProof.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} • Click to view`
                                     : 'Upload proof of deposit payment (bank transfer, receipt)'}
                             </p>
                         </div>
-                    </div>
+                    </button>
                     {isLocked ? (
                         depositProof ? (
-                            <span className="text-sm text-green-600 font-medium">✓ Recorded</span>
+                            <button
+                                onClick={async () => {
+                                    if (!depositProof?.storage_path) return
+                                    const supabase = createClient()
+                                    const { data } = await supabase.storage.from('guard-rent').createSignedUrl(depositProof.storage_path, 3600)
+                                    if (data?.signedUrl) {
+                                        setLightboxImages([{
+                                            src: data.signedUrl,
+                                            caption: 'Deposit Payment Proof',
+                                            subcaption: `Uploaded ${new Date(depositProof.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                                        }])
+                                        setLightboxOpen(true)
+                                    }
+                                }}
+                                className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 px-3 py-1 rounded-md"
+                            >
+                                View
+                            </button>
                         ) : (
                             <span className="text-sm text-slate-400">Not uploaded</span>
                         )
                     ) : depositProof ? (
                         <div className="flex items-center gap-2">
+                            <button
+                                onClick={async () => {
+                                    if (!depositProof?.storage_path) return
+                                    const supabase = createClient()
+                                    const { data } = await supabase.storage.from('guard-rent').createSignedUrl(depositProof.storage_path, 3600)
+                                    if (data?.signedUrl) {
+                                        setLightboxImages([{
+                                            src: data.signedUrl,
+                                            caption: 'Deposit Payment Proof',
+                                            subcaption: `Uploaded ${new Date(depositProof.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                                        }])
+                                        setLightboxOpen(true)
+                                    }
+                                }}
+                                className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 px-3 py-1 rounded-md"
+                            >
+                                View
+                            </button>
                             <button
                                 onClick={() => setPhotoToDelete(depositProof)}
                                 className="text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 px-3 py-1 rounded-md"
