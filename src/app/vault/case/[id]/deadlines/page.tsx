@@ -297,7 +297,8 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
     // Save Handlers
     const saveTermination = async () => {
-        if (!termination.date) return
+        const deadline = getSuggestedTerminationDate()
+        if (!deadline) return
         setSaving('termination')
         setError(null)
 
@@ -308,7 +309,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                 body: JSON.stringify({
                     caseId,
                     type: 'termination_notice',
-                    date: termination.date,
+                    date: deadline, // Always use system-calculated deadline
                     offsets: termination.offsets,
                     rentalLabel,
                     noticeMethod: contractData?.notice_method?.value
@@ -606,41 +607,45 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
                     {termination.enabled && (
                         <div className="mt-6 pt-6 border-t border-slate-100 pl-2 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Reminder Date</label>
-                                    <input
-                                        type="date"
-                                        value={termination.date || ''}
-                                        onChange={(e) => setTermination(prev => ({ ...prev, date: e.target.value, saved: false }))}
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                    />
-                                    {suggestedDate && !termination.saved && (
-                                        <p className="text-xs text-slate-500 mt-1.5">
-                                            Suggested: {new Date(suggestedDate).toLocaleDateString()}
-                                        </p>
-                                    )}
+                            {/* Locked deadline display */}
+                            {suggestedDate && (
+                                <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                    <div className="text-sm text-slate-600 mb-1">Last day to give notice</div>
+                                    <div className="text-xl font-semibold text-slate-900">
+                                        {new Date(suggestedDate).toLocaleDateString('en-GB', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric'
+                                        })}
+                                    </div>
+                                    <div className="text-xs text-slate-500 mt-1">from contract</div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">When to notify</label>
-                                    <select
-                                        value={termination.offsets[0]}
-                                        onChange={(e) => setTermination(prev => ({ ...prev, offsets: [parseInt(e.target.value)], saved: false }))}
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
-                                    >
-                                        <option value={60}>2 months before</option>
-                                        <option value={30}>1 month before</option>
-                                        <option value={14}>2 weeks before</option>
-                                        <option value={7}>1 week before</option>
-                                    </select>
-                                </div>
+                            )}
+
+                            {/* Offset selector only */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Notify me</label>
+                                <select
+                                    value={termination.offsets[0]}
+                                    onChange={(e) => setTermination(prev => ({ ...prev, offsets: [parseInt(e.target.value)], saved: false }))}
+                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                                >
+                                    <option value={60}>2 months before</option>
+                                    <option value={30}>1 month before</option>
+                                    <option value={14}>2 weeks before</option>
+                                    <option value={7}>1 week before</option>
+                                    <option value={0}>On the deadline</option>
+                                </select>
+                                <p className="text-xs text-slate-500 mt-2">
+                                    We'll notify you before the notice deadline shown above.
+                                </p>
                             </div>
 
                             <div className="flex items-center justify-between pt-2">
                                 {termination.saved ? (
                                     <div className="flex items-center gap-2 text-green-600 text-sm font-medium">
                                         <Check size={16} />
-                                        Reminder active
+                                        Reminder set relative to the notice deadline
                                     </div>
                                 ) : (
                                     <div className="text-sm text-slate-400 italic">Unsaved changes</div>
@@ -648,7 +653,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
                                 <button
                                     onClick={saveTermination}
-                                    disabled={!termination.date || termination.saved}
+                                    disabled={!suggestedDate || termination.saved}
                                     className="px-6 py-2 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                                 >
                                     {saving === 'termination' ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
