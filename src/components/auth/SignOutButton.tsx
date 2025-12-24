@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { LogOut, AlertTriangle, Download, X } from 'lucide-react'
+import { LogOut, AlertTriangle, ShoppingBag, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface SignOutButtonProps {
     className?: string
@@ -13,6 +14,7 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
     const [hasUnpaidCases, setHasUnpaidCases] = useState(false)
     const [loading, setLoading] = useState(true)
     const [signingOut, setSigningOut] = useState(false)
+    const router = useRouter()
 
     useEffect(() => {
         async function checkUnpaidCases() {
@@ -72,6 +74,11 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
         }
     }
 
+    const handleKeepData = () => {
+        setShowWarning(false)
+        router.push('/pricing')
+    }
+
     return (
         <>
             <button
@@ -89,36 +96,35 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
             {/* Warning Dialog */}
             {showWarning && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-                    <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl animate-in fade-in zoom-in duration-200">
+                    <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl animate-in fade-in zoom-in duration-200 relative">
                         <div className="flex items-start gap-4 mb-4">
                             <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
                                 <AlertTriangle className="text-amber-600" size={24} />
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg text-slate-900 mb-1">
-                                    Your data will be lost
+                                    Your data isn't protected yet
                                 </h3>
                                 <p className="text-slate-600 text-sm">
-                                    You haven't purchased any packs yet. If you sign out now,
-                                    your uploaded photos and documents will be permanently deleted.
+                                    Without a purchase, your uploaded photos and documents will expire and be deleted automatically.
                                 </p>
                             </div>
                         </div>
 
                         <div className="bg-slate-50 rounded-xl p-4 mb-6">
                             <p className="text-sm text-slate-600">
-                                <strong>To keep your data:</strong> Purchase a Check-in Pack or Deposit Recovery Pack
-                                before signing out. Your evidence will then be securely stored for 12 months.
+                                <strong>To protect your data:</strong> Purchase a Check-in Pack or Deposit Recovery Pack.
+                                Your evidence will then be securely stored for 12 months.
                             </p>
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
-                                onClick={() => setShowWarning(false)}
+                                onClick={handleKeepData}
                                 className="flex-1 px-4 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
                             >
-                                <Download size={18} />
-                                Keep my data
+                                <ShoppingBag size={18} />
+                                View packs
                             </button>
                             <button
                                 onClick={performSignOut}
@@ -141,3 +147,4 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
         </>
     )
 }
+
