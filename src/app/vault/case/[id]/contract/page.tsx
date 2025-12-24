@@ -35,7 +35,7 @@ export default async function ContractPage({ params }: { params: { id: string } 
             </div>
 
             {/* Upgrade Banner */}
-            <UpgradeBanner caseId={params.id} currentPack={rentalCase?.purchase_type} />
+            <UpgradeBanner caseId={params.id} currentPack={rentalCase?.purchase_type} isAdmin={isAdmin} />
 
             {/* Preview mode banner - only show when not purchased */}
             {/* Preview mode banner - only show when not purchased */}

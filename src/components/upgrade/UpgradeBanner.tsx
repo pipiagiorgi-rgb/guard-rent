@@ -6,9 +6,10 @@ import { Shield, CheckCircle, ArrowRight } from 'lucide-react'
 interface UpgradeBannerProps {
     caseId: string
     currentPack?: string | null
+    isAdmin?: boolean  // Admin users get full access
 }
 
-export function UpgradeBanner({ caseId, currentPack }: UpgradeBannerProps) {
+export function UpgradeBanner({ caseId, currentPack, isAdmin = false }: UpgradeBannerProps) {
     const [loading, setLoading] = useState<string | null>(null)
 
     const handlePurchase = async (packType: 'checkin' | 'bundle' | 'moveout') => {
@@ -31,6 +32,25 @@ export function UpgradeBanner({ caseId, currentPack }: UpgradeBannerProps) {
             alert('Something went wrong. Please try again.')
             setLoading(null)
         }
+    }
+
+    // CASE 0: Admin users always get full access
+    if (isAdmin) {
+        return (
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0">
+                        <CheckCircle size={20} />
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-green-900">Full Access</h3>
+                        <p className="text-sm text-green-700">
+                            You have unlimited access to all features for this rental.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     // CASE 1: Full Bundle purchased - Show "Full Access" success banner

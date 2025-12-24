@@ -5,6 +5,7 @@ import { Calendar, MapPin, Clock, ChevronRight } from 'lucide-react'
 import { formatCountryWithCode } from '@/lib/countries'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { Footer } from '@/components/layout/Footer'
+import { isAdminEmail } from '@/lib/admin'
 
 // Helper to format country for display (handles custom countries)
 function formatCountry(code: string | null): string {
@@ -20,6 +21,10 @@ function formatCountry(code: string | null): string {
 
 export default async function CaseOverviewPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
+
+    // Get current user for admin check
+    const { data: { user } } = await supabase.auth.getUser()
+    const isAdmin = isAdminEmail(user?.email)
 
     const { data: rental } = await supabase
         .from('cases')
@@ -42,7 +47,7 @@ export default async function CaseOverviewPage({ params }: { params: { id: strin
             </div>
 
             {/* Upgrade Banner */}
-            <UpgradeBanner caseId={params.id} currentPack={rental.purchase_type} />
+            <UpgradeBanner caseId={params.id} currentPack={rental.purchase_type} isAdmin={isAdmin} />
 
             {/* Info Cards */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
