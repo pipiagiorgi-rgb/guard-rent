@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json()
-        const { assetId } = body
+        const { assetId, forceDownload, fileName } = body
 
         if (!assetId) {
             return NextResponse.json({ error: 'Missing assetId' }, { status: 400 })
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         // Verify ownership and get path
         const { data: asset } = await supabase
             .from('assets')
-            .select('storage_path, user_id')
+            .select('storage_path, user_id, type')
             .eq('asset_id', assetId)
             .single()
 
@@ -28,11 +28,19 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Asset not found or access denied' }, { status: 404 })
         }
 
-        // Generate Signed Download URL (valid for 60 seconds is usually enough for redirect or immediate fetch)
+        // Determine download filename
+        const downloadFileName = fileName || asset.storage_path.split('/').pop() || 'download'
+
+        // Generate Signed Download URL with optional download header
+        const options: { download?: string | boolean } = {}
+        if (forceDownload) {
+            options.download = downloadFileName
+        }
+
         const { data: sigData, error: storageError } = await supabase
             .storage
             .from('guard-rent')
-            .createSignedUrl(asset.storage_path, 60)
+            .createSignedUrl(asset.storage_path, 60, options)
 
         if (storageError) {
             console.error('Storage Sign Error:', storageError)
@@ -48,3 +56,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
+

@@ -537,11 +537,15 @@ export async function POST(request: Request) {
             storage_path: storagePath
         })
 
-        // Get signed URL
+        // Get signed URL - with download option for non-previews
+        const downloadFileName = forPreview
+            ? undefined
+            : `RentVault_Check-in_Report_${caseId.slice(0, 8)}.pdf`
+
         const { data: signData } = await supabase
             .storage
             .from('guard-rent')
-            .createSignedUrl(storagePath, 3600)
+            .createSignedUrl(storagePath, 3600, downloadFileName ? { download: downloadFileName } : {})
 
         return NextResponse.json({ url: signData?.signedUrl })
 
