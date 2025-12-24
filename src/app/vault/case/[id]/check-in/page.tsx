@@ -621,47 +621,39 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
 
                         <div className="p-5">
                             {room.photos.length > 0 ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                    {room.photos.slice(0, 4).map((photo, i) => ( // Show first 4 thumbnails
-                                        <div
-                                            key={photo.asset_id}
-                                            className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group"
-                                        >
-                                            <button
-                                                onClick={() => openRoomGallery(room, i)}
-                                                className="w-full h-full"
+                                <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                    <div className="flex gap-3 min-w-max">
+                                        {room.photos.map((photo, i) => (
+                                            <div
+                                                key={photo.asset_id}
+                                                className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-slate-200 group"
                                             >
-                                                {photo.signedUrl ? (
-                                                    <img src={photo.signedUrl} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full bg-slate-100 flex items-center justify-center text-xs text-slate-400">
-                                                        Photo {i + 1}
-                                                    </div>
-                                                )}
-                                            </button>
-                                            {/* Delete button */}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleDeletePhoto(photo)
-                                                }}
-                                                className="absolute top-1 right-1 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-                                                title="Delete photo"
-                                            >
-                                                <X size={14} />
-                                            </button>
-
-                                        </div>
-                                    ))}
-                                    {room.photos.length > 4 && (
-                                        <button
-                                            onClick={() => openRoomGallery(room)}
-                                            className="aspect-square rounded-lg border border-slate-200 bg-slate-50 flex flex-col items-center justify-center hover:bg-slate-100 transition-colors"
-                                        >
-                                            <span className="font-medium text-slate-600">+{room.photos.length - 4}</span>
-                                            <span className="text-xs text-slate-400">more</span>
-                                        </button>
-                                    )}
+                                                <button
+                                                    onClick={() => openRoomGallery(room, i)}
+                                                    className="w-full h-full"
+                                                >
+                                                    {photo.signedUrl ? (
+                                                        <img src={photo.signedUrl} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-slate-100 flex items-center justify-center text-xs text-slate-400">
+                                                            Photo {i + 1}
+                                                        </div>
+                                                    )}
+                                                </button>
+                                                {/* Delete button */}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleDeletePhoto(photo)
+                                                    }}
+                                                    className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                                                    title="Delete photo"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="py-8 text-center border-2 border-dashed border-slate-100 rounded-xl">

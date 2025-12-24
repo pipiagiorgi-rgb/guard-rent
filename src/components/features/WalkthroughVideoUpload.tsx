@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
-import { Video, Upload, Trash2, Loader2, CheckCircle, Lock, AlertCircle, Download } from 'lucide-react'
+import { Video, Upload, Trash2, Loader2, CheckCircle, Lock, AlertCircle, Eye } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 interface WalkthroughVideoUploadProps {
@@ -31,7 +31,7 @@ export function WalkthroughVideoUpload({
 }: WalkthroughVideoUploadProps) {
     const [uploading, setUploading] = useState(false)
     const [deleting, setDeleting] = useState(false)
-    const [downloading, setDownloading] = useState(false)
+    const [previewing, setPreviewing] = useState(false)
     const [progress, setProgress] = useState(0)
     const [error, setError] = useState<string | null>(null)
     const [dragOver, setDragOver] = useState(false)
@@ -162,10 +162,10 @@ export function WalkthroughVideoUpload({
         }
     }
 
-    const handleDownload = async () => {
-        if (!existingVideo || downloading) return
+    const handlePreview = async () => {
+        if (!existingVideo || previewing) return
 
-        setDownloading(true)
+        setPreviewing(true)
         setError(null)
 
         try {
@@ -176,20 +176,15 @@ export function WalkthroughVideoUpload({
             })
 
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to get download link')
+            if (!res.ok) throw new Error(data.error || 'Failed to get preview link')
 
-            // Trigger download
-            const link = document.createElement('a')
-            link.href = data.signedUrl
-            link.download = existingVideo.fileName || 'walkthrough-video.mp4'
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
+            // Open in new tab for preview
+            window.open(data.signedUrl, '_blank')
 
         } catch (err: any) {
-            setError(err.message || 'Download failed')
+            setError(err.message || 'Preview failed')
         } finally {
-            setDownloading(false)
+            setPreviewing(false)
         }
     }
 
@@ -252,12 +247,12 @@ export function WalkthroughVideoUpload({
                         </p>
                     </div>
                     <button
-                        onClick={handleDownload}
-                        disabled={downloading}
+                        onClick={handlePreview}
+                        disabled={previewing}
                         className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                        title="Download video"
+                        title="Preview video"
                     >
-                        {downloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                        {previewing ? <Loader2 size={18} className="animate-spin" /> : <Eye size={18} />}
                     </button>
                 </div>
                 {existingVideo.fileHash && (
@@ -274,7 +269,7 @@ export function WalkthroughVideoUpload({
         )
     }
 
-    // Existing video (not locked) - show with delete and download options
+    // Existing video (not locked) - show with delete and preview options
     if (existingVideo && !isLocked) {
         return (
             <div className="bg-white border border-slate-200 rounded-xl p-4">
@@ -292,12 +287,12 @@ export function WalkthroughVideoUpload({
                         </p>
                     </div>
                     <button
-                        onClick={handleDownload}
-                        disabled={downloading}
+                        onClick={handlePreview}
+                        disabled={previewing}
                         className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                        title="Download video"
+                        title="Preview video"
                     >
-                        {downloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                        {previewing ? <Loader2 size={18} className="animate-spin" /> : <Eye size={18} />}
                     </button>
                     <button
                         onClick={handleDelete}
