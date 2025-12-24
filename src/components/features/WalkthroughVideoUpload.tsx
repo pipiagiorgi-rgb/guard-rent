@@ -183,7 +183,14 @@ export function WalkthroughVideoUpload({
 
             if (data.signedUrl) {
                 console.log('Preview: Opening URL in new tab')
-                window.open(data.signedUrl, '_blank')
+                // Use anchor element for mobile compatibility (window.open blocked after async)
+                const link = document.createElement('a')
+                link.href = data.signedUrl
+                link.target = '_blank'
+                link.rel = 'noopener noreferrer'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
             } else {
                 throw new Error('No signed URL returned')
             }

@@ -318,8 +318,14 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to get download link')
 
-            // Trigger download by opening in new tab with download header
-            window.open(data.signedUrl, '_blank')
+            // Use anchor element for mobile compatibility (window.open blocked after async)
+            const link = document.createElement('a')
+            link.href = data.signedUrl
+            link.target = '_blank'
+            link.rel = 'noopener noreferrer'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
         } catch (err) {
             console.error('Video download error:', err)
         } finally {
@@ -440,7 +446,15 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 setPreviewType(packType)
                 setPreviewOpen(true)
             } else if (url) {
-                window.open(url, '_blank')
+                // Use anchor element for mobile compatibility (window.open blocked after async)
+                const link = document.createElement('a')
+                link.href = url
+                link.target = '_blank'
+                link.rel = 'noopener noreferrer'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+
                 const hasPack = packType === 'checkin_pack' ? hasCheckinPack : hasDepositPack
                 if (hasPack) {
                     setLastGeneratedPdf({ type: packType, url })
@@ -574,7 +588,16 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         </button>
                                         <button
                                             onClick={() => {
-                                                if (previewUrl) window.open(previewUrl, '_blank')
+                                                if (previewUrl) {
+                                                    // Use anchor for mobile compatibility
+                                                    const link = document.createElement('a')
+                                                    link.href = previewUrl
+                                                    link.target = '_blank'
+                                                    link.rel = 'noopener noreferrer'
+                                                    document.body.appendChild(link)
+                                                    link.click()
+                                                    document.body.removeChild(link)
+                                                }
                                             }}
                                             className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center gap-2"
                                         >
