@@ -87,7 +87,7 @@ export default async function MyRentalsPage() {
                                             </span>
                                         </div>
                                         <p className="text-slate-500 text-sm">
-                                            {formatCountry(rental.country)} · <span className="text-slate-400">Created {new Date(rental.created_at).toLocaleDateString()}</span>
+                                            {formatCountry(rental.country)} · <span className="text-slate-400">Created {new Date(rental.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                         </p>
                                     </div>
                                     <ChevronRight className="text-slate-400 group-hover:text-slate-600 transition-colors flex-shrink-0" size={20} />

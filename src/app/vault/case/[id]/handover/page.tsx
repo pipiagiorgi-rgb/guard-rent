@@ -527,7 +527,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 <div className="bg-white rounded-xl p-6 max-w-md w-full">
                     <h3 className="font-semibold text-lg mb-2">Edit completed handover?</h3>
                     <p className="text-slate-600 mb-6">
-                        This handover was already marked complete on {new Date(handover.completedAt!).toLocaleDateString()}. Are you sure you want to make changes?
+                        This handover was already marked complete on {new Date(handover.completedAt!).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}. Are you sure you want to make changes?
                     </p>
                     <div className="flex gap-3">
                         <button
@@ -619,7 +619,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                             <div>
                                 <p className="font-semibold text-green-900">Handover completed</p>
                                 <p className="text-sm text-green-700">
-                                    Completed on {new Date(handover.completedAt).toLocaleDateString()}
+                                    Completed on {new Date(handover.completedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </p>
                             </div>
                         </div>
@@ -886,7 +886,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                             <h2 className="font-medium">Deposit payment proof</h2>
                             <p className="text-sm text-slate-500">
                                 {depositProof
-                                    ? `Uploaded ${new Date(depositProof.created_at).toLocaleDateString()}`
+                                    ? `Uploaded ${new Date(depositProof.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
                                     : 'Upload proof of deposit payment'}
                             </p>
                         </div>
@@ -918,7 +918,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                             <h2 className="font-medium">Keys returned</h2>
                             <p className="text-sm text-slate-500">
                                 {handover.keysReturned
-                                    ? `Confirmed ${new Date(handover.keysConfirmedAt!).toLocaleDateString()}`
+                                    ? `Confirmed ${new Date(handover.keysConfirmedAt!).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
                                     : 'Confirm when keys are handed over'}
                             </p>
                         </div>

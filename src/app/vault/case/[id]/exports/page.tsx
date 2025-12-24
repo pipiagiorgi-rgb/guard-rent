@@ -307,7 +307,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 const signedPhotos = assets.map(a => ({
                     src: signedMap.get(a.storage_path) || '',
                     caption: a.room_name || (type === 'checkin' ? 'Check-in Photo' : 'Handover Photo'),
-                    subcaption: `${type === 'checkin' ? 'Check-in' : 'Handover'} • ${new Date(a.created_at).toLocaleDateString()}`
+                    subcaption: `${type === 'checkin' ? 'Check-in' : 'Handover'} • ${new Date(a.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
                 })).filter(p => p.src)
 
                 if (signedPhotos.length > 0) {

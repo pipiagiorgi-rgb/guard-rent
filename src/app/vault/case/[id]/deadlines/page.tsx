@@ -786,7 +786,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                                     <div>
                                         <span className="font-medium text-slate-900">{reminder.label}</span>
                                         <span className="text-slate-500 text-sm ml-2">
-                                            {new Date(reminder.date).toLocaleDateString()}
+                                            {new Date(reminder.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                         </span>
                                     </div>
                                     <button
