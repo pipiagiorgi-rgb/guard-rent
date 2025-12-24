@@ -268,10 +268,9 @@ export function WalkthroughVideoUpload({
                     <button
                         onClick={handlePreview}
                         disabled={previewing}
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                        title="Preview video"
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 px-3 py-1 rounded-md disabled:opacity-50 flex items-center gap-1"
                     >
-                        {previewing ? <Loader2 size={18} className="animate-spin" /> : <Eye size={18} />}
+                        {previewing ? <Loader2 size={14} className="animate-spin" /> : 'View'}
                     </button>
                 </div>
                 {existingVideo.fileHash && (
@@ -319,18 +318,16 @@ export function WalkthroughVideoUpload({
                         <button
                             onClick={handlePreview}
                             disabled={previewing}
-                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                            title="Preview video"
+                            className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 px-3 py-1 rounded-md disabled:opacity-50 flex items-center gap-1"
                         >
-                            {previewing ? <Loader2 size={18} className="animate-spin" /> : <Eye size={18} />}
+                            {previewing ? <Loader2 size={14} className="animate-spin" /> : 'View'}
                         </button>
                         <button
                             onClick={() => setShowDeleteModal(true)}
                             disabled={deleting}
-                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                            title="Delete video"
+                            className="text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 px-3 py-1 rounded-md disabled:opacity-50 flex items-center gap-1"
                         >
-                            {deleting ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
+                            {deleting ? <Loader2 size={14} className="animate-spin" /> : 'Remove'}
                         </button>
                     </div>
                     {error && (
