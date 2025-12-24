@@ -499,23 +499,87 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="flex items-center justify-between p-4 border-t border-slate-200 bg-slate-50">
-                            <button
-                                onClick={closePreview}
-                                className="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
-                            >
-                                ← Back to customize
-                            </button>
-                            <button
-                                onClick={() => {
-                                    if (previewUrl) window.open(previewUrl, '_blank')
-                                }}
-                                className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center gap-2"
-                            >
-                                <Download size={18} />
-                                Download PDF
-                            </button>
-                        </div>
+                        {(() => {
+                            const isPaid = previewType === 'checkin_pack' ? hasCheckinPack : hasDepositPack
+                            const packPrice = previewType === 'checkin_pack' ? '€19' : '€29'
+                            const packName = previewType === 'checkin_pack' ? 'Check-in Pack' : 'Deposit Recovery Pack'
+
+                            if (isPaid) {
+                                // Paid user - show download button
+                                return (
+                                    <div className="flex items-center justify-between p-4 border-t border-slate-200 bg-slate-50">
+                                        <button
+                                            onClick={closePreview}
+                                            className="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
+                                        >
+                                            ← Back to customize
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (previewUrl) window.open(previewUrl, '_blank')
+                                            }}
+                                            className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center gap-2"
+                                        >
+                                            <Download size={18} />
+                                            Download PDF
+                                        </button>
+                                    </div>
+                                )
+                            }
+
+                            // Unpaid user - show locked state with purchase CTA
+                            return (
+                                <div className="p-5 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
+                                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                                        {/* Value prop */}
+                                        <div className="flex-1 text-center sm:text-left">
+                                            <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                                                <Lock size={16} className="text-slate-500" />
+                                                <span className="text-sm font-medium text-slate-700">Download locked</span>
+                                            </div>
+                                            <p className="text-sm text-slate-500">
+                                                Remove watermarks and download your evidence pack
+                                            </p>
+                                        </div>
+
+                                        {/* Purchase CTA */}
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={closePreview}
+                                                className="px-4 py-2.5 text-slate-600 hover:text-slate-900 font-medium text-sm"
+                                            >
+                                                Back
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    closePreview()
+                                                    handlePurchase(previewType!, previewType === 'checkin_pack' ? 1900 : 2900)
+                                                }}
+                                                className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 flex items-center gap-2 shadow-lg shadow-slate-900/20"
+                                            >
+                                                <span>Unlock for {packPrice}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Trust indicators */}
+                                    <div className="flex items-center justify-center gap-4 mt-3 text-xs text-slate-500">
+                                        <span className="flex items-center gap-1">
+                                            <Check size={12} className="text-green-600" />
+                                            Watermark-free PDF
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <Check size={12} className="text-green-600" />
+                                            Stored for 12 months
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <Check size={12} className="text-green-600" />
+                                            Dispute-ready
+                                        </span>
+                                    </div>
+                                </div>
+                            )
+                        })()}
                     </div>
                 </div>
             )}
