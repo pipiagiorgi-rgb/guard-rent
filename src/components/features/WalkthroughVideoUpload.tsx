@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react'
 import { Video, Upload, Trash2, Loader2, CheckCircle, Lock, AlertCircle, Eye } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 
 interface WalkthroughVideoUploadProps {
     caseId: string
@@ -35,6 +36,7 @@ export function WalkthroughVideoUpload({
     const [progress, setProgress] = useState(0)
     const [error, setError] = useState<string | null>(null)
     const [dragOver, setDragOver] = useState(false)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const formatDuration = (seconds: number) => {
@@ -289,43 +291,55 @@ export function WalkthroughVideoUpload({
     // Existing video (not locked) - show with delete and preview options
     if (existingVideo && !isLocked) {
         return (
-            <div className="bg-white border border-slate-200 rounded-xl p-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                        <Video className="text-blue-600" size={20} />
-                    </div>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                            <span className="font-medium text-slate-900">Walkthrough video</span>
-                            <CheckCircle size={16} className="text-green-500" />
+            <>
+                <DeleteConfirmationModal
+                    isOpen={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    onConfirm={async () => {
+                        await handleDelete()
+                        setShowDeleteModal(false)
+                    }}
+                    itemType="video"
+                    context={phase}
+                />
+                <div className="bg-white border border-slate-200 rounded-xl p-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <Video className="text-blue-600" size={20} />
                         </div>
-                        <p className="text-sm text-slate-500">
-                            {existingVideo.durationSeconds && formatDuration(existingVideo.durationSeconds)} · Uploaded
-                        </p>
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                                <span className="font-medium text-slate-900">Walkthrough video</span>
+                                <CheckCircle size={16} className="text-green-500" />
+                            </div>
+                            <p className="text-sm text-slate-500">
+                                {existingVideo.durationSeconds && formatDuration(existingVideo.durationSeconds)} · Uploaded
+                            </p>
+                        </div>
+                        <button
+                            onClick={handlePreview}
+                            disabled={previewing}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                            title="Preview video"
+                        >
+                            {previewing ? <Loader2 size={18} className="animate-spin" /> : <Eye size={18} />}
+                        </button>
+                        <button
+                            onClick={() => setShowDeleteModal(true)}
+                            disabled={deleting}
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            title="Delete video"
+                        >
+                            {deleting ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
+                        </button>
                     </div>
-                    <button
-                        onClick={handlePreview}
-                        disabled={previewing}
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                        title="Preview video"
-                    >
-                        {previewing ? <Loader2 size={18} className="animate-spin" /> : <Eye size={18} />}
-                    </button>
-                    <button
-                        onClick={handleDelete}
-                        disabled={deleting}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                        title="Delete video"
-                    >
-                        {deleting ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
-                    </button>
+                    {error && (
+                        <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                            <AlertCircle size={14} /> {error}
+                        </p>
+                    )}
                 </div>
-                {error && (
-                    <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle size={14} /> {error}
-                    </p>
-                )}
-            </div>
+            </>
         )
     }
 

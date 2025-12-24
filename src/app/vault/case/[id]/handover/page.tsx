@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
+import { LockConfirmationModal } from '@/components/ui/LockConfirmationModal'
 import { isPurchased } from '@/lib/preview-limits'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { WalkthroughVideoUpload } from '@/components/features/WalkthroughVideoUpload'
@@ -72,6 +73,10 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
 
     // Delete confirmation state
     const [photoToDelete, setPhotoToDelete] = useState<Asset | null>(null)
+
+    // Lock confirmation modals
+    const [showKeysModal, setShowKeysModal] = useState(false)
+    const [showLockModal, setShowLockModal] = useState(false)
 
     // Walkthrough video state
     const [existingVideo, setExistingVideo] = useState<{
@@ -441,7 +446,6 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     }
 
     const handleConfirmKeys = async () => {
-        if (!confirm('Confirm keys returned?\n\nThis creates a timestamped record that cannot be changed. The exact date and time will be recorded as proof of key handover.')) return
         setSaving(true)
         try {
             const res = await fetch(`/api/cases/${caseId}/confirm-keys`, { method: 'POST' })
@@ -453,11 +457,11 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             setError('Failed to confirm keys')
         } finally {
             setSaving(false)
+            setShowKeysModal(false)
         }
     }
 
     const handleMarkComplete = async () => {
-        if (!confirm('Are you sure you want to COMPLETE & LOCK handover? This seals your evidence and prevents further changes.')) return
         setSaving(true)
         try {
             const res = await fetch(`/api/cases/${caseId}/lock-handover`, { method: 'POST' })
@@ -469,6 +473,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             setError('Failed to lock handover')
         } finally {
             setSaving(false)
+            setShowLockModal(false)
         }
     }
 
@@ -648,6 +653,20 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 onConfirm={confirmDeletePhoto}
                 itemType="photo"
                 context="handover"
+            />
+
+            <LockConfirmationModal
+                isOpen={showKeysModal}
+                onClose={() => setShowKeysModal(false)}
+                onConfirm={handleConfirmKeys}
+                type="keys"
+            />
+
+            <LockConfirmationModal
+                isOpen={showLockModal}
+                onClose={() => setShowLockModal(false)}
+                onConfirm={handleMarkComplete}
+                type="handover"
             />
 
             <div>
@@ -990,7 +1009,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     </div>
                     {!handover.keysReturned && (
                         <button
-                            onClick={handleConfirmKeys}
+                            onClick={() => setShowKeysModal(true)}
                             disabled={saving}
                             className="px-4 py-2 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 disabled:opacity-50"
                         >
@@ -1019,7 +1038,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             ═══════════════════════════════════════════════════════════ */}
             <div className="pt-4">
                 <button
-                    onClick={handleMarkComplete}
+                    onClick={() => setShowLockModal(true)}
                     disabled={!canComplete || saving}
                     className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${canComplete
                         ? 'bg-slate-900 text-white hover:bg-slate-800'

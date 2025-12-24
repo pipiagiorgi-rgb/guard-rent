@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Camera, Plus, Check, Loader2, Upload, Trash2, AlertCircle, Gauge, ChevronDown, ChevronUp, X, ImageIcon, Eye, Lock, ShieldCheck } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
+import { LockConfirmationModal } from '@/components/ui/LockConfirmationModal'
 import { canUploadPreviewPhoto, getPhotosRemaining, recordPreviewPhoto, isPurchased } from '@/lib/preview-limits'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { WalkthroughVideoUpload } from '@/components/features/WalkthroughVideoUpload'
@@ -47,6 +48,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     const [hasPack, setHasPack] = useState(false)
     const [isLocked, setIsLocked] = useState(false)
     const [locking, setLocking] = useState(false)
+    const [showLockModal, setShowLockModal] = useState(false)
 
     // Meter readings state
     const [meterReadings, setMeterReadings] = useState<MeterReadings>({})
@@ -383,7 +385,6 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     }
 
     const handleLockCheckIn = async () => {
-        if (!confirm('Are you sure you want to complete and lock the check-in? Use this only when you have uploaded all evidence. This action cannot be undone.')) return
         setLocking(true)
         try {
             const res = await fetch(`/api/cases/${caseId}/lock-checkin`, { method: 'POST' })
@@ -396,6 +397,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             setError('Failed to lock check-in')
         } finally {
             setLocking(false)
+            setShowLockModal(false)
         }
     }
 
@@ -560,6 +562,13 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 context="check-in"
             />
 
+            <LockConfirmationModal
+                isOpen={showLockModal}
+                onClose={() => setShowLockModal(false)}
+                onConfirm={handleLockCheckIn}
+                type="check-in"
+            />
+
             <div>
                 <h1 className="text-2xl font-bold mb-1">Check-in photos</h1>
                 <p className="text-slate-500">
@@ -616,7 +625,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                         </div>
                     </div>
                     <button
-                        onClick={handleLockCheckIn}
+                        onClick={() => setShowLockModal(true)}
                         disabled={locking}
                         className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
                     >
