@@ -3,17 +3,25 @@ import ContractScanClient from '@/components/features/ContractScanClient'
 import Link from 'next/link'
 import { Lock, Info } from 'lucide-react'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
+import { isAdminEmail } from '@/lib/admin'
 
 export default async function ContractPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
+
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser()
+    const userEmail = user?.email
+
     const { data: rentalCase } = await supabase
         .from('cases')
         .select('purchase_type')
         .eq('case_id', params.id)
         .single()
 
-    // Check if user has purchased a pack
-    const hasPurchasedPack = rentalCase?.purchase_type === 'checkin' ||
+    // Check if user has purchased a pack OR is admin
+    const isAdmin = isAdminEmail(userEmail)
+    const hasPurchasedPack = isAdmin ||
+        rentalCase?.purchase_type === 'checkin' ||
         rentalCase?.purchase_type === 'bundle' ||
         rentalCase?.purchase_type === 'moveout'
 
