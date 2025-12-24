@@ -907,6 +907,99 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             </div>
 
             {/* ═══════════════════════════════════════════════════════════
+                METER READINGS SECTION (Initial readings at move-in)
+            ═══════════════════════════════════════════════════════════ */}
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <button
+                    onClick={() => {
+                        const next = new Set(expandedSections)
+                        if (next.has('meters')) {
+                            next.delete('meters')
+                        } else {
+                            next.add('meters')
+                        }
+                        setExpandedSections(next)
+                    }}
+                    className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${hasMeterReadings ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                            <Gauge size={20} />
+                        </div>
+                        <div className="text-left">
+                            <h2 className="font-medium">Meter readings (optional)</h2>
+                            <p className="text-sm text-slate-500">Record initial utility readings at move-in</p>
+                        </div>
+                    </div>
+                    {expandedSections.has('meters') ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </button>
+
+                {expandedSections.has('meters') && (
+                    <div className="px-6 pb-6 space-y-6">
+                        {(['electricity', 'gas', 'water'] as const).map(meter => {
+                            const data = meterReadings[meter] || { value: '' }
+                            const isUploadingThis = uploading === `meter-${meter}`
+
+                            return (
+                                <div key={meter} className="grid grid-cols-1 sm:grid-cols-[100px_1fr_auto] gap-4 items-start sm:items-center">
+                                    <label className="text-sm font-medium capitalize pt-2 sm:pt-0">{meter}</label>
+
+                                    <div className="flex-1">
+                                        <input
+                                            type="text"
+                                            value={data.value || ''}
+                                            onChange={(e) => updateMeterValue(meter, e.target.value)}
+                                            onBlur={() => handleSaveMeters()}
+                                            placeholder={`Enter ${meter} reading`}
+                                            disabled={isLocked}
+                                            className="w-full px-4 py-2 border border-slate-200 rounded-lg disabled:bg-slate-50 disabled:text-slate-500"
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        {data.asset_id ? (
+                                            <div className="relative group">
+                                                <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+                                                    {data.photo_url ? (
+                                                        <img src={data.photo_url} alt={meter} loading="lazy" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Check size={16} className="text-green-600" />
+                                                    )}
+                                                </div>
+                                                {!isLocked && (
+                                                    <button
+                                                        onClick={() => removeMeterPhoto(meter)}
+                                                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                                                    >
+                                                        <X size={12} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ) : !isLocked ? (
+                                            <label className={`w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-colors ${isUploadingThis ? 'opacity-50' : ''}`}>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    disabled={isUploadingThis}
+                                                    onChange={(e) => handleMeterPhotoUpload(meter, e)}
+                                                />
+                                                {isUploadingThis ? (
+                                                    <Loader2 size={16} className="animate-spin text-slate-400" />
+                                                ) : (
+                                                    <ImageIcon size={18} className="text-slate-400" />
+                                                )}
+                                            </label>
+                                        ) : null}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* ═══════════════════════════════════════════════════════════
                 COMPLETE & LOCK SECTION (matching handover pattern)
             ═══════════════════════════════════════════════════════════ */}
             {isLocked ? (
