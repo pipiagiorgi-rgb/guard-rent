@@ -6,7 +6,7 @@ import {
     FileText, Camera, Download, Lock, Check,
     Loader2, Calendar, Shield, AlertCircle,
     ChevronRight, Eye, Mail, CheckCircle2,
-    ChevronDown, ChevronUp, PenLine, Star, X
+    ChevronDown, ChevronUp, PenLine, Star, X, Video
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import Link from 'next/link'
@@ -28,6 +28,13 @@ interface PhotoAsset {
     src: string
     caption: string
     subcaption: string
+}
+
+interface VideoAsset {
+    assetId: string
+    phase: 'check-in' | 'handover'
+    fileName: string
+    durationSeconds?: number
 }
 
 interface CustomSection {
@@ -93,6 +100,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const [lastSavedAt, setLastSavedAt] = useState<string | null>(null)
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const lastSavedRef = useRef<string>('')
+
+    // Video state
+    const [videos, setVideos] = useState<VideoAsset[]>([])
+    const [downloadingVideo, setDownloadingVideo] = useState<string | null>(null)
 
     useEffect(() => {
         async function load() {
@@ -268,10 +279,51 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 retentionUntil,
                 purchasedPacks
             })
+
+            // Fetch walkthrough videos
+            const { data: videoAssets } = await supabase
+                .from('assets')
+                .select('asset_id, storage_path, duration_seconds, phase')
+                .eq('case_id', id)
+                .eq('type', 'walkthrough_video')
+
+            if (videoAssets && videoAssets.length > 0) {
+                setVideos(videoAssets.map(v => ({
+                    assetId: v.asset_id,
+                    phase: v.phase as 'check-in' | 'handover',
+                    fileName: v.storage_path.split('/').pop() || 'walkthrough.mp4',
+                    durationSeconds: v.duration_seconds
+                })))
+            }
         } catch (err) {
             console.error('Failed to load evidence:', err)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleVideoDownload = async (video: VideoAsset) => {
+        setDownloadingVideo(video.assetId)
+        try {
+            const res = await fetch('/api/assets/download-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    assetId: video.assetId,
+                    forceDownload: true,
+                    fileName: `RentVault_${video.phase === 'check-in' ? 'CheckIn' : 'Handover'}_Video.mp4`
+                })
+            })
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to get download link')
+
+            // Trigger download by opening in new tab with download header
+            window.open(data.signedUrl, '_blank')
+        } catch (err) {
+            console.error('Video download error:', err)
+        } finally {
+            setDownloadingVideo(null)
         }
     }
 
@@ -689,6 +741,86 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                         </Link>
                     )}
                 </div>
+
+                {/* Check-in Video */}
+                {(() => {
+                    const checkinVideo = videos.find(v => v.phase === 'check-in')
+                    return (
+                        <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${checkinVideo ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                                    <Video size={20} />
+                                </div>
+                                <div>
+                                    <h3 className="font-medium">Check-in video</h3>
+                                    <p className="text-sm text-slate-500">
+                                        {checkinVideo
+                                            ? `Walkthrough recorded${checkinVideo.durationSeconds ? ` (${Math.round(checkinVideo.durationSeconds / 60)}min)` : ''}`
+                                            : 'No video yet'}
+                                    </p>
+                                </div>
+                            </div>
+                            {checkinVideo ? (
+                                <button
+                                    onClick={() => handleVideoDownload(checkinVideo)}
+                                    disabled={downloadingVideo === checkinVideo.assetId}
+                                    className="text-sm text-white bg-slate-900 hover:bg-slate-800 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                                >
+                                    {downloadingVideo === checkinVideo.assetId ? (
+                                        <Loader2 size={16} className="animate-spin" />
+                                    ) : (
+                                        <Download size={16} />
+                                    )}
+                                    Download video
+                                </button>
+                            ) : (
+                                <Link href={`/vault/case/${caseId}/check-in`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                                    Go to check-in <ChevronRight size={16} />
+                                </Link>
+                            )}
+                        </div>
+                    )
+                })()}
+
+                {/* Handover Video */}
+                {(() => {
+                    const handoverVideo = videos.find(v => v.phase === 'handover')
+                    return (
+                        <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${handoverVideo ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                                    <Video size={20} />
+                                </div>
+                                <div>
+                                    <h3 className="font-medium">Handover video</h3>
+                                    <p className="text-sm text-slate-500">
+                                        {handoverVideo
+                                            ? `Walkthrough recorded${handoverVideo.durationSeconds ? ` (${Math.round(handoverVideo.durationSeconds / 60)}min)` : ''}`
+                                            : 'No video yet'}
+                                    </p>
+                                </div>
+                            </div>
+                            {handoverVideo ? (
+                                <button
+                                    onClick={() => handleVideoDownload(handoverVideo)}
+                                    disabled={downloadingVideo === handoverVideo.assetId}
+                                    className="text-sm text-white bg-slate-900 hover:bg-slate-800 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                                >
+                                    {downloadingVideo === handoverVideo.assetId ? (
+                                        <Loader2 size={16} className="animate-spin" />
+                                    ) : (
+                                        <Download size={16} />
+                                    )}
+                                    Download video
+                                </button>
+                            ) : (
+                                <Link href={`/vault/case/${caseId}/handover`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                                    Go to handover <ChevronRight size={16} />
+                                </Link>
+                            )}
+                        </div>
+                    )
+                })()}
 
                 {/* Contract summary */}
                 <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
