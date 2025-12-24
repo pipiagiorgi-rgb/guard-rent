@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import { OrganizationSchema, WebsiteSchema } from '@/lib/seo-schemas';
+import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://rentvault.ai'),
@@ -66,6 +67,7 @@ export default function RootLayout({
                 <WebsiteSchema />
                 <Navbar />
                 <main>{children}</main>
+                <ScrollToTop />
             </body>
         </html>
     );
