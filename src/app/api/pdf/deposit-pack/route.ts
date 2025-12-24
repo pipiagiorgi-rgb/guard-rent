@@ -59,16 +59,6 @@ function drawWatermark(page: PDFPage, font: any) {
             opacity: 0.5,
         })
     }
-
-    // Draw RentVault branding
-    page.drawText('rentvault.ai', {
-        x: width / 2 - 50,
-        y: height / 2 - 60,
-        size: 20,
-        font,
-        color: rgb(0.7, 0.7, 0.7),
-        opacity: 0.6,
-    })
 }
 
 /**

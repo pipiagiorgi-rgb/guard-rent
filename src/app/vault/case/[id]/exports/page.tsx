@@ -243,11 +243,12 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 .eq('case_id', id)
                 .eq('type', 'handover_photo')
 
-            // Check deadlines
+            // Check deadlines with notifications enabled
             const { count: deadlineCount } = await supabase
                 .from('deadlines')
                 .select('*', { count: 'exact', head: true })
                 .eq('case_id', id)
+                .eq('notify', true)
 
             // Get entitlement status from server (includes admin check)
             let purchasedPacks: string[] = []
