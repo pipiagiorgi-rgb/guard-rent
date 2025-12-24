@@ -325,6 +325,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             // Update the pre-opened window's location
             if (newWindow) {
                 newWindow.location.href = data.signedUrl
+                // Auto-close blank tab after download initiates (gives time for download prompt)
+                setTimeout(() => {
+                    try { newWindow.close() } catch (e) { /* cross-origin, ignore */ }
+                }, 1500)
             }
         } catch (err) {
             console.error('Video download error:', err)
@@ -451,10 +455,16 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 setPreviewUrl(url)
                 setPreviewType(packType)
                 setPreviewOpen(true)
+                // Close the blank window since we're showing modal instead
+                if (newWindow) newWindow.close()
             } else if (url) {
                 // Update the pre-opened window's location
                 if (newWindow) {
                     newWindow.location.href = url
+                    // Auto-close blank tab after download initiates
+                    setTimeout(() => {
+                        try { newWindow.close() } catch (e) { /* cross-origin, ignore */ }
+                    }, 1500)
                 }
 
                 const hasPack = packType === 'checkin_pack' ? hasCheckinPack : hasDepositPack
