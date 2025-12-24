@@ -1,15 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { LogOut } from 'lucide-react'
 import { Logo } from '@/components/brand/Logo'
-
-async function signOut() {
-    'use server'
-    const supabase = await createClient()
-    await supabase.auth.signOut()
-    redirect('/login')
-}
+import { SignOutButton } from '@/components/auth/SignOutButton'
 
 export default async function AppLayout({
     children,
@@ -37,15 +30,7 @@ export default async function AppLayout({
                             <span className="text-sm text-slate-500 hidden md:block">
                                 {user.email}
                             </span>
-                            <form action={signOut}>
-                                <button
-                                    type="submit"
-                                    className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors p-2 -mr-2"
-                                >
-                                    <LogOut size={18} />
-                                    <span className="hidden sm:inline">Sign out</span>
-                                </button>
-                            </form>
+                            <SignOutButton />
                         </div>
                     </div>
                 </div>
@@ -58,3 +43,4 @@ export default async function AppLayout({
         </div>
     )
 }
+
