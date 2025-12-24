@@ -1120,20 +1120,27 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
 
                                     <div className="flex items-center gap-2">
                                         {data.asset_id ? (
-                                            <div className="relative group">
-                                                <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center text-[0]">
-                                                    {data.photo_url ? (
-                                                        <img src={data.photo_url} alt="" loading="lazy" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <Check size={16} className="text-green-600" />
-                                                    )}
-                                                </div>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!data.photo_url) return
+                                                        setLightboxImages([{
+                                                            src: data.photo_url,
+                                                            caption: `${meter.charAt(0).toUpperCase() + meter.slice(1)} Meter`,
+                                                            subcaption: data.value || ''
+                                                        }])
+                                                        setLightboxOpen(true)
+                                                    }}
+                                                    className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 px-3 py-1 rounded-md"
+                                                >
+                                                    View
+                                                </button>
                                                 {!isLocked && (
                                                     <button
                                                         onClick={() => removeMeterPhoto(meter)}
-                                                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                                                        className="text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 px-3 py-1 rounded-md"
                                                     >
-                                                        <X size={12} />
+                                                        Remove
                                                     </button>
                                                 )}
                                             </div>
