@@ -53,7 +53,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     // Meter readings state
     const [meterReadings, setMeterReadings] = useState<MeterReadings>({})
     const [saving, setSaving] = useState(false)
-    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['photos', 'meters']))
+    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
     const [expandedRooms, setExpandedRooms] = useState<Set<string>>(new Set())
 
     // Lightbox state

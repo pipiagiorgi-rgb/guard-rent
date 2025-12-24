@@ -61,7 +61,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     })
     const [uploading, setUploading] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['photos', 'meters']))
+    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
     const [hasPack, setHasPack] = useState(false)
     const [showEditWarning, setShowEditWarning] = useState(false)
     const [allowEdit, setAllowEdit] = useState(false)
