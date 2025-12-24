@@ -427,7 +427,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     }
 
     const handleConfirmKeys = async () => {
-        if (!confirm('Confirm keys returned? This event will be logged securely.')) return
+        if (!confirm('Confirm keys returned?\n\nThis creates a timestamped record that cannot be changed. The exact date and time will be recorded as proof of key handover.')) return
         setSaving(true)
         try {
             const res = await fetch(`/api/cases/${caseId}/confirm-keys`, { method: 'POST' })
