@@ -96,7 +96,8 @@ export async function POST(request: Request) {
 
         if (signedError || !signedUrl) {
             console.error('Failed to create signed URL:', signedError)
-            return NextResponse.json({ error: 'Failed to prepare upload' }, { status: 500 })
+            const errorMessage = signedError?.message || 'Storage not configured correctly'
+            return NextResponse.json({ error: `Failed to prepare upload: ${errorMessage}` }, { status: 500 })
         }
 
         // Create asset record (pending upload)
