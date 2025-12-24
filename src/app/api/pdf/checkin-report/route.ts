@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { PDFDocument, StandardFonts, rgb, PDFPage } from 'pdf-lib'
+import { PDFDocument, StandardFonts, rgb, PDFPage, degrees } from 'pdf-lib'
 import { v4 as uuidv4 } from 'uuid'
 import { isAdminEmail } from '@/lib/admin'
 import { getPhotosGroupedByRoom, drawPhotoGrid, drawHashAppendix } from '@/lib/pdf-images'
@@ -31,6 +31,43 @@ function drawPageNumber(page: PDFPage, pageNum: number, totalPages: number, font
         size: 9,
         font,
         color: rgb(0.5, 0.5, 0.5),
+    })
+}
+
+/**
+ * Draw preview watermark on a page
+ */
+function drawWatermark(page: PDFPage, font: any) {
+    const { width, height } = page.getSize()
+    const watermarkText = 'PREVIEW'
+
+    // Draw multiple diagonal watermarks across the page
+    const positions = [
+        { x: width / 2 - 80, y: height / 2 },
+        { x: width / 4 - 40, y: height / 3 * 2 },
+        { x: width / 4 * 3 - 40, y: height / 3 },
+    ]
+
+    for (const pos of positions) {
+        page.drawText(watermarkText, {
+            x: pos.x,
+            y: pos.y,
+            size: 60,
+            font,
+            color: rgb(0.85, 0.85, 0.85),
+            rotate: degrees(45),
+            opacity: 0.5,
+        })
+    }
+
+    // Draw RentVault branding
+    page.drawText('rentvault.ai', {
+        x: width / 2 - 50,
+        y: height / 2 - 60,
+        size: 20,
+        font,
+        color: rgb(0.7, 0.7, 0.7),
+        opacity: 0.6,
     })
 }
 
@@ -189,7 +226,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json()
-        const { caseId, customSections = {} } = body as { caseId: string; customSections?: CustomSections }
+        const { caseId, customSections = {}, forPreview = false } = body as { caseId: string; customSections?: CustomSections; forPreview?: boolean }
 
         if (!caseId) {
             return NextResponse.json({ error: 'Missing Case ID' }, { status: 400 })
@@ -460,6 +497,14 @@ export async function POST(request: Request) {
         pages.forEach((page, idx) => {
             drawPageNumber(page, idx + 1, totalPages, helvetica)
         })
+
+        // Add watermarks if this is a preview
+        if (forPreview) {
+            const allPages = pdfDoc.getPages()
+            for (const page of allPages) {
+                drawWatermark(page, helveticaBold)
+            }
+        }
 
         // Save PDF
         const pdfBytes = await pdfDoc.save()
