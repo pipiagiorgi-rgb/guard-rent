@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
     Camera, Check, Loader2, Upload, FileText,
     Key, Gauge, ChevronDown, ChevronUp, AlertCircle,
-    X, ImageIcon, Eye, Lock, CheckCircle2
+    X, ImageIcon, Eye, Lock, CheckCircle2, Plus
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
@@ -760,24 +760,44 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                                             </span>
                                         )}
                                     </div>
-                                    <label className={`px-4 py-2 rounded-lg font-medium cursor-pointer transition-colors flex items-center gap-2 ${uploading === room.room_id
-                                        ? 'bg-slate-200 text-slate-400'
-                                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
-                                        }`}>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            multiple
-                                            onChange={(e) => handlePhotoUpload(room.room_id, e)}
-                                            disabled={uploading === room.room_id}
-                                            className="hidden"
-                                        />
-                                        {uploading === room.room_id ? (
-                                            <Loader2 size={16} className="animate-spin" />
-                                        ) : (
-                                            'Add photos'
-                                        )}
-                                    </label>
+                                    <div className="flex items-center gap-2">
+                                        {/* Camera button - mobile-first */}
+                                        <label className={`px-3 py-2 rounded-lg font-medium cursor-pointer transition-colors flex items-center gap-2 ${uploading === room.room_id
+                                            ? 'bg-blue-400 text-white'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                                            }`}>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                capture="environment"
+                                                onChange={(e) => handlePhotoUpload(room.room_id, e)}
+                                                disabled={uploading === room.room_id}
+                                                className="hidden"
+                                            />
+                                            {uploading === room.room_id ? (
+                                                <Loader2 size={16} className="animate-spin" />
+                                            ) : (
+                                                <Camera size={16} />
+                                            )}
+                                            <span className="hidden sm:inline">Take photo</span>
+                                        </label>
+                                        {/* File picker for gallery */}
+                                        <label className={`px-3 py-2 rounded-lg font-medium cursor-pointer transition-colors flex items-center gap-2 ${uploading === room.room_id
+                                            ? 'bg-slate-200 text-slate-400'
+                                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                                            }`}>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                multiple
+                                                onChange={(e) => handlePhotoUpload(room.room_id, e)}
+                                                disabled={uploading === room.room_id}
+                                                className="hidden"
+                                            />
+                                            <Plus size={16} />
+                                            <span className="hidden sm:inline">Gallery</span>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 {/* Before/after prompt if check-in has photos but handover doesn't */}

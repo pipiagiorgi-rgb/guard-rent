@@ -774,23 +774,38 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                                     const canUpload = !isLocked && (hasPack || canUploadPreviewPhoto(caseId))
                                     const isUploading = uploading === room.room_id
                                     return (
-                                        <label className={`flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-medium transition-colors ${!canUpload || isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'
-                                            }`}>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                multiple
-                                                onChange={(e) => handlePhotoUpload(room.room_id, e)}
-                                                disabled={!canUpload || isUploading}
-                                                className="hidden"
-                                            />
-                                            {isUploading ? (
-                                                <Loader2 size={14} className="animate-spin" />
-                                            ) : (
+                                        <div className="flex items-center gap-2">
+                                            {/* Camera button - mobile-first */}
+                                            <label className={`flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white border border-blue-600 rounded-lg text-sm font-medium transition-colors ${!canUpload || isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-blue-700'}`}>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    capture="environment"
+                                                    onChange={(e) => handlePhotoUpload(room.room_id, e)}
+                                                    disabled={!canUpload || isUploading}
+                                                    className="hidden"
+                                                />
+                                                {isUploading ? (
+                                                    <Loader2 size={14} className="animate-spin" />
+                                                ) : (
+                                                    <Camera size={14} />
+                                                )}
+                                                <span className="hidden sm:inline">Take photo</span>
+                                            </label>
+                                            {/* File picker for gallery/desktop */}
+                                            <label className={`flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-medium transition-colors ${!canUpload || isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'}`}>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    multiple
+                                                    onChange={(e) => handlePhotoUpload(room.room_id, e)}
+                                                    disabled={!canUpload || isUploading}
+                                                    className="hidden"
+                                                />
                                                 <Plus size={14} />
-                                            )}
-                                            {!canUpload && !hasPack ? 'Limit reached' : isUploading ? 'Uploading...' : 'Add photo'}
-                                        </label>
+                                                <span className="hidden sm:inline">{!canUpload && !hasPack ? 'Limit' : 'Gallery'}</span>
+                                            </label>
+                                        </div>
                                     )
                                 })()}
                                 {/* Delete room button - only when not locked */}

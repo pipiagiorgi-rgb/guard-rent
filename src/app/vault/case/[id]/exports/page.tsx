@@ -54,6 +54,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const [loading, setLoading] = useState(true)
     const [purchasing, setPurchasing] = useState<string | null>(null)
     const [generating, setGenerating] = useState<string | null>(null)
+    const [generatingMessage, setGeneratingMessage] = useState<string>('')
     const [evidence, setEvidence] = useState<EvidenceState>({
         checkinPhotos: 0,
         handoverPhotos: 0,
@@ -411,8 +412,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const handleGenerate = async (packType: string, forPreview = false) => {
         if (forPreview) {
             setPreviewing(packType)
+            setGeneratingMessage('Loading preview...')
         } else {
             setGenerating(packType)
+            setGeneratingMessage('Preparing photos...')
         }
         setLastGeneratedPdf(null)
 
@@ -420,6 +423,9 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             const endpoint = packType === 'checkin_pack'
                 ? '/api/pdf/checkin-report'
                 : '/api/pdf/deposit-pack'
+
+            // Update message before API call
+            setGeneratingMessage('Building PDF...')
 
             // Include custom sections if any are filled
             const hasCustomContent = customSections.personalNotes ||
@@ -436,6 +442,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                     forPreview
                 })
             })
+
+            setGeneratingMessage('Finalizing...')
 
             const data = await res.json()
             if (!res.ok) {
@@ -472,6 +480,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         } finally {
             setGenerating(null)
             setPreviewing(null)
+            setGeneratingMessage('')
         }
     }
 
@@ -1092,7 +1101,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
                                     >
                                         {previewing === 'checkin_pack' ? (
-                                            <Loader2 className="animate-spin" size={20} />
+                                            <>
+                                                <Loader2 className="animate-spin" size={18} />
+                                                <span className="text-sm">{generatingMessage || 'Loading...'}</span>
+                                            </>
                                         ) : (
                                             <>
                                                 <Eye size={20} />
@@ -1106,7 +1118,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         className="flex-1 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
                                     >
                                         {generating === 'checkin_pack' ? (
-                                            <Loader2 className="animate-spin" size={20} />
+                                            <>
+                                                <Loader2 className="animate-spin" size={18} />
+                                                <span className="text-sm">{generatingMessage || 'Generating...'}</span>
+                                            </>
                                         ) : (
                                             <>
                                                 <Download size={20} />
@@ -1124,7 +1139,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                             className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
                                         >
                                             {previewing === 'checkin_pack' ? (
-                                                <Loader2 className="animate-spin" size={20} />
+                                                <>
+                                                    <Loader2 className="animate-spin" size={18} />
+                                                    <span className="text-sm">{generatingMessage || 'Loading...'}</span>
+                                                </>
                                             ) : (
                                                 <>
                                                     <Eye size={20} />
@@ -1348,7 +1366,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
                                     >
                                         {previewing === 'deposit_pack' ? (
-                                            <Loader2 className="animate-spin" size={20} />
+                                            <>
+                                                <Loader2 className="animate-spin" size={18} />
+                                                <span className="text-sm">{generatingMessage || 'Loading...'}</span>
+                                            </>
                                         ) : (
                                             <>
                                                 <Eye size={20} />
@@ -1362,7 +1383,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         className="flex-1 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
                                     >
                                         {generating === 'deposit_pack' ? (
-                                            <Loader2 className="animate-spin" size={20} />
+                                            <>
+                                                <Loader2 className="animate-spin" size={18} />
+                                                <span className="text-sm">{generatingMessage || 'Generating...'}</span>
+                                            </>
                                         ) : (
                                             <>
                                                 <Download size={20} />
@@ -1380,7 +1404,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                             className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
                                         >
                                             {previewing === 'deposit_pack' ? (
-                                                <Loader2 className="animate-spin" size={20} />
+                                                <>
+                                                    <Loader2 className="animate-spin" size={18} />
+                                                    <span className="text-sm">{generatingMessage || 'Loading...'}</span>
+                                                </>
                                             ) : (
                                                 <>
                                                     <Eye size={20} />
