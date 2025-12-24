@@ -27,6 +27,7 @@ interface EvidenceState {
     handoverPhotos: number
     contractSummary: boolean
     hasDeadlines: boolean
+    checkinLocked: boolean
     handoverCompleted: boolean
     retentionUntil: string | null
     purchasedPacks: string[]
@@ -68,11 +69,13 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         handoverPhotos: 0,
         contractSummary: false,
         hasDeadlines: false,
+        checkinLocked: false,
         handoverCompleted: false,
         retentionUntil: null,
         purchasedPacks: []
     })
     const [rentalLabel, setRentalLabel] = useState('')
+    const [lockMessage, setLockMessage] = useState<string | null>(null)
 
     // Lightbox State
     const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -245,7 +248,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             // Fetch case data
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('label, contract_analysis, handover_completed_at, retention_until')
+                .select('label, contract_analysis, checkin_completed_at, handover_completed_at, retention_until')
                 .eq('case_id', id)
                 .single()
 
@@ -300,6 +303,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 handoverPhotos: handoverCount || 0,
                 contractSummary: !!caseData?.contract_analysis,
                 hasDeadlines: (deadlineCount || 0) > 0,
+                checkinLocked: !!caseData?.checkin_completed_at,
                 handoverCompleted: !!caseData?.handover_completed_at,
                 retentionUntil,
                 purchasedPacks
@@ -506,6 +510,16 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     }
 
     const handleGenerate = async (packType: string, forPreview = false) => {
+        // Check if the corresponding phase is locked before generating
+        if (packType === 'checkin_pack' && !evidence.checkinLocked) {
+            setLockMessage('Please complete and lock your check-in evidence first. This seals your photos with timestamps before generating the PDF.')
+            return
+        }
+        if (packType === 'deposit_pack' && !evidence.handoverCompleted) {
+            setLockMessage('Please complete and lock your handover evidence first. This seals your move-out documentation before generating the recovery pack.')
+            return
+        }
+
         if (forPreview) {
             setPreviewing(packType)
             setGeneratingMessage('Loading preview...')
@@ -780,6 +794,23 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 currentPack={evidence.purchasedPacks.length > 0 ? evidence.purchasedPacks[0] : null}
                 isAdmin={isAdmin}
             />
+
+            {/* Lock Required Message */}
+            {lockMessage && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                    <Lock className="text-amber-600 flex-shrink-0 mt-0.5" size={20} />
+                    <div className="flex-1">
+                        <p className="text-sm font-medium text-amber-900 mb-1">Evidence not sealed yet</p>
+                        <p className="text-sm text-amber-700">{lockMessage}</p>
+                    </div>
+                    <button
+                        onClick={() => setLockMessage(null)}
+                        className="text-amber-600 hover:text-amber-800 p-1"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+            )}
 
             {/* Email me a copy panel - shows after PDF generation for paid packs */}
             {lastGeneratedPdf && (
@@ -1197,17 +1228,25 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                     <button
                                         onClick={() => handleGenerate('checkin_pack')}
                                         disabled={generating === 'checkin_pack'}
-                                        className="flex-1 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
+                                        className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${evidence.checkinLocked
+                                            ? 'bg-green-600 text-white hover:bg-green-700'
+                                            : 'bg-amber-500 text-white hover:bg-amber-600'
+                                            }`}
                                     >
                                         {generating === 'checkin_pack' ? (
                                             <>
                                                 <Loader2 className="animate-spin" size={18} />
                                                 <span className="text-sm">{generatingMessage || 'Generating...'}</span>
                                             </>
-                                        ) : (
+                                        ) : evidence.checkinLocked ? (
                                             <>
                                                 <Download size={20} />
                                                 Download
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Lock size={18} />
+                                                Seal to Download
                                             </>
                                         )}
                                     </button>
@@ -1462,17 +1501,25 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                     <button
                                         onClick={() => handleGenerate('deposit_pack')}
                                         disabled={generating === 'deposit_pack'}
-                                        className="flex-1 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
+                                        className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${evidence.handoverCompleted
+                                                ? 'bg-green-600 text-white hover:bg-green-700'
+                                                : 'bg-amber-500 text-white hover:bg-amber-600'
+                                            }`}
                                     >
                                         {generating === 'deposit_pack' ? (
                                             <>
                                                 <Loader2 className="animate-spin" size={18} />
                                                 <span className="text-sm">{generatingMessage || 'Generating...'}</span>
                                             </>
-                                        ) : (
+                                        ) : evidence.handoverCompleted ? (
                                             <>
                                                 <Download size={20} />
                                                 Download
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Lock size={18} />
+                                                Seal to Download
                                             </>
                                         )}
                                     </button>
