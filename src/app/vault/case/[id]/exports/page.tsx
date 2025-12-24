@@ -715,63 +715,6 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 SECTION A: EVIDENCE (FREE)
             ═══════════════════════════════════════════════════════════════ */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Check-in photos */}
-                <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${evidence.checkinPhotos > 0 ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
-                            <Camera size={20} />
-                        </div>
-                        <div>
-                            <h3 className="font-medium">Check-in photos</h3>
-                            <p className="text-sm text-slate-500">
-                                {evidence.checkinPhotos > 0 ? `${evidence.checkinPhotos} photos recorded` : 'No photos yet'}
-                            </p>
-                        </div>
-                    </div>
-                    {evidence.checkinPhotos > 0 ? (
-                        <button
-                            onClick={() => openGallery('checkin')}
-                            disabled={loadingPhotos}
-                            className="text-sm text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors"
-                        >
-                            {loadingPhotos ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} />}
-                            View gallery
-                        </button>
-                    ) : (
-                        <Link href={`/vault/case/${caseId}/check-in`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
-                            Go to check-in <ChevronRight size={16} />
-                        </Link>
-                    )}
-                </div>
-
-                {/* Handover photos */}
-                <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${evidence.handoverPhotos > 0 ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
-                            <Camera size={20} />
-                        </div>
-                        <div>
-                            <h3 className="font-medium">Handover photos</h3>
-                            <p className="text-sm text-slate-500">
-                                {evidence.handoverPhotos > 0 ? `${evidence.handoverPhotos} photos recorded` : 'No photos yet'}
-                            </p>
-                        </div>
-                    </div>
-                    {evidence.handoverPhotos > 0 ? (
-                        <button
-                            onClick={() => openGallery('handover')}
-                            disabled={loadingPhotos}
-                            className="text-sm text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors"
-                        >
-                            {loadingPhotos ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} />}
-                            View gallery
-                        </button>
-                    ) : (
-                        <Link href={`/vault/case/${caseId}/handover`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
-                            Go to handover <ChevronRight size={16} />
-                        </Link>
-                    )}
-                </div>
 
                 {/* Check-in Video */}
                 {(() => {
@@ -853,53 +796,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                     )
                 })()}
 
-                {/* Contract summary */}
-                <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${evidence.contractSummary ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
-                            <FileText size={20} />
-                        </div>
-                        <div>
-                            <h3 className="font-medium">Contract summary</h3>
-                            <p className="text-sm text-slate-500">
-                                {evidence.contractSummary ? 'Contract analysed' : 'Not scanned yet'}
-                            </p>
-                        </div>
-                    </div>
-                    {evidence.contractSummary ? (
-                        <Link
-                            href={`/vault/case/${caseId}/contract`}
-                            className="text-sm text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors"
-                        >
-                            <Eye size={16} />
-                            View details
-                        </Link>
-                    ) : (
-                        <div className="h-9"></div> // Spacer
-                    )}
-                </div>
 
-                {/* Deadlines */}
-                <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${evidence.hasDeadlines ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
-                            <Calendar size={20} />
-                        </div>
-                        <div>
-                            <h3 className="font-medium">Reminders</h3>
-                            <p className="text-sm text-slate-500">
-                                {evidence.hasDeadlines ? 'Active' : 'No reminders active'}
-                            </p>
-                        </div>
-                    </div>
-                    <Link
-                        href={`/vault/case/${caseId}/deadlines`}
-                        className="text-sm text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors"
-                    >
-                        <Eye size={16} />
-                        {evidence.hasDeadlines ? 'View reminders' : 'Set reminders'}
-                    </Link>
-                </div>
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
