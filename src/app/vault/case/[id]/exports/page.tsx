@@ -376,8 +376,12 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 })
             })
 
-            if (!res.ok) throw new Error('Generation failed')
-            const { url } = await res.json()
+            const data = await res.json()
+            if (!res.ok) {
+                console.error('PDF Generation failed:', data.error || data)
+                throw new Error(data.error || 'Generation failed')
+            }
+            const { url } = data
 
             if (forPreview && url) {
                 setPreviewUrl(url)
@@ -389,6 +393,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 if (hasPack) {
                     setLastGeneratedPdf({ type: packType, url })
                 }
+            } else {
+                console.error('No URL returned from PDF API')
             }
         } catch (err) {
             console.error('Generate error:', err)
