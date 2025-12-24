@@ -478,7 +478,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             })
 
             if (!res.ok) throw new Error('Failed to get upload URL')
-            const { signedUrl, assetId } = await res.json()
+            const { signedUrl, assetId, storagePath } = await res.json()
 
             const uploadRes = await fetch(signedUrl, {
                 method: 'PUT',
@@ -495,7 +495,12 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 body: JSON.stringify({ assetId, caseId })
             })
 
-            await loadData(caseId)
+            // Optimistic update: set deposit proof in local state
+            setDepositProof({
+                asset_id: assetId,
+                storage_path: storagePath || '',
+                created_at: new Date().toISOString()
+            })
 
         } catch (err: any) {
             console.error('Deposit upload error:', err)
@@ -518,6 +523,11 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
 
     const confirmDeleteRoom = async (room: Room) => {
         setDeletingRoom(true)
+        setRoomToDelete(null)
+
+        // Optimistic update: remove room from state immediately
+        setRooms(prev => prev.filter(r => r.room_id !== room.room_id))
+
         try {
             // Delete room (cascade deletes assets via FK)
             const res = await fetch(`/api/rooms/${room.room_id}`, {
@@ -526,13 +536,13 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
 
             if (!res.ok) throw new Error('Failed to delete room')
 
-            await loadData(caseId)
         } catch (err) {
             console.error('Delete room error:', err)
             setError('Failed to delete room')
+            // Reload to restore state if delete failed
+            await loadData(caseId)
         } finally {
             setDeletingRoom(false)
-            setRoomToDelete(null)
         }
     }
 

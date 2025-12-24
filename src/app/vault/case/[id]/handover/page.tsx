@@ -372,7 +372,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             })
 
             if (!res.ok) throw new Error('Failed to get upload URL')
-            const { signedUrl, assetId } = await res.json()
+            const { signedUrl, assetId, storagePath } = await res.json()
 
             const uploadRes = await fetch(signedUrl, {
                 method: 'PUT',
@@ -387,7 +387,12 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ assetId, caseId })
             })
 
-            await loadData(caseId)
+            // Optimistic update: set deposit proof in local state
+            setDepositProof({
+                asset_id: assetId,
+                storage_path: storagePath || '',
+                created_at: new Date().toISOString()
+            })
 
         } catch (err: any) {
             console.error('Deposit upload error:', err)
