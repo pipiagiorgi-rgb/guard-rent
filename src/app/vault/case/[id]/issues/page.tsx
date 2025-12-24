@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
     Plus,
@@ -12,7 +12,9 @@ import {
     ChevronDown,
     ChevronUp,
     X,
-    Trash2
+    Trash2,
+    Play,
+    Image as ImageIcon
 } from 'lucide-react'
 import Link from 'next/link'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
@@ -24,19 +26,21 @@ interface Room {
     name: string
 }
 
+interface IssueMedia {
+    asset_id: string
+    storage_path: string
+    signedUrl?: string
+    type: 'issue_photo' | 'issue_video'
+    mime_type?: string
+}
+
 interface Issue {
     issue_id: string
     room_name: string
     description: string
     incident_date: string
     created_at: string
-    photos: { asset_id: string; signedUrl?: string }[]
-}
-
-interface IssuePhoto {
-    asset_id: string
-    storage_path: string
-    signedUrl?: string
+    media: IssueMedia[]
 }
 
 export default function IssuesPage({ params }: { params: Promise<{ id: string }> }) {
@@ -56,6 +60,9 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
     const [uploading, setUploading] = useState(false)
     const [saving, setSaving] = useState(false)
     const [pendingPhotos, setPendingPhotos] = useState<File[]>([])
+    const [pendingVideo, setPendingVideo] = useState<File | null>(null)
+    const [videoError, setVideoError] = useState<string | null>(null)
+    const videoInputRef = useRef<HTMLInputElement>(null)
 
     // Delete state
     const [deleteIssue, setDeleteIssue] = useState<Issue | null>(null)
@@ -107,37 +114,39 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                 .order('incident_date', { ascending: false })
 
             if (issuesData) {
-                // Fetch photos for each issue
-                const issuesWithPhotos = await Promise.all(
+                // Fetch media (photos + videos) for each issue
+                const issuesWithMedia = await Promise.all(
                     issuesData.map(async (issue) => {
-                        const { data: photos } = await supabase
+                        const { data: mediaAssets } = await supabase
                             .from('assets')
-                            .select('asset_id, storage_path')
+                            .select('asset_id, storage_path, type, mime_type')
                             .eq('issue_id', issue.issue_id)
-                            .eq('type', 'issue_photo')
+                            .in('type', ['issue_photo', 'issue_video'])
 
-                        // Generate signed URLs
-                        let signedPhotos: IssuePhoto[] = []
-                        if (photos && photos.length > 0) {
-                            const paths = photos.map(p => p.storage_path)
+                        // Generate signed URLs for all media
+                        let signedMedia: IssueMedia[] = []
+                        if (mediaAssets && mediaAssets.length > 0) {
+                            const paths = mediaAssets.map(m => m.storage_path)
                             const { data: signedData } = await supabase.storage
                                 .from('guard-rent')
                                 .createSignedUrls(paths, 3600)
 
-                            signedPhotos = photos.map(p => ({
-                                asset_id: p.asset_id,
-                                storage_path: p.storage_path,
-                                signedUrl: signedData?.find(s => s.path === p.storage_path)?.signedUrl
+                            signedMedia = mediaAssets.map(m => ({
+                                asset_id: m.asset_id,
+                                storage_path: m.storage_path,
+                                type: m.type as 'issue_photo' | 'issue_video',
+                                mime_type: m.mime_type,
+                                signedUrl: signedData?.find(s => s.path === m.storage_path)?.signedUrl
                             }))
                         }
 
                         return {
                             ...issue,
-                            photos: signedPhotos
+                            media: signedMedia
                         }
                     })
                 )
-                setIssues(issuesWithPhotos)
+                setIssues(issuesWithMedia)
             }
         } catch (err) {
             console.error('Failed to load issues:', err)
@@ -153,6 +162,8 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
         setIssueDescription('')
         setIssueDate(new Date().toISOString().split('T')[0])
         setPendingPhotos([])
+        setPendingVideo(null)
+        setVideoError(null)
         setShowAddModal(true)
     }
 
@@ -163,8 +174,37 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
         }
     }
 
+    const handleVideoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setVideoError(null)
+
+        // Check duration using video element
+        const video = document.createElement('video')
+        video.preload = 'metadata'
+        video.src = URL.createObjectURL(file)
+
+        video.onloadedmetadata = () => {
+            URL.revokeObjectURL(video.src)
+            if (video.duration > 60) {
+                setVideoError('Video must be 1 minute or less')
+                setPendingVideo(null)
+                if (videoInputRef.current) videoInputRef.current.value = ''
+            } else {
+                setPendingVideo(file)
+            }
+        }
+    }
+
     const removePhoto = (index: number) => {
         setPendingPhotos(prev => prev.filter((_, i) => i !== index))
+    }
+
+    const removeVideo = () => {
+        setPendingVideo(null)
+        setVideoError(null)
+        if (videoInputRef.current) videoInputRef.current.value = ''
     }
 
     const handleSaveIssue = async () => {
@@ -216,6 +256,28 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                 }
             }
 
+            // Upload video
+            if (pendingVideo && newIssue) {
+                const ext = pendingVideo.name.split('.').pop() || 'mp4'
+                const fileName = `video_${Date.now()}.${ext}`
+                const storagePath = `${user.id}/${caseId}/issues/${newIssue.issue_id}/${fileName}`
+
+                await supabase.storage
+                    .from('guard-rent')
+                    .upload(storagePath, pendingVideo)
+
+                await supabase.from('assets').insert({
+                    case_id: caseId,
+                    user_id: user.id,
+                    issue_id: newIssue.issue_id,
+                    type: 'issue_video',
+                    original_name: pendingVideo.name,
+                    storage_path: storagePath,
+                    file_size: pendingVideo.size,
+                    mime_type: pendingVideo.type
+                })
+            }
+
             setShowAddModal(false)
             await loadData(caseId)
         } catch (err) {
@@ -264,10 +326,10 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
         }
     }
 
-    const openPhotoLightbox = (photos: { signedUrl?: string }[]) => {
-        const images = photos
-            .filter(p => p.signedUrl)
-            .map(p => ({ src: p.signedUrl! }))
+    const openPhotoLightbox = (media: IssueMedia[]) => {
+        const images = media
+            .filter(m => m.type === 'issue_photo' && m.signedUrl)
+            .map(m => ({ src: m.signedUrl! }))
         setLightboxImages(images)
         setLightboxOpen(true)
     }
@@ -355,32 +417,42 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                         </div>
                                         <p className="text-slate-700">{issue.description}</p>
 
-                                        {/* Photos */}
-                                        {issue.photos.length > 0 && (
-                                            <div className="flex gap-2 mt-3">
-                                                {issue.photos.slice(0, 3).map((photo, idx) => (
-                                                    <button
-                                                        key={photo.asset_id}
-                                                        onClick={() => openPhotoLightbox(issue.photos)}
-                                                        className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100"
-                                                    >
-                                                        {photo.signedUrl && (
-                                                            <img
-                                                                src={photo.signedUrl}
-                                                                alt=""
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        )}
-                                                    </button>
+                                        {/* Media */}
+                                        {issue.media.length > 0 && (
+                                            <div className="flex gap-2 mt-3 flex-wrap">
+                                                {issue.media.map((item) => (
+                                                    item.type === 'issue_photo' ? (
+                                                        <button
+                                                            key={item.asset_id}
+                                                            onClick={() => openPhotoLightbox(issue.media)}
+                                                            className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-100 group"
+                                                        >
+                                                            {item.signedUrl && (
+                                                                <img
+                                                                    src={item.signedUrl}
+                                                                    alt=""
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            )}
+                                                            <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1">
+                                                                <ImageIcon size={10} className="text-white" />
+                                                            </div>
+                                                        </button>
+                                                    ) : (
+                                                        <a
+                                                            key={item.asset_id}
+                                                            href={item.signedUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center group"
+                                                        >
+                                                            <Play size={20} className="text-white" />
+                                                            <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1">
+                                                                <Video size={10} className="text-white" />
+                                                            </div>
+                                                        </a>
+                                                    )
                                                 ))}
-                                                {issue.photos.length > 3 && (
-                                                    <button
-                                                        onClick={() => openPhotoLightbox(issue.photos)}
-                                                        className="w-16 h-16 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 text-sm font-medium"
-                                                    >
-                                                        +{issue.photos.length - 3}
-                                                    </button>
-                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -468,9 +540,9 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                             </div>
 
                             {/* Photos */}
-                            <div className="mb-6">
+                            <div className="mb-4">
                                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Photos (optional)
+                                    Photos
                                 </label>
                                 <div className="flex flex-wrap gap-2">
                                     {pendingPhotos.map((file, idx) => (
@@ -500,6 +572,45 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                         />
                                     </label>
                                 </div>
+                            </div>
+
+                            {/* Video */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Video <span className="font-normal text-slate-400">(1 min max)</span>
+                                </label>
+                                {pendingVideo ? (
+                                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                        <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center">
+                                            <Play size={20} className="text-white" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-slate-900 truncate">{pendingVideo.name}</p>
+                                            <p className="text-xs text-slate-500">{(pendingVideo.size / 1024 / 1024).toFixed(1)} MB</p>
+                                        </div>
+                                        <button
+                                            onClick={removeVideo}
+                                            className="p-2 text-slate-400 hover:text-red-500"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label className="flex items-center gap-3 p-4 border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:border-slate-300 hover:bg-slate-50">
+                                        <Video size={24} className="text-slate-400" />
+                                        <span className="text-sm text-slate-500">Add a video clip</span>
+                                        <input
+                                            ref={videoInputRef}
+                                            type="file"
+                                            accept="video/*"
+                                            onChange={handleVideoSelect}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                )}
+                                {videoError && (
+                                    <p className="text-sm text-red-500 mt-2">{videoError}</p>
+                                )}
                             </div>
 
                             {/* Actions */}
