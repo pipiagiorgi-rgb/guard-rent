@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Camera, Eye, Loader2, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Camera, Eye, Loader2, ToggleLeft, ToggleRight, ChevronDown, ChevronUp } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 
 interface Asset {
@@ -38,6 +38,7 @@ export function PhotoComparison({ caseId }: PhotoComparisonProps) {
     const [lightboxOpen, setLightboxOpen] = useState(false)
     const [lightboxImages, setLightboxImages] = useState<PhotoAsset[]>([])
     const [loadingPhotos, setLoadingPhotos] = useState(false)
+    const [expandedRooms, setExpandedRooms] = useState<Set<string>>(new Set())
 
     useEffect(() => {
         loadRoomPhotos()
@@ -186,128 +187,151 @@ export function PhotoComparison({ caseId }: PhotoComparisonProps) {
             <div className="space-y-3">
                 {rooms.map(room => (
                     <div key={room.room_id} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                        {/* Clickable header to toggle */}
+                        <button
+                            onClick={() => {
+                                const next = new Set(expandedRooms)
+                                if (next.has(room.room_id)) {
+                                    next.delete(room.room_id)
+                                } else {
+                                    next.add(room.room_id)
+                                }
+                                setExpandedRooms(next)
+                            }}
+                            className="w-full p-4 border-b border-slate-100 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                        >
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                                     <Camera size={16} className="text-slate-600" />
                                 </div>
-                                <div>
+                                <div className="text-left">
                                     <h4 className="font-medium">{room.name}</h4>
                                     <p className="text-xs text-slate-500">
                                         {room.checkinPhotos.length} check-in · {room.handoverPhotos.length} handover
                                     </p>
                                 </div>
                             </div>
+                            <div className="flex items-center gap-2">
+                                {room.hasBothPhases && (
+                                    <span className="text-xs text-blue-600 font-medium">Comparison</span>
+                                )}
+                                {expandedRooms.has(room.room_id) ? <ChevronUp size={18} className="text-slate-400" /> : <ChevronDown size={18} className="text-slate-400" />}
+                            </div>
+                        </button>
 
-                            {room.hasBothPhases && (
-                                <button
-                                    onClick={() => toggleComparisonMode(room.room_id)}
-                                    className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
-                                >
-                                    {comparisonMode[room.room_id] ? (
-                                        <>
-                                            <ToggleRight size={20} className="text-blue-600" />
-                                            <span>Comparison</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ToggleLeft size={20} />
-                                            <span>Separate</span>
-                                        </>
-                                    )}
-                                </button>
-                            )}
-                        </div>
-
-                        <div className="p-4">
-                            {room.hasBothPhases && comparisonMode[room.room_id] ? (
-                                // Side-by-side comparison view
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">Check-in</p>
+                        {/* Collapsible photo section */}
+                        {expandedRooms.has(room.room_id) && (
+                            <div className="p-4">
+                                {/* Comparison mode toggle - only when expanded */}
+                                {room.hasBothPhases && (
+                                    <div className="flex justify-end mb-3">
                                         <button
-                                            onClick={() => openPhotoLightbox(room.checkinPhotos, room.name, 'Check-in')}
-                                            disabled={loadingPhotos}
-                                            className="w-full aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden relative group hover:ring-2 hover:ring-blue-500 transition-all"
+                                            onClick={(e) => { e.stopPropagation(); toggleComparisonMode(room.room_id) }}
+                                            className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
                                         >
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                {loadingPhotos ? (
-                                                    <Loader2 size={20} className="animate-spin text-slate-400" />
-                                                ) : (
-                                                    <div className="text-center">
-                                                        <Camera size={24} className="mx-auto text-slate-400 mb-1" />
-                                                        <span className="text-sm text-slate-600">{room.checkinPhotos.length} photos</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="absolute bottom-2 right-2 bg-white/90 rounded px-2 py-1 text-xs text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                View all
-                                            </div>
+                                            {comparisonMode[room.room_id] ? (
+                                                <>
+                                                    <ToggleRight size={20} className="text-blue-600" />
+                                                    <span>Comparison</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <ToggleLeft size={20} />
+                                                    <span>Separate</span>
+                                                </>
+                                            )}
                                         </button>
-                                        <p className="text-xs text-slate-400 mt-1">
-                                            {new Date(room.checkinPhotos[0]?.created_at).toLocaleDateString('en-GB')}
-                                        </p>
                                     </div>
-                                    <div>
-                                        <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">Handover</p>
-                                        <button
-                                            onClick={() => openPhotoLightbox(room.handoverPhotos, room.name, 'Handover')}
-                                            disabled={loadingPhotos}
-                                            className="w-full aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden relative group hover:ring-2 hover:ring-blue-500 transition-all"
-                                        >
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                {loadingPhotos ? (
-                                                    <Loader2 size={20} className="animate-spin text-slate-400" />
-                                                ) : (
-                                                    <div className="text-center">
-                                                        <Camera size={24} className="mx-auto text-slate-400 mb-1" />
-                                                        <span className="text-sm text-slate-600">{room.handoverPhotos.length} photos</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="absolute bottom-2 right-2 bg-white/90 rounded px-2 py-1 text-xs text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                View all
-                                            </div>
-                                        </button>
-                                        <p className="text-xs text-slate-400 mt-1">
-                                            {new Date(room.handoverPhotos[0]?.created_at).toLocaleDateString('en-GB')}
-                                        </p>
+                                )}
+                                {room.hasBothPhases && comparisonMode[room.room_id] ? (
+                                    // Side-by-side comparison view
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">Check-in</p>
+                                            <button
+                                                onClick={() => openPhotoLightbox(room.checkinPhotos, room.name, 'Check-in')}
+                                                disabled={loadingPhotos}
+                                                className="w-full aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden relative group hover:ring-2 hover:ring-blue-500 transition-all"
+                                            >
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    {loadingPhotos ? (
+                                                        <Loader2 size={20} className="animate-spin text-slate-400" />
+                                                    ) : (
+                                                        <div className="text-center">
+                                                            <Camera size={24} className="mx-auto text-slate-400 mb-1" />
+                                                            <span className="text-sm text-slate-600">{room.checkinPhotos.length} photos</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="absolute bottom-2 right-2 bg-white/90 rounded px-2 py-1 text-xs text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    View all
+                                                </div>
+                                            </button>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                {new Date(room.checkinPhotos[0]?.created_at).toLocaleDateString('en-GB')}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">Handover</p>
+                                            <button
+                                                onClick={() => openPhotoLightbox(room.handoverPhotos, room.name, 'Handover')}
+                                                disabled={loadingPhotos}
+                                                className="w-full aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden relative group hover:ring-2 hover:ring-blue-500 transition-all"
+                                            >
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    {loadingPhotos ? (
+                                                        <Loader2 size={20} className="animate-spin text-slate-400" />
+                                                    ) : (
+                                                        <div className="text-center">
+                                                            <Camera size={24} className="mx-auto text-slate-400 mb-1" />
+                                                            <span className="text-sm text-slate-600">{room.handoverPhotos.length} photos</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="absolute bottom-2 right-2 bg-white/90 rounded px-2 py-1 text-xs text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    View all
+                                                </div>
+                                            </button>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                {new Date(room.handoverPhotos[0]?.created_at).toLocaleDateString('en-GB')}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                // Separate sections fallback
-                                <div className="space-y-3">
-                                    {room.checkinPhotos.length > 0 && (
-                                        <button
-                                            onClick={() => openPhotoLightbox(room.checkinPhotos, room.name, 'Check-in')}
-                                            disabled={loadingPhotos}
-                                            className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <Camera size={16} className="text-slate-500" />
-                                                <span className="text-sm">Check-in photos</span>
-                                                <span className="text-xs text-slate-400">({room.checkinPhotos.length})</span>
-                                            </div>
-                                            <Eye size={16} className="text-slate-400" />
-                                        </button>
-                                    )}
-                                    {room.handoverPhotos.length > 0 && (
-                                        <button
-                                            onClick={() => openPhotoLightbox(room.handoverPhotos, room.name, 'Handover')}
-                                            disabled={loadingPhotos}
-                                            className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <Camera size={16} className="text-slate-500" />
-                                                <span className="text-sm">Handover photos</span>
-                                                <span className="text-xs text-slate-400">({room.handoverPhotos.length})</span>
-                                            </div>
-                                            <Eye size={16} className="text-slate-400" />
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                                ) : (
+                                    // Separate sections fallback
+                                    <div className="space-y-3">
+                                        {room.checkinPhotos.length > 0 && (
+                                            <button
+                                                onClick={() => openPhotoLightbox(room.checkinPhotos, room.name, 'Check-in')}
+                                                disabled={loadingPhotos}
+                                                className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <Camera size={16} className="text-slate-500" />
+                                                    <span className="text-sm">Check-in photos</span>
+                                                    <span className="text-xs text-slate-400">({room.checkinPhotos.length})</span>
+                                                </div>
+                                                <Eye size={16} className="text-slate-400" />
+                                            </button>
+                                        )}
+                                        {room.handoverPhotos.length > 0 && (
+                                            <button
+                                                onClick={() => openPhotoLightbox(room.handoverPhotos, room.name, 'Handover')}
+                                                disabled={loadingPhotos}
+                                                className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <Camera size={16} className="text-slate-500" />
+                                                    <span className="text-sm">Handover photos</span>
+                                                    <span className="text-xs text-slate-400">({room.handoverPhotos.length})</span>
+                                                </div>
+                                                <Eye size={16} className="text-slate-400" />
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

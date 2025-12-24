@@ -54,6 +54,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     const [meterReadings, setMeterReadings] = useState<MeterReadings>({})
     const [saving, setSaving] = useState(false)
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['photos', 'meters']))
+    const [expandedRooms, setExpandedRooms] = useState<Set<string>>(new Set())
 
     // Lightbox state
     const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -760,16 +761,32 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 {rooms.map(room => (
                     <div key={room.room_id} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                         <div className="px-5 py-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                            {/* Clickable left section - toggles photo visibility */}
+                            <button
+                                onClick={() => {
+                                    const next = new Set(expandedRooms)
+                                    if (next.has(room.room_id)) {
+                                        next.delete(room.room_id)
+                                    } else {
+                                        next.add(room.room_id)
+                                    }
+                                    setExpandedRooms(next)
+                                }}
+                                className="flex items-center gap-3 hover:bg-slate-100 -ml-2 px-2 py-1 rounded-lg transition-colors"
+                            >
                                 <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center">
                                     <Camera size={16} className="text-slate-600" />
                                 </div>
-                                <h3 className="font-semibold">{room.name}</h3>
-                            </div>
+                                <div className="flex items-center gap-2">
+                                    <h3 className="font-semibold">{room.name}</h3>
+                                    {room.checkin_photos > 0 && (
+                                        <span className="text-sm text-slate-500">({room.checkin_photos})</span>
+                                    )}
+                                </div>
+                                {expandedRooms.has(room.room_id) ? <ChevronUp size={18} className="text-slate-400" /> : <ChevronDown size={18} className="text-slate-400" />}
+                            </button>
+                            {/* Action buttons - always visible */}
                             <div className="flex items-center gap-3">
-                                {room.checkin_photos > 0 && (
-                                    <span className="text-sm text-slate-500">{room.checkin_photos} photos</span>
-                                )}
                                 {(() => {
                                     const canUpload = !isLocked && (hasPack || canUploadPreviewPhoto(caseId))
                                     const isUploading = uploading === room.room_id
@@ -821,54 +838,57 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                             </div>
                         </div>
 
-                        <div className="p-5">
-                            {room.photos.length > 0 ? (
-                                <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="flex gap-3 min-w-max">
-                                        {room.photos.map((photo, i) => (
-                                            <div
-                                                key={photo.asset_id}
-                                                className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-slate-200 group"
-                                            >
-                                                <button
-                                                    onClick={() => openRoomGallery(room, i)}
-                                                    className="w-full h-full"
+                        {/* Collapsible photo section */}
+                        {expandedRooms.has(room.room_id) && (
+                            <div className="p-5">
+                                {room.photos.length > 0 ? (
+                                    <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                        <div className="flex gap-3 min-w-max">
+                                            {room.photos.map((photo, i) => (
+                                                <div
+                                                    key={photo.asset_id}
+                                                    className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-slate-200 group"
                                                 >
-                                                    {photo.signedUrl ? (
-                                                        <img src={photo.signedUrl} alt={`Photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <div className="w-full h-full bg-slate-100 flex items-center justify-center text-xs text-slate-400">
-                                                            Photo {i + 1}
-                                                        </div>
-                                                    )}
-                                                </button>
-                                                {/* Delete button */}
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        handleDeletePhoto(photo)
-                                                    }}
-                                                    className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-                                                    title="Delete photo"
-                                                >
-                                                    <X size={12} />
-                                                </button>
-                                            </div>
-                                        ))}
+                                                    <button
+                                                        onClick={() => openRoomGallery(room, i)}
+                                                        className="w-full h-full"
+                                                    >
+                                                        {photo.signedUrl ? (
+                                                            <img src={photo.signedUrl} alt={`Photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-xs text-slate-400">
+                                                                Photo {i + 1}
+                                                            </div>
+                                                        )}
+                                                    </button>
+                                                    {/* Delete button */}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handleDeletePhoto(photo)
+                                                        }}
+                                                        className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                                                        title="Delete photo"
+                                                    >
+                                                        <X size={12} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="py-6 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
-                                    <div className="flex flex-col items-center gap-2">
-                                        <Camera size={24} className="text-slate-300" />
-                                        <p className="text-slate-500 text-sm font-medium">Document this room&apos;s condition</p>
-                                        <p className="text-slate-400 text-xs max-w-[200px]">
-                                            Photos create timestamped proof for deposit disputes
-                                        </p>
+                                ) : (
+                                    <div className="py-6 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Camera size={24} className="text-slate-300" />
+                                            <p className="text-slate-500 text-sm font-medium">Document this room&apos;s condition</p>
+                                            <p className="text-slate-400 text-xs max-w-[200px]">
+                                                Photos create timestamped proof for deposit disputes
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 ))}
 
