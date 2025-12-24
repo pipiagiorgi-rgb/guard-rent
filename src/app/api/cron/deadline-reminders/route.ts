@@ -121,7 +121,8 @@ export async function GET(req: Request) {
                     rentalLabel: caseInfo.label,
                     date: deadline.date,
                     daysUntil,
-                    noticeMethod
+                    noticeMethod,
+                    caseId: caseInfo.case_id
                 })
 
                 if (result.success) {

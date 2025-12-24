@@ -398,7 +398,8 @@ export async function sendDeadlineReminderEmail({
     rentalLabel,
     date,
     daysUntil,
-    noticeMethod
+    noticeMethod,
+    caseId
 }: {
     to: string
     type: 'termination_notice' | 'rent_payment'
@@ -406,6 +407,7 @@ export async function sendDeadlineReminderEmail({
     date: string
     daysUntil: number
     noticeMethod?: string
+    caseId?: string
 }): Promise<{ success: boolean; error?: string }> {
     const formattedDate = new Date(date).toLocaleDateString('en-GB', {
         day: 'numeric',
@@ -419,6 +421,9 @@ export async function sendDeadlineReminderEmail({
 
     const urgencyColor = daysUntil <= 7 ? '#dc2626' : '#f59e0b'
 
+    // Link to contract page for AI draft feature
+    const contractUrl = caseId ? `${process.env.SITE_URL || 'https://rentvault.app'}/vault/case/${caseId}/contract` : null
+
     let subject: string
     let title: string
     let bodyContent: string
@@ -427,6 +432,22 @@ export async function sendDeadlineReminderEmail({
     if (type === 'termination_notice') {
         subject = `[Reminder] Notice deadline ${urgency}`
         title = `Notice deadline ${urgency}`
+
+        // AI Draft CTA section - only for termination notices
+        const aiDraftCta = contractUrl ? `
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
+                <tr>
+                    <td style="padding: 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 12px; text-align: center;">
+                        <p style="margin: 0 0 12px 0; color: white; font-size: 15px; font-weight: 500;">Need to draft your termination notice?</p>
+                        <a href="${contractUrl}" style="display: inline-block; background: white; color: #1d4ed8; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none;">
+                            ✨ Draft with AI assistant
+                        </a>
+                        <p style="margin: 12px 0 0 0; color: rgba(255,255,255,0.8); font-size: 12px;">We'll help you write a professional notice based on your contract terms</p>
+                    </td>
+                </tr>
+            </table>
+        ` : ''
+
         bodyContent = `
             <p style="margin: 0 0 16px 0;">Your termination notice deadline is approaching.</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; margin-bottom: 16px;">
@@ -449,9 +470,10 @@ export async function sendDeadlineReminderEmail({
                     </td>
                 </tr>
             </table>
+            ${aiDraftCta}
             <p style="margin: 0; font-size: 13px; color: #64748b;">If you wish to terminate the contract, make sure to send your notice before this date.</p>
         `
-        text = `Notice deadline ${urgency}\n\nYour termination notice deadline is approaching.\n\nDeadline: ${formattedDate}\nContract: ${rentalLabel}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\nIf you wish to terminate the contract, make sure to send your notice before this date.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
+        text = `Notice deadline ${urgency}\n\nYour termination notice deadline is approaching.\n\nDeadline: ${formattedDate}\nContract: ${rentalLabel}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\n${contractUrl ? `Draft your notice with AI: ${contractUrl}\n\n` : ''}If you wish to terminate the contract, make sure to send your notice before this date.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else {
         subject = `[Reminder] Rent due ${urgency}`
         title = `Rent due ${urgency}`
