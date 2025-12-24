@@ -108,16 +108,16 @@ export default function BlogPost() {
                                     Before assuming the worst, check how long your landlord legally has to return
                                     your deposit:
                                 </p>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 gap-3">
                                     {[
-                                        { country: '🇬🇧 UK', info: '10 days common' },
-                                        { country: '🇩🇪 Germany', info: 'Up to 6 months' },
-                                        { country: '🇫🇷 France', info: '2 months max' },
-                                        { country: '🇺🇸 US', info: '14-60 days (by state)' },
+                                        { country: '🇬🇧 UK', info: '10 days after deductions are agreed or dispute is resolved' },
+                                        { country: '🇫🇷 France', info: '1–2 months, depending on the condition report' },
+                                        { country: '🇩🇪 Germany', info: 'Several months (often up to 6)' },
+                                        { country: '🇺🇸 US', info: '14–60 days, depending on the state' },
                                     ].map((item, i) => (
-                                        <div key={i} className="bg-slate-50 rounded-lg p-3 text-center">
-                                            <div className="font-semibold text-slate-900 text-sm">{item.country}</div>
-                                            <div className="text-slate-500 text-xs">{item.info}</div>
+                                        <div key={i} className="bg-slate-50 rounded-lg p-3">
+                                            <span className="font-semibold text-slate-900 text-sm">{item.country}:</span>
+                                            <span className="text-slate-600 text-sm ml-2">{item.info}</span>
                                         </div>
                                     ))}
                                 </div>

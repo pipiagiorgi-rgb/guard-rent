@@ -69,7 +69,7 @@ export default function BlogPost() {
                     {/* Content */}
                     <div className="space-y-8">
                         <p className="text-xl text-slate-600 leading-relaxed font-light">
-                            Every year, thousands of tenants pay extra months of rent simply because they didn't
+                            Every year, countless tenants pay extra months of rent simply because they didn't
                             understand their notice period. These aren't careless people; they just didn't know
                             the rules. Here are the three most expensive mistakes to avoid.
                         </p>
@@ -83,8 +83,8 @@ export default function BlogPost() {
                                 <div>
                                     <h3 className="font-bold text-amber-900 mb-2">The Real Cost</h3>
                                     <p className="text-amber-800 text-sm leading-relaxed">
-                                        Missing a 3-month notice deadline by just one day can legally require you
-                                        to pay rent for 3 more months. At €1,500/month, that's €4,500 you didn't budget for.
+                                        Missing your notice deadline can cause your contract to roll over for another year,
+                                        leaving you facing a hefty fine or locked into the lease.
                                     </p>
                                 </div>
                             </div>
