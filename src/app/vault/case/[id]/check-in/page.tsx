@@ -1058,9 +1058,9 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                                     <div className="flex items-center gap-2">
                                         {data.asset_id ? (
                                             <div className="relative group">
-                                                <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+                                                <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center text-[0]">
                                                     {data.photo_url ? (
-                                                        <img src={data.photo_url} alt={meter} loading="lazy" className="w-full h-full object-cover" />
+                                                        <img src={data.photo_url} alt="" loading="lazy" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <Check size={16} className="text-green-600" />
                                                     )}
