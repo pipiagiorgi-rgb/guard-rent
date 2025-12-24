@@ -45,6 +45,7 @@ export async function POST(request: Request) {
                 type: type,
                 storage_path: storagePath,
                 mime_type: mimeType,
+                original_name: filename,  // Store original filename for display
                 size_bytes: 0,
                 room_id: roomId || null,
                 file_hash: fileHash || null // Integrity hash

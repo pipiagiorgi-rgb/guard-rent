@@ -322,15 +322,24 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             }
 
             // Fetch contract PDF and deposit proof for downloads
-            const { data: docAssets } = await supabase
+            const { data: docAssets, error: docError } = await supabase
                 .from('assets')
                 .select('asset_id, type, original_name, storage_path, created_at')
                 .eq('case_id', id)
                 .in('type', ['contract_pdf', 'deposit_proof'])
 
+            if (docError) {
+                console.error('Error fetching documents:', docError)
+            }
+
+            console.log('Document assets found:', docAssets)
+
             if (docAssets) {
                 const contract = docAssets.find(a => a.type === 'contract_pdf')
                 const deposit = docAssets.find(a => a.type === 'deposit_proof')
+
+                console.log('Contract:', contract)
+                console.log('Deposit:', deposit)
 
                 if (contract) {
                     setContractAsset({
