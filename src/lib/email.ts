@@ -705,3 +705,114 @@ export async function sendStorageReminderEmail({ to, daysRemaining, caseLabel, r
         tags: [{ name: 'type', value: 'storage_reminder' }]
     })
 }
+
+// ============================================================
+// EVIDENCE LOCKED EMAIL (backup confirmation)
+// ============================================================
+export async function sendEvidenceLockedEmail({
+    to,
+    rentalLabel,
+    lockType,
+    lockTimestamp,
+    caseId,
+    photoCount
+}: {
+    to: string
+    rentalLabel: string
+    lockType: 'check-in' | 'handover'
+    lockTimestamp: string
+    caseId: string
+    photoCount: number
+}): Promise<{ success: boolean; error?: string }> {
+    const formattedDate = new Date(lockTimestamp).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'UTC'
+    })
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+    const exportUrl = `${siteUrl}/vault/case/${caseId}/exports`
+
+    const subject = `Evidence sealed: ${lockType === 'check-in' ? 'Check-in' : 'Handover'} for ${rentalLabel}`
+    const title = `${lockType === 'check-in' ? 'Check-in' : 'Handover'} evidence sealed`
+
+    const bodyContent = `
+        <p style="margin: 0 0 16px 0;">This email is a <strong>backup confirmation</strong> of your sealed evidence record.</p>
+        
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 16px;">
+            <tr>
+                <td style="padding: 16px;">
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Evidence Status</p>
+                    <p style="margin: 0; font-weight: 700; color: #166534; font-size: 16px;">🔒 Permanently Sealed</p>
+                </td>
+            </tr>
+        </table>
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 8px; margin-bottom: 16px;">
+            <tr>
+                <td style="padding: 16px;">
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Rental</p>
+                    <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${rentalLabel}</p>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Sealed at (UTC)</p>
+                    <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${formattedDate}</p>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Evidence</p>
+                    <p style="margin: 0; font-weight: 600; color: #0f172a;">${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded</p>
+                </td>
+            </tr>
+        </table>
+
+        <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">
+            <strong>What this means:</strong>
+        </p>
+        <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #475569; font-size: 14px;">
+            <li style="margin-bottom: 8px;">Photos and timestamps are now immutable</li>
+            <li style="margin-bottom: 8px;">Evidence cannot be added, edited, or deleted</li>
+            <li>You can generate a PDF report from your dashboard</li>
+        </ul>
+
+        <p style="margin: 0; font-size: 13px; color: #64748b;">
+            Keep this email as a backup record. In case of a deposit dispute, this confirms when your evidence was sealed.
+        </p>
+    `
+
+    const text = `Evidence sealed: ${lockType === 'check-in' ? 'Check-in' : 'Handover'} for ${rentalLabel}
+
+This email is a backup confirmation of your sealed evidence record.
+
+Evidence Status: 🔒 Permanently Sealed
+
+Rental: ${rentalLabel}
+Sealed at (UTC): ${formattedDate}
+Evidence: ${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded
+
+What this means:
+- Photos and timestamps are now immutable
+- Evidence cannot be added, edited, or deleted
+- You can generate a PDF report from your dashboard
+
+Keep this email as a backup record. In case of a deposit dispute, this confirms when your evidence was sealed.
+
+Download your evidence pack: ${exportUrl}
+
+---
+RentVault securely stores and organises your rental documents. Not legal advice.`
+
+    const html = emailTemplate({
+        title,
+        previewText: `Your ${lockType} evidence is now permanently sealed`,
+        bodyContent,
+        ctaText: 'Download Evidence Pack',
+        ctaUrl: exportUrl
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'evidence_locked' }]
+    })
+}

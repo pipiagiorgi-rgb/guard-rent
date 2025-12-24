@@ -367,7 +367,7 @@ export async function drawComparisonGrid(
         const moreText = []
         if (moreCheckin > 0) moreText.push(`+${moreCheckin} check-in`)
         if (moreHandover > 0) moreText.push(`+${moreHandover} handover`)
-        page.drawText(`${moreText.join(', ')} photos in app`, {
+        page.drawText(`${moreText.join(', ')} photos — see full evidence on following pages`, {
             x: MARGIN,
             y: yPos,
             size: 8,

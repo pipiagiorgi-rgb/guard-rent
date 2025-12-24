@@ -589,7 +589,6 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 </div>
             )}
 
-            {/* Walkthrough Video Section */}
             <WalkthroughVideoUpload
                 caseId={caseId}
                 phase="check-in"
@@ -599,52 +598,6 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 onVideoUploaded={() => loadData(caseId)}
                 onVideoDeleted={() => loadData(caseId)}
             />
-
-            {/* Status banner */}
-            {isLocked ? (
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-3">
-                    <div className="p-2 bg-slate-100 rounded-full">
-                        <ShieldCheck className="text-slate-700" size={24} />
-                    </div>
-                    <div>
-                        <p className="font-semibold text-slate-900">Check-in Evidence Locked</p>
-                        <p className="text-sm text-slate-600">
-                            Photos are sealed with system timestamps and cannot be changed.
-                        </p>
-                    </div>
-                </div>
-            ) : isComplete ? (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                        <Check className="text-green-600" size={20} />
-                        <div>
-                            <p className="font-medium text-green-900">Check-in evidence recorded</p>
-                            <p className="text-sm text-green-700">
-                                {totalPhotos} photos across {rooms.filter(r => r.checkin_photos > 0).length} rooms
-                            </p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => setShowLockModal(true)}
-                        disabled={locking}
-                        className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
-                    >
-                        {locking ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} />}
-                        Complete & Lock Check-in
-                    </button>
-                    <p className="text-xs text-green-600 mt-2 text-center">
-                        This seals your evidence with immutable timestamps.
-                    </p>
-                </div>
-            ) : (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
-                    <Camera className="text-amber-600" size={20} />
-                    <div>
-                        <p className="font-medium text-amber-900">Add photos to document move-in condition</p>
-                        <p className="text-sm text-amber-700">Upload at least one photo per room</p>
-                    </div>
-                </div>
-            )}
 
             {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 text-red-700">
@@ -793,6 +746,52 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                     )}
                 </div>
             </div>
+
+            {/* ═══════════════════════════════════════════════════════════
+                COMPLETE & LOCK SECTION (matching handover pattern)
+            ═══════════════════════════════════════════════════════════ */}
+            {isLocked ? (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-3">
+                    <div className="p-2 bg-slate-100 rounded-full">
+                        <ShieldCheck className="text-slate-700" size={24} />
+                    </div>
+                    <div>
+                        <p className="font-semibold text-slate-900">Check-in Evidence Locked</p>
+                        <p className="text-sm text-slate-600">
+                            Photos are sealed with system timestamps and cannot be changed.
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <div className="pt-4">
+                    <button
+                        onClick={() => setShowLockModal(true)}
+                        disabled={!isComplete || locking}
+                        className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${isComplete
+                            ? 'bg-slate-900 text-white hover:bg-slate-800'
+                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            }`}
+                    >
+                        {locking ? (
+                            <Loader2 className="animate-spin" size={24} />
+                        ) : (
+                            <>
+                                <Lock size={20} />
+                                Complete & Lock Check-in
+                            </>
+                        )}
+                    </button>
+                    {!isComplete ? (
+                        <p className="text-sm text-slate-500 text-center mt-2">
+                            Add at least one photo to complete check-in
+                        </p>
+                    ) : (
+                        <p className="text-xs text-slate-500 text-center mt-2">
+                            Seals evidence with immutable timestamps.
+                        </p>
+                    )}
+                </div>
+            )}
         </div >
     )
 }

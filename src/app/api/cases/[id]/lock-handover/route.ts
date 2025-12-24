@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { sendEvidenceLockedEmail } from '@/lib/email'
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -14,7 +15,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         // Verify ownership and current status
         const { data: rentalCase } = await supabase
             .from('cases')
-            .select('user_id, handover_completed_at')
+            .select('user_id, handover_completed_at, label')
             .eq('case_id', caseId)
             .single()
 
@@ -32,7 +33,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
         if (updateError) throw updateError
 
-        // 2. Audit Log
+        // 2. Count handover photos for email
+        const { count: photoCount } = await supabase
+            .from('assets')
+            .select('*', { count: 'exact', head: true })
+            .eq('case_id', caseId)
+            .in('type', ['handover_photo'])
+
+        // 3. Audit Log
         await supabase.from('audit_logs').insert({
             case_id: caseId,
             user_id: user.id,
@@ -42,6 +50,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                 reason: 'user_completed_handover'
             }
         })
+
+        // 4. Send backup confirmation email
+        if (user.email) {
+            await sendEvidenceLockedEmail({
+                to: user.email,
+                rentalLabel: rentalCase.label || 'Your rental',
+                lockType: 'handover',
+                lockTimestamp: now,
+                caseId,
+                photoCount: photoCount || 0
+            })
+        }
 
         return NextResponse.json({ success: true, timestamp: now })
 
