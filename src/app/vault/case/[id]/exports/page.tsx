@@ -106,6 +106,11 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const [videos, setVideos] = useState<VideoAsset[]>([])
     const [downloadingVideo, setDownloadingVideo] = useState<string | null>(null)
 
+    // Document download state (contract PDF, deposit proof)
+    const [contractAsset, setContractAsset] = useState<{ assetId: string; fileName: string; storagePath: string } | null>(null)
+    const [depositAsset, setDepositAsset] = useState<{ assetId: string; fileName: string; storagePath: string; uploadedAt: string } | null>(null)
+    const [downloadingDoc, setDownloadingDoc] = useState<string | null>(null)
+
     useEffect(() => {
         async function load() {
             const { id } = await params
@@ -297,6 +302,34 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                     durationSeconds: v.duration_seconds
                 })))
             }
+
+            // Fetch contract PDF and deposit proof for downloads
+            const { data: docAssets } = await supabase
+                .from('assets')
+                .select('asset_id, type, original_name, storage_path, created_at')
+                .eq('case_id', id)
+                .in('type', ['contract_pdf', 'deposit_proof'])
+
+            if (docAssets) {
+                const contract = docAssets.find(a => a.type === 'contract_pdf')
+                const deposit = docAssets.find(a => a.type === 'deposit_proof')
+
+                if (contract) {
+                    setContractAsset({
+                        assetId: contract.asset_id,
+                        fileName: contract.original_name || 'contract.pdf',
+                        storagePath: contract.storage_path
+                    })
+                }
+                if (deposit) {
+                    setDepositAsset({
+                        assetId: deposit.asset_id,
+                        fileName: deposit.original_name || 'deposit_proof',
+                        storagePath: deposit.storage_path,
+                        uploadedAt: deposit.created_at
+                    })
+                }
+            }
         } catch (err) {
             console.error('Failed to load evidence:', err)
         } finally {
@@ -334,6 +367,31 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             console.error('Video download error:', err)
         } finally {
             setDownloadingVideo(null)
+        }
+    }
+
+    const handleDocDownload = async (type: 'contract' | 'deposit', storagePath: string, fileName: string) => {
+        setDownloadingDoc(type)
+        try {
+            const supabase = createClient()
+            const { data } = await supabase.storage
+                .from('guard-rent')
+                .createSignedUrl(storagePath, 3600)
+
+            if (data?.signedUrl) {
+                // Create download link
+                const link = document.createElement('a')
+                link.href = data.signedUrl
+                link.download = `RentVault_${type === 'contract' ? 'Contract' : 'Deposit_Proof'}_${fileName}`
+                link.style.display = 'none'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+            }
+        } catch (err) {
+            console.error('Document download error:', err)
+        } finally {
+            setDownloadingDoc(null)
         }
     }
 
@@ -796,6 +854,73 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                     )
                 })()}
 
+                {/* Contract PDF Download */}
+                <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${contractAsset ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                            <FileText size={20} />
+                        </div>
+                        <div>
+                            <h3 className="font-medium">Contract PDF</h3>
+                            <p className="text-sm text-slate-500">
+                                {contractAsset ? 'Original contract uploaded' : 'Not uploaded yet'}
+                            </p>
+                        </div>
+                    </div>
+                    {contractAsset ? (
+                        <button
+                            onClick={() => handleDocDownload('contract', contractAsset.storagePath, contractAsset.fileName)}
+                            disabled={downloadingDoc === 'contract'}
+                            className="text-sm text-white bg-slate-900 hover:bg-slate-800 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                        >
+                            {downloadingDoc === 'contract' ? (
+                                <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                                <Download size={16} />
+                            )}
+                            Download contract
+                        </button>
+                    ) : (
+                        <Link href={`/vault/case/${caseId}/contract`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                            Go to contract <ChevronRight size={16} />
+                        </Link>
+                    )}
+                </div>
+
+                {/* Deposit Proof Download */}
+                <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${depositAsset ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                            <FileText size={20} />
+                        </div>
+                        <div>
+                            <h3 className="font-medium">Deposit proof</h3>
+                            <p className="text-sm text-slate-500">
+                                {depositAsset
+                                    ? `Uploaded ${new Date(depositAsset.uploadedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                                    : 'Not uploaded yet'}
+                            </p>
+                        </div>
+                    </div>
+                    {depositAsset ? (
+                        <button
+                            onClick={() => handleDocDownload('deposit', depositAsset.storagePath, depositAsset.fileName)}
+                            disabled={downloadingDoc === 'deposit'}
+                            className="text-sm text-white bg-slate-900 hover:bg-slate-800 px-4 py-2 rounded-lg font-medium w-full flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                        >
+                            {downloadingDoc === 'deposit' ? (
+                                <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                                <Download size={16} />
+                            )}
+                            Download proof
+                        </button>
+                    ) : (
+                        <Link href={`/vault/case/${caseId}/check-in`} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                            Go to check-in <ChevronRight size={16} />
+                        </Link>
+                    )}
+                </div>
 
             </div>
 

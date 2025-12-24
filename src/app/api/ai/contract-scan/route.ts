@@ -160,9 +160,10 @@ export async function POST(request: Request) {
         console.log('Extracting text from PDF...')
 
         let extractedText = ''
+        let contractBuffer: Buffer
         try {
-            const buffer = Buffer.from(fileBase64, 'base64')
-            extractedText = await extractTextFromPDF(buffer)
+            contractBuffer = Buffer.from(fileBase64, 'base64')
+            extractedText = await extractTextFromPDF(contractBuffer)
             console.log('Extracted text length:', extractedText.length)
         } catch (pdfError: any) {
             console.error('PDF extraction error:', pdfError.message)
@@ -303,6 +304,51 @@ export async function POST(request: Request) {
             console.error('No case updated - case_id or RLS issue')
         } else {
             console.log('Analysis saved to case:', savedCase.case_id)
+        }
+
+        // ============================================================
+        // STEP 7: STORE CONTRACT PDF FOR DOWNLOAD
+        // ============================================================
+        try {
+            const storagePath = `${user.id}/${caseId}/contract.pdf`
+
+            // Upload contract PDF to storage
+            const { error: uploadError } = await supabase.storage
+                .from('guard-rent')
+                .upload(storagePath, contractBuffer, {
+                    contentType: 'application/pdf',
+                    upsert: true // Replace if exists (re-scan)
+                })
+
+            if (uploadError) {
+                console.error('Contract storage error:', uploadError.message)
+            } else {
+                // Create or update asset record for contract
+                const { error: assetError } = await supabase
+                    .from('assets')
+                    .upsert({
+                        case_id: caseId,
+                        user_id: user.id,
+                        type: 'contract_pdf',
+                        original_name: fileName || 'contract.pdf',
+                        storage_path: storagePath,
+                        file_size: contractBuffer.length,
+                        mime_type: 'application/pdf',
+                        created_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'case_id,type',
+                        ignoreDuplicates: false
+                    })
+
+                if (assetError) {
+                    console.error('Contract asset record error:', assetError.message)
+                } else {
+                    console.log('Contract PDF saved for download:', storagePath)
+                }
+            }
+        } catch (storageErr: any) {
+            console.error('Contract storage failed:', storageErr.message)
+            // Continue - analysis still worked
         }
 
         // ============================================================
