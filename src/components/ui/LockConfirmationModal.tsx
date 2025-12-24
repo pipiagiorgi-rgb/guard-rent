@@ -117,10 +117,7 @@ export function LockConfirmationModal({
                         {locking ? (
                             <Loader2 className="animate-spin" size={18} />
                         ) : (
-                            <>
-                                <ShieldCheck size={16} />
-                                {getButtonText()}
-                            </>
+                            getButtonText()
                         )}
                     </button>
                 </div>
