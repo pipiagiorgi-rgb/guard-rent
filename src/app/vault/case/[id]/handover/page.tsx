@@ -8,6 +8,7 @@ import {
     X, ImageIcon, Eye, Lock, CheckCircle2
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
+import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 import { isPurchased } from '@/lib/preview-limits'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { WalkthroughVideoUpload } from '@/components/features/WalkthroughVideoUpload'
@@ -68,6 +69,9 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     // Lightbox State
     const [lightboxOpen, setLightboxOpen] = useState(false)
     const [lightboxImages, setLightboxImages] = useState<{ src: string; caption: string; subcaption: string }[]>([])
+
+    // Delete confirmation state
+    const [photoToDelete, setPhotoToDelete] = useState<Asset | null>(null)
 
     // Walkthrough video state
     const [existingVideo, setExistingVideo] = useState<{
@@ -485,7 +489,12 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
     }
 
     const handleDeletePhoto = async (photo: Asset) => {
-        if (!confirm('Delete this photo?')) return
+        // Show confirmation modal instead of browser confirm
+        setPhotoToDelete(photo)
+    }
+
+    const confirmDeletePhoto = async () => {
+        if (!photoToDelete) return
 
         try {
             const supabase = createClient()
@@ -493,19 +502,21 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             // Delete from storage
             await supabase.storage
                 .from('guard-rent')
-                .remove([photo.storage_path])
+                .remove([photoToDelete.storage_path])
 
             // Delete from database
             await supabase
                 .from('assets')
                 .delete()
-                .eq('asset_id', photo.asset_id)
+                .eq('asset_id', photoToDelete.asset_id)
 
             // Reload data
             await loadData(caseId)
         } catch (err) {
             console.error('Failed to delete photo:', err)
             setError('Failed to delete photo')
+        } finally {
+            setPhotoToDelete(null)
         }
     }
 
@@ -629,6 +640,14 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 isOpen={lightboxOpen}
                 onClose={() => setLightboxOpen(false)}
                 images={lightboxImages}
+            />
+
+            <DeleteConfirmationModal
+                isOpen={!!photoToDelete}
+                onClose={() => setPhotoToDelete(null)}
+                onConfirm={confirmDeletePhoto}
+                itemType="photo"
+                context="handover"
             />
 
             <div>

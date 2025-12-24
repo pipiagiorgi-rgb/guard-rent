@@ -44,13 +44,17 @@ export async function POST(request: Request) {
         const buffer = Buffer.from(arrayBuffer)
         const hash = crypto.createHash('sha256').update(buffer).digest('hex')
 
-        // 4. Update Asset Record
+        // 4. Check Hash Integrity
+        const hashMismatch = asset.file_hash && asset.file_hash !== hash
+
+        // 5. Update Asset Record (include integrity_warning if mismatch)
         const { error: updateError } = await supabase
             .from('assets')
             .update({
                 file_hash_server: hash,
                 size_bytes: fileData.size,
-                mime_type: fileData.type
+                mime_type: fileData.type,
+                integrity_warning: hashMismatch || null
             })
             .eq('asset_id', assetId)
 
@@ -59,22 +63,26 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to update asset' }, { status: 500 })
         }
 
-        // 5. Audit Log: Upload Completed
+        // 6. Audit Log: Upload Completed
         await supabase.from('audit_logs').insert({
             case_id: caseId,
             user_id: user.id,
-            action: 'upload_completed',
+            action: hashMismatch ? 'upload_integrity_warning' : 'upload_completed',
             details: {
                 asset_id: assetId,
                 server_hash: hash,
-                client_hash_match: asset.file_hash === hash,
-                size_bytes: fileData.size
+                client_hash: asset.file_hash,
+                client_hash_match: !hashMismatch,
+                size_bytes: fileData.size,
+                integrity_warning: hashMismatch ? 'Hash mismatch between client and server' : null
             }
         })
 
+        // Return with integrity warning if hashes don't match
         return NextResponse.json({
             success: true,
-            verified: asset.file_hash === hash
+            verified: !hashMismatch,
+            integrityWarning: hashMismatch ? 'File integrity could not be verified. The file may have been modified during upload.' : null
         })
 
     } catch (err: any) {
