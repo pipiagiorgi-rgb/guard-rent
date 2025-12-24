@@ -74,6 +74,10 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     // Deposit proof state
     const [depositProof, setDepositProof] = useState<Asset | null>(null)
 
+    // Room deletion state
+    const [roomToDelete, setRoomToDelete] = useState<Room | null>(null)
+    const [deletingRoom, setDeletingRoom] = useState(false)
+
     // Default rooms for new rentals
     const DEFAULT_ROOMS = ['Living Room', 'Kitchen', 'Bathroom', 'Bedroom']
 
@@ -472,6 +476,36 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
         }
     }
 
+    const handleDeleteRoom = (room: Room) => {
+        // If room has photos, show confirmation
+        if (room.photos && room.photos.length > 0) {
+            setRoomToDelete(room)
+        } else {
+            // Empty room - delete immediately
+            confirmDeleteRoom(room)
+        }
+    }
+
+    const confirmDeleteRoom = async (room: Room) => {
+        setDeletingRoom(true)
+        try {
+            // Delete room (cascade deletes assets via FK)
+            const res = await fetch(`/api/rooms/${room.room_id}`, {
+                method: 'DELETE',
+            })
+
+            if (!res.ok) throw new Error('Failed to delete room')
+
+            await loadData(caseId)
+        } catch (err) {
+            console.error('Delete room error:', err)
+            setError('Failed to delete room')
+        } finally {
+            setDeletingRoom(false)
+            setRoomToDelete(null)
+        }
+    }
+
     const handlePhotoUpload = async (roomId: string, e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
         if (!files || files.length === 0) return
@@ -625,6 +659,17 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 type="check-in"
             />
 
+            {/* Room deletion confirmation */}
+            <DeleteConfirmationModal
+                isOpen={!!roomToDelete}
+                onClose={() => setRoomToDelete(null)}
+                onConfirm={async () => { if (roomToDelete) await confirmDeleteRoom(roomToDelete) }}
+                itemType="room"
+                itemName={roomToDelete?.name}
+                context="check-in"
+                customMessage={roomToDelete?.photos?.length ? `This room has ${roomToDelete.photos.length} photo${roomToDelete.photos.length > 1 ? 's' : ''}. Deleting it will permanently remove all photos.` : undefined}
+            />
+
             <div>
                 <h1 className="text-2xl font-bold mb-1">Check-in photos</h1>
                 <p className="text-slate-500">
@@ -748,6 +793,16 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                                         </label>
                                     )
                                 })()}
+                                {/* Delete room button - only when not locked */}
+                                {!isLocked && (
+                                    <button
+                                        onClick={() => handleDeleteRoom(room)}
+                                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Delete room"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                )}
                             </div>
                         </div>
 

@@ -16,8 +16,10 @@ interface DeleteConfirmationModalProps {
     onConfirm: () => Promise<void>
     title?: string
     description?: string
-    itemType?: 'photo' | 'video' | 'file'
+    itemType?: 'photo' | 'video' | 'file' | 'room'
+    itemName?: string
     context?: 'check-in' | 'handover' | 'general'
+    customMessage?: string
 }
 
 export function DeleteConfirmationModal({
@@ -27,17 +29,21 @@ export function DeleteConfirmationModal({
     title,
     description,
     itemType = 'photo',
-    context = 'general'
+    itemName,
+    context = 'general',
+    customMessage
 }: DeleteConfirmationModalProps) {
     const [deleting, setDeleting] = useState(false)
 
     const getTitle = () => {
         if (title) return title
+        if (itemName) return `Delete "${itemName}"?`
         return `Delete ${itemType}?`
     }
 
     const getDescription = () => {
         if (description) return description
+        if (customMessage) return customMessage
 
         const contextText = context === 'check-in'
             ? 'check-in evidence record'
