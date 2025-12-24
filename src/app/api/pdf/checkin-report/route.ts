@@ -428,6 +428,50 @@ export async function POST(request: Request) {
         })
         yPos -= 18
 
+        // Initial Meter Readings (move-in)
+        if (rentalCase.checkin_meter_readings && Object.keys(rentalCase.checkin_meter_readings).length > 0) {
+            yPos -= 20
+            coverPage.drawText('Initial Meter Readings (move-in)', {
+                x: MARGIN,
+                y: yPos,
+                size: 14,
+                font: helveticaBold,
+            })
+            yPos -= 25
+
+            for (const [meter, reading] of Object.entries(rentalCase.checkin_meter_readings)) {
+                if (reading) {
+                    let displayValue: string
+                    if (typeof reading === 'object' && reading !== null) {
+                        const readingObj = reading as Record<string, unknown>
+                        // Skip if no actual value recorded
+                        if (!readingObj.value || String(readingObj.value).trim() === '') {
+                            continue
+                        }
+                        displayValue = String(readingObj.value) + (readingObj.unit ? ` ${readingObj.unit}` : '')
+                    } else if (String(reading).trim() === '') {
+                        continue
+                    } else {
+                        displayValue = String(reading)
+                    }
+
+                    coverPage.drawText(`${meter.charAt(0).toUpperCase() + meter.slice(1)}:`, {
+                        x: MARGIN,
+                        y: yPos,
+                        size: 11,
+                        font: helveticaBold,
+                    })
+                    coverPage.drawText(displayValue, {
+                        x: 150,
+                        y: yPos,
+                        size: 11,
+                        font: helvetica,
+                    })
+                    yPos -= 18
+                }
+            }
+        }
+
         // Custom sections on cover page
         if (Object.keys(customSections).length > 0) {
             yPos = drawCustomSections(coverPage, customSections, yPos, helveticaBold, helvetica)

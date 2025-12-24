@@ -448,7 +448,7 @@ export async function POST(request: Request) {
         // Meter readings if present
         if (rentalCase.meter_readings && Object.keys(rentalCase.meter_readings).length > 0) {
             yPos -= 20
-            coverPage.drawText('Final Meter Readings', {
+            coverPage.drawText('Final Meter Readings (move-out)', {
                 x: MARGIN,
                 y: yPos,
                 size: 14,
