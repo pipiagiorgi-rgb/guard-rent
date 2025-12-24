@@ -44,6 +44,18 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
 
             if (dbError) throw dbError
 
+            // 2. Send email notification to support
+            await fetch('/api/feedback/notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type,
+                    message,
+                    pageUrl: pathname,
+                    userEmail: user?.email
+                })
+            })
+
             setSuccess(true)
 
         } catch (err) {
