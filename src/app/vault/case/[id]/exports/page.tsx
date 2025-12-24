@@ -303,6 +303,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     }
 
     const handleVideoDownload = async (video: VideoAsset) => {
+        // MOBILE FIX: Open window synchronously BEFORE async operations
+        // Mobile browsers block window.open after await
+        const newWindow = window.open('about:blank', '_blank')
+
         setDownloadingVideo(video.assetId)
         try {
             const res = await fetch('/api/assets/download-url', {
@@ -318,16 +322,14 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to get download link')
 
-            // Use anchor element for mobile compatibility (window.open blocked after async)
-            const link = document.createElement('a')
-            link.href = data.signedUrl
-            link.target = '_blank'
-            link.rel = 'noopener noreferrer'
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
+            // Update the pre-opened window's location
+            if (newWindow) {
+                newWindow.location.href = data.signedUrl
+            }
         } catch (err) {
             console.error('Video download error:', err)
+            // Close blank window on error
+            if (newWindow) newWindow.close()
         } finally {
             setDownloadingVideo(null)
         }
@@ -406,6 +408,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     }
 
     const handleGenerate = async (packType: string, forPreview = false) => {
+        // MOBILE FIX: Open window synchronously BEFORE async operations (for non-preview downloads)
+        // Mobile browsers block window.open after await
+        const newWindow = !forPreview ? window.open('about:blank', '_blank') : null
+
         if (forPreview) {
             setPreviewing(packType)
         } else {
@@ -446,14 +452,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 setPreviewType(packType)
                 setPreviewOpen(true)
             } else if (url) {
-                // Use anchor element for mobile compatibility (window.open blocked after async)
-                const link = document.createElement('a')
-                link.href = url
-                link.target = '_blank'
-                link.rel = 'noopener noreferrer'
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
+                // Update the pre-opened window's location
+                if (newWindow) {
+                    newWindow.location.href = url
+                }
 
                 const hasPack = packType === 'checkin_pack' ? hasCheckinPack : hasDepositPack
                 if (hasPack) {
@@ -461,9 +463,12 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 }
             } else {
                 console.error('No URL returned from PDF API')
+                if (newWindow) newWindow.close()
             }
         } catch (err) {
             console.error('Generate error:', err)
+            // Close blank window on error
+            if (newWindow) newWindow.close()
         } finally {
             setGenerating(null)
             setPreviewing(null)
@@ -588,15 +593,9 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         </button>
                                         <button
                                             onClick={() => {
+                                                // URL is already available, no async - window.open works
                                                 if (previewUrl) {
-                                                    // Use anchor for mobile compatibility
-                                                    const link = document.createElement('a')
-                                                    link.href = previewUrl
-                                                    link.target = '_blank'
-                                                    link.rel = 'noopener noreferrer'
-                                                    document.body.appendChild(link)
-                                                    link.click()
-                                                    document.body.removeChild(link)
+                                                    window.open(previewUrl, '_blank')
                                                 }
                                             }}
                                             className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center gap-2"

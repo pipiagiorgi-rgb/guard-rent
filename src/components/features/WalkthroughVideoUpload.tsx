@@ -165,6 +165,10 @@ export function WalkthroughVideoUpload({
     const handlePreview = async () => {
         if (!existingVideo || previewing) return
 
+        // MOBILE FIX: Open window synchronously BEFORE async operations
+        // Mobile browsers block window.open after await
+        const newWindow = window.open('about:blank', '_blank')
+
         setPreviewing(true)
         setError(null)
 
@@ -182,15 +186,11 @@ export function WalkthroughVideoUpload({
             if (!res.ok) throw new Error(data.error || 'Failed to get preview link')
 
             if (data.signedUrl) {
-                console.log('Preview: Opening URL in new tab')
-                // Use anchor element for mobile compatibility (window.open blocked after async)
-                const link = document.createElement('a')
-                link.href = data.signedUrl
-                link.target = '_blank'
-                link.rel = 'noopener noreferrer'
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
+                console.log('Preview: Navigating pre-opened window')
+                // Update the pre-opened window's location
+                if (newWindow) {
+                    newWindow.location.href = data.signedUrl
+                }
             } else {
                 throw new Error('No signed URL returned')
             }
@@ -198,6 +198,8 @@ export function WalkthroughVideoUpload({
         } catch (err: any) {
             console.error('Preview error:', err)
             setError(err.message || 'Preview failed')
+            // Close blank window on error
+            if (newWindow) newWindow.close()
         } finally {
             setPreviewing(false)
         }
