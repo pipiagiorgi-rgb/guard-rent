@@ -169,6 +169,7 @@ export function WalkthroughVideoUpload({
         setError(null)
 
         try {
+            console.log('Preview: Fetching signed URL for video:', existingVideo.assetId)
             const res = await fetch('/api/assets/download-url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -176,12 +177,19 @@ export function WalkthroughVideoUpload({
             })
 
             const data = await res.json()
+            console.log('Preview: API response:', { ok: res.ok, data })
+
             if (!res.ok) throw new Error(data.error || 'Failed to get preview link')
 
-            // Open in new tab for preview
-            window.open(data.signedUrl, '_blank')
+            if (data.signedUrl) {
+                console.log('Preview: Opening URL in new tab')
+                window.open(data.signedUrl, '_blank')
+            } else {
+                throw new Error('No signed URL returned')
+            }
 
         } catch (err: any) {
+            console.error('Preview error:', err)
             setError(err.message || 'Preview failed')
         } finally {
             setPreviewing(false)
