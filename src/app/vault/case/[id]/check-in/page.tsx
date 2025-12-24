@@ -89,9 +89,23 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 .eq('case_id', id)
                 .single()
 
-            // Check if user has purchased a pack
+            // Check if user has purchased a pack (or is admin)
             if (caseData) {
-                setHasPack(isPurchased(caseData.purchase_type))
+                try {
+                    const statusRes = await fetch(`/api/exports/status?caseId=${id}`)
+                    if (statusRes.ok) {
+                        const status = await statusRes.json()
+                        // Admin or has any pack unlocks check-in features
+                        const hasAccess = status.isAdmin || status.purchasedPacks?.length > 0
+                        setHasPack(hasAccess)
+                    } else {
+                        // Fallback to purchase_type column
+                        setHasPack(isPurchased(caseData.purchase_type))
+                    }
+                } catch {
+                    // Fallback to purchase_type column
+                    setHasPack(isPurchased(caseData.purchase_type))
+                }
                 setIsLocked(!!caseData.checkin_completed_at)
             }
 

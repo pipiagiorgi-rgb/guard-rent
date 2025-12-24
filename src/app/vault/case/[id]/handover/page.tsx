@@ -98,9 +98,27 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 .eq('case_id', id)
                 .single()
 
+
             if (caseData) {
-                // Check if user has purchased a pack
-                setHasPack(isPurchased(caseData.purchase_type))
+                // Check if user has purchased a pack (or is admin)
+                try {
+                    const statusRes = await fetch(`/api/exports/status?caseId=${id}`)
+                    if (statusRes.ok) {
+                        const status = await statusRes.json()
+                        // Admin or has deposit_pack or bundle_pack unlocks handover
+                        const hasHandoverAccess = status.isAdmin ||
+                            status.purchasedPacks?.includes('deposit_pack') ||
+                            status.purchasedPacks?.includes('bundle_pack')
+                        setHasPack(hasHandoverAccess)
+                    } else {
+                        // Fallback to purchase_type column
+                        setHasPack(caseData.purchase_type === 'bundle' || caseData.purchase_type === 'moveout')
+                    }
+                } catch {
+                    // Fallback to purchase_type column
+                    setHasPack(caseData.purchase_type === 'bundle' || caseData.purchase_type === 'moveout')
+                }
+
                 // Parse legacy string data for meters
                 const rawMeters = caseData.meter_readings || {}
                 const normalizedMeters: HandoverState['meterReadings'] = {}
