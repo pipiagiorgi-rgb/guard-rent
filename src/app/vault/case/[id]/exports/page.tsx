@@ -303,10 +303,6 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     }
 
     const handleVideoDownload = async (video: VideoAsset) => {
-        // MOBILE FIX: Open window synchronously BEFORE async operations
-        // Mobile browsers block window.open after await
-        const newWindow = window.open('about:blank', '_blank')
-
         setDownloadingVideo(video.assetId)
         try {
             const res = await fetch('/api/assets/download-url', {
@@ -322,18 +318,18 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to get download link')
 
-            // Update the pre-opened window's location
-            if (newWindow) {
-                newWindow.location.href = data.signedUrl
-                // Auto-close blank tab after download initiates (gives time for download prompt)
-                setTimeout(() => {
-                    try { newWindow.close() } catch (e) { /* cross-origin, ignore */ }
-                }, 1500)
-            }
+            // Use hidden iframe for download (no visible tab)
+            const iframe = document.createElement('iframe')
+            iframe.style.display = 'none'
+            iframe.src = data.signedUrl
+            document.body.appendChild(iframe)
+
+            // Clean up iframe after download starts
+            setTimeout(() => {
+                document.body.removeChild(iframe)
+            }, 5000)
         } catch (err) {
             console.error('Video download error:', err)
-            // Close blank window on error
-            if (newWindow) newWindow.close()
         } finally {
             setDownloadingVideo(null)
         }
@@ -412,10 +408,6 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     }
 
     const handleGenerate = async (packType: string, forPreview = false) => {
-        // MOBILE FIX: Open window synchronously BEFORE async operations (for non-preview downloads)
-        // Mobile browsers block window.open after await
-        const newWindow = !forPreview ? window.open('about:blank', '_blank') : null
-
         if (forPreview) {
             setPreviewing(packType)
         } else {
@@ -455,17 +447,17 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 setPreviewUrl(url)
                 setPreviewType(packType)
                 setPreviewOpen(true)
-                // Close the blank window since we're showing modal instead
-                if (newWindow) newWindow.close()
             } else if (url) {
-                // Update the pre-opened window's location
-                if (newWindow) {
-                    newWindow.location.href = url
-                    // Auto-close blank tab after download initiates
-                    setTimeout(() => {
-                        try { newWindow.close() } catch (e) { /* cross-origin, ignore */ }
-                    }, 1500)
-                }
+                // Use hidden iframe for download (no visible tab on mobile)
+                const iframe = document.createElement('iframe')
+                iframe.style.display = 'none'
+                iframe.src = url
+                document.body.appendChild(iframe)
+
+                // Clean up iframe after download starts
+                setTimeout(() => {
+                    document.body.removeChild(iframe)
+                }, 5000)
 
                 const hasPack = packType === 'checkin_pack' ? hasCheckinPack : hasDepositPack
                 if (hasPack) {
@@ -473,12 +465,9 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 }
             } else {
                 console.error('No URL returned from PDF API')
-                if (newWindow) newWindow.close()
             }
         } catch (err) {
             console.error('Generate error:', err)
-            // Close blank window on error
-            if (newWindow) newWindow.close()
         } finally {
             setGenerating(null)
             setPreviewing(null)
