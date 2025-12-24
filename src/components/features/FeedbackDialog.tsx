@@ -7,8 +7,7 @@ import {
     DialogDescription, DialogFooter
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Loader2, Send, MessageSquarePlus, Bug, Lightbulb } from 'lucide-react'
-import { toast } from 'sonner'
+import { Loader2, Send, MessageSquarePlus, Bug, Lightbulb, Check } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
 interface FeedbackDialogProps {
@@ -17,23 +16,25 @@ interface FeedbackDialogProps {
 }
 
 export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
-    const [type, setType] = useState<'bug' | 'feature' | 'general'>('general')
+    const [type, setType] = useState<'bug' | 'feature' | 'general'>('bug')
     const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     const pathname = usePathname()
 
     const handleSubmit = async () => {
         if (!message.trim()) return
 
         setLoading(true)
+        setError(null)
         const supabase = createClient()
 
         try {
             const { data: { user } } = await supabase.auth.getUser()
 
             // 1. Save to database
-            const { error } = await supabase.from('feedback').insert({
+            const { error: dbError } = await supabase.from('feedback').insert({
                 user_id: user?.id,
                 type,
                 message,
@@ -41,28 +42,27 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
                 user_agent: navigator.userAgent
             })
 
-            if (error) throw error
+            if (dbError) throw dbError
 
             setSuccess(true)
-            toast.success('Feedback sent! Thank you for helping us improve.')
-
-            // Close after delay
-            setTimeout(() => {
-                onOpenChange(false)
-                // Reset form
-                setTimeout(() => {
-                    setSuccess(false)
-                    setMessage('')
-                    setType('general')
-                }, 300)
-            }, 1500)
 
         } catch (err) {
             console.error('Feedback error:', err)
-            toast.error('Failed to send feedback. Please try again.')
+            setError('Something went wrong. Please try again.')
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleClose = () => {
+        onOpenChange(false)
+        // Reset form after modal animation
+        setTimeout(() => {
+            setSuccess(false)
+            setMessage('')
+            setType('bug')
+            setError(null)
+        }, 300)
     }
 
     return (
@@ -108,6 +108,10 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
                                 }
                                 className="min-h-[120px] p-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none text-sm"
                             />
+
+                            {error && (
+                                <p className="text-sm text-red-600">{error}</p>
+                            )}
                         </div>
 
                         <DialogFooter>
@@ -126,12 +130,21 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
                         </DialogFooter>
                     </>
                 ) : (
-                    <div className="py-12 flex flex-col items-center justify-center text-center">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                            <Send className="w-6 h-6 text-green-600" />
+                    <div className="py-8 flex flex-col items-center justify-center text-center">
+                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                            <Check className="w-5 h-5 text-slate-600" />
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900 mb-1">Thank you!</h3>
-                        <p className="text-slate-500">Your feedback has been received.</p>
+                        <h3 className="text-base font-semibold text-slate-900 mb-2">Thank you for the feedback</h3>
+                        <p className="text-sm text-slate-500 mb-6 max-w-[280px]">
+                            Thanks for taking the time to share this. We review every message and use it to improve RentVault.
+                        </p>
+                        <Button
+                            onClick={handleClose}
+                            variant="outline"
+                            className="px-6"
+                        >
+                            Close
+                        </Button>
                     </div>
                 )}
             </DialogContent>
