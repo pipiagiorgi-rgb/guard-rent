@@ -85,6 +85,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             assetId,
+            storagePath,
             signedUrl: signedUrlData.signedUrl,
             path: signedUrlData.path, // token included
             publicUrl: null // Private bucket

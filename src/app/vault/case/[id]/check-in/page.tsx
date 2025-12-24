@@ -575,7 +575,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 })
 
                 if (!res.ok) throw new Error('Failed to get upload URL')
-                const { signedUrl, assetId } = await res.json()
+                const { signedUrl, assetId, storagePath } = await res.json()
 
                 const uploadRes = await fetch(signedUrl, {
                     method: 'PUT',
@@ -594,9 +594,24 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 if (!hasPack) {
                     recordPreviewPhoto(caseId)
                 }
-            }
 
-            await loadData(caseId)
+                // Optimistic update: add photo to local state
+                const previewUrl = URL.createObjectURL(file)
+                setRooms(prev => prev.map(room =>
+                    room.room_id === roomId
+                        ? {
+                            ...room,
+                            checkin_photos: room.checkin_photos + 1,
+                            photos: [...room.photos, {
+                                asset_id: assetId,
+                                storage_path: storagePath || '',
+                                created_at: new Date().toISOString(),
+                                signedUrl: previewUrl
+                            }]
+                        }
+                        : room
+                ))
+            }
         } catch (err: any) {
             console.error('Upload error:', err)
             setError('Failed to upload photo. Please try again.')
@@ -636,27 +651,37 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     const confirmDeletePhoto = async () => {
         if (!photoToDelete) return
 
+        const deletedPhoto = photoToDelete
+        setPhotoToDelete(null)
+
+        // Optimistic update: remove photo from local state immediately
+        setRooms(prev => prev.map(room => ({
+            ...room,
+            photos: room.photos.filter(p => p.asset_id !== deletedPhoto.asset_id),
+            checkin_photos: room.photos.some(p => p.asset_id === deletedPhoto.asset_id)
+                ? room.checkin_photos - 1
+                : room.checkin_photos
+        })))
+
         try {
             const supabase = createClient()
 
             // Delete from storage
             await supabase.storage
                 .from('guard-rent')
-                .remove([photoToDelete.storage_path])
+                .remove([deletedPhoto.storage_path])
 
             // Delete from database
             await supabase
                 .from('assets')
                 .delete()
-                .eq('asset_id', photoToDelete.asset_id)
+                .eq('asset_id', deletedPhoto.asset_id)
 
-            // Reload data
-            await loadData(caseId)
         } catch (err) {
             console.error('Failed to delete photo:', err)
             setError('Failed to delete photo')
-        } finally {
-            setPhotoToDelete(null)
+            // Reload to restore state if delete failed
+            await loadData(caseId)
         }
     }
 
