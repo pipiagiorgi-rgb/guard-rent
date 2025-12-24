@@ -299,17 +299,17 @@ export default function Home() {
                             <span className="text-sm font-medium text-slate-500 uppercase tracking-wide">Guides for tenants</span>
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-sm">
-                            <Link href="/guides/move-in-photos" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
-                                Why move-in photos matter
+                            <Link href="/blog/move-in-photo-checklist" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
+                                Move-in photo checklist
                             </Link>
-                            <Link href="/guides/notice-periods" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
-                                Understanding notice periods
+                            <Link href="/blog/rental-notice-period-mistakes" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
+                                Notice period mistakes
                             </Link>
-                            <Link href="/guides/renting-abroad" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
-                                Renting abroad: what to watch for
+                            <Link href="/blog/landlord-refuses-deposit-return" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
+                                When landlord won't return deposit
                             </Link>
-                            <Link href="/guides/deposit-protection" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
-                                How to protect your deposit
+                            <Link href="/blog/protect-deposit-before-moving-in" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
+                                5 things before moving in
                             </Link>
                         </div>
                     </div>

@@ -29,8 +29,6 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
 
     // Don't show navbar on app routes (they have their own layout)
     if (pathname?.startsWith('/vault')) return null;
-    // Don't show navbar on guides pages (they have their own custom header)
-    if (pathname?.startsWith('/guides')) return null;
     // Don't show navbar on login page
     if (pathname === '/login') return null;
 
@@ -62,7 +60,7 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
                                 href="/blog"
                                 className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors leading-none"
                             >
-                                Blog
+                                Guides
                             </Link>
 
                             {isLoggedIn ? (
@@ -176,22 +174,12 @@ export default function NavbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
 
                                 {/* Guides link */}
                                 <Link
-                                    href="/guides"
+                                    href="/blog"
                                     onClick={handleNavClick}
                                     className="flex items-center gap-3 py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
                                 >
                                     <BookOpen size={20} className="text-slate-400" />
                                     Guides
-                                </Link>
-
-                                {/* Blog link */}
-                                <Link
-                                    href="/blog"
-                                    onClick={handleNavClick}
-                                    className="flex items-center gap-3 py-4 text-lg font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 -mx-3 px-3 rounded-lg transition-colors"
-                                >
-                                    <FileText size={20} className="text-slate-400" />
-                                    Blog
                                 </Link>
                             </nav>
                         </div>
