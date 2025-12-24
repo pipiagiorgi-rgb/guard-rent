@@ -4,6 +4,7 @@ import { Plus, ChevronRight } from 'lucide-react'
 import { formatCountryWithCode } from '@/lib/countries'
 import { UnpaidRentalBanner } from '@/components/upgrade/UnpaidRentalBanner'
 import { Footer } from '@/components/layout/Footer'
+import { isAdminEmail } from '@/lib/admin'
 
 // Helper to format country for display (handles custom countries)
 function formatCountry(code: string | null): string {
@@ -19,6 +20,11 @@ function formatCountry(code: string | null): string {
 
 export default async function MyRentalsPage() {
     const supabase = await createClient()
+
+    // Get current user for admin check
+    const { data: { user } } = await supabase.auth.getUser()
+    const isAdmin = isAdminEmail(user?.email)
+
     const { data: rentals } = await supabase
         .from('cases')
         .select('*')
@@ -51,8 +57,8 @@ export default async function MyRentalsPage() {
                     )}
                 </div>
 
-                {/* Unpaid Rentals Banner */}
-                <UnpaidRentalBanner unpaidRentals={unpaidRentals} />
+                {/* Unpaid Rentals Banner - hidden for admins */}
+                <UnpaidRentalBanner unpaidRentals={unpaidRentals} isAdmin={isAdmin} />
 
                 {/* Rentals List */}
                 {!rentals || rentals.length === 0 ? (

@@ -8,9 +8,15 @@ interface UnpaidRentalBannerProps {
         case_id: string
         label: string
     }>
+    isAdmin?: boolean
 }
 
-export function UnpaidRentalBanner({ unpaidRentals }: UnpaidRentalBannerProps) {
+export function UnpaidRentalBanner({ unpaidRentals, isAdmin = false }: UnpaidRentalBannerProps) {
+    // Admin users have full access - don't show unlock prompt
+    if (isAdmin) {
+        return null
+    }
+
     if (unpaidRentals.length === 0) {
         return null
     }
