@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Shield } from 'lucide-react'
+import { Shield, CheckCircle, ArrowRight } from 'lucide-react'
 
 interface UpgradeBannerProps {
     caseId: string
@@ -10,11 +10,6 @@ interface UpgradeBannerProps {
 
 export function UpgradeBanner({ caseId, currentPack }: UpgradeBannerProps) {
     const [loading, setLoading] = useState<string | null>(null)
-
-    // Don't show if already has a pack
-    if (currentPack) {
-        return null
-    }
 
     const handlePurchase = async (packType: 'checkin' | 'bundle' | 'moveout') => {
         setLoading(packType)
@@ -38,6 +33,88 @@ export function UpgradeBanner({ caseId, currentPack }: UpgradeBannerProps) {
         }
     }
 
+    // CASE 1: Full Bundle purchased - Show "Full Access" success banner
+    if (currentPack === 'bundle') {
+        return (
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0">
+                        <CheckCircle size={20} />
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-green-900">Full Access</h3>
+                        <p className="text-sm text-green-700">
+                            You have unlimited access to all features for this rental.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // CASE 2: Check-In pack purchased - Upsell Move-Out pack
+    if (currentPack === 'checkin') {
+        return (
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 mb-6">
+                <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
+                        <Shield size={20} />
+                    </div>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Check-In Pack Active</span>
+                        </div>
+                        <h3 className="font-semibold text-slate-900 mb-1">Complete your protection</h3>
+                        <p className="text-sm text-slate-600 mb-3">
+                            Add move-out evidence collection and deposit recovery tools.
+                        </p>
+                        <button
+                            onClick={() => handlePurchase('moveout')}
+                            disabled={loading === 'moveout'}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                        >
+                            {loading === 'moveout' ? 'Loading...' : (
+                                <>Add Move-Out Pack €29 <ArrowRight size={16} /></>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // CASE 3: Move-Out pack purchased - Upsell Check-In pack
+    if (currentPack === 'moveout') {
+        return (
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 mb-6">
+                <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
+                        <Shield size={20} />
+                    </div>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Move-Out Pack Active</span>
+                        </div>
+                        <h3 className="font-semibold text-slate-900 mb-1">Document your move-in too</h3>
+                        <p className="text-sm text-slate-600 mb-3">
+                            Add check-in evidence with contract analysis and room photos.
+                        </p>
+                        <button
+                            onClick={() => handlePurchase('checkin')}
+                            disabled={loading === 'checkin'}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                        >
+                            {loading === 'checkin' ? 'Loading...' : (
+                                <>Add Check-In Pack €19 <ArrowRight size={16} /></>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // CASE 4: No pack (Free/Preview) - Show all options
     return (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
             <div className="flex items-start gap-4">
