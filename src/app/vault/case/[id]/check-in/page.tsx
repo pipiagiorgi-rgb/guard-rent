@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Camera, Plus, Check, Loader2, Upload, Trash2, AlertCircle, Gauge, ChevronDown, ChevronUp, X, ImageIcon, Eye, Lock, ShieldCheck } from 'lucide-react'
+import { Camera, Plus, Check, Loader2, Upload, Trash2, AlertCircle, Gauge, ChevronDown, ChevronUp, X, ImageIcon, Eye, Lock, ShieldCheck, FileText } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 import { LockConfirmationModal } from '@/components/ui/LockConfirmationModal'
@@ -70,6 +70,9 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
         uploadedAt: string
         fileHash?: string
     } | undefined>(undefined)
+
+    // Deposit proof state
+    const [depositProof, setDepositProof] = useState<Asset | null>(null)
 
     // Default rooms for new rentals
     const DEFAULT_ROOMS = ['Living Room', 'Kitchen', 'Bathroom', 'Bedroom']
@@ -146,8 +149,13 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 .from('assets')
                 .select('*')
                 .eq('case_id', id)
-                .in('type', ['checkin_photo', 'photo'])
+                .in('type', ['checkin_photo', 'photo', 'deposit_proof'])
                 .order('created_at', { ascending: false })
+
+            // Separate deposit proof from room photos
+            const depositProofAsset = assets?.find(a => a.type === 'deposit_proof') || null
+            setDepositProof(depositProofAsset)
+            const roomAssets = assets?.filter(a => a.type !== 'deposit_proof') || []
 
             // Generate signed URLs for ALL photos
             let signedMap = new Map<string, string>()
@@ -416,6 +424,54 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
         await handleSaveMeters(updated)
     }
 
+    const handleDepositUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files
+        if (!files || files.length === 0) return
+        const file = files[0]
+        setUploading('deposit')
+        setError(null)
+
+        try {
+            const res = await fetch('/api/assets/upload-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    caseId,
+                    filename: file.name,
+                    mimeType: file.type,
+                    type: 'deposit_proof',
+                })
+            })
+
+            if (!res.ok) throw new Error('Failed to get upload URL')
+            const { signedUrl, assetId } = await res.json()
+
+            const uploadRes = await fetch(signedUrl, {
+                method: 'PUT',
+                body: file,
+                headers: { 'Content-Type': file.type }
+            })
+
+            if (!uploadRes.ok) throw new Error('Upload failed')
+
+            // Verify
+            await fetch('/api/assets/confirm-upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assetId, caseId })
+            })
+
+            await loadData(caseId)
+
+        } catch (err: any) {
+            console.error('Deposit upload error:', err)
+            setError('Failed to upload proof of deposit')
+        } finally {
+            setUploading(null)
+            e.target.value = ''
+        }
+    }
+
     const handlePhotoUpload = async (roomId: string, e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
         if (!files || files.length === 0) return
@@ -606,6 +662,54 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 </div>
             )}
 
+            {/* ═══════════════════════════════════════════════════════════
+                DEPOSIT PROOF SECTION
+            ═══════════════════════════════════════════════════════════ */}
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${depositProof ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                            <FileText size={16} />
+                        </div>
+                        <div>
+                            <h2 className="font-medium">Deposit payment proof</h2>
+                            <p className="text-sm text-slate-500">
+                                {depositProof
+                                    ? `Uploaded ${new Date(depositProof.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                                    : 'Upload proof of deposit payment (bank transfer, receipt)'}
+                            </p>
+                        </div>
+                    </div>
+                    {isLocked ? (
+                        depositProof ? (
+                            <span className="text-sm text-green-600 font-medium">✓ Recorded</span>
+                        ) : (
+                            <span className="text-sm text-slate-400">Not uploaded</span>
+                        )
+                    ) : depositProof ? (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setPhotoToDelete(depositProof)}
+                                className="text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 px-3 py-1 rounded-md"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    ) : (
+                        <label className={`px-4 py-2 bg-white border border-slate-200 rounded-lg font-medium cursor-pointer hover:bg-slate-50 flex items-center gap-2 ${uploading === 'deposit' ? 'opacity-50' : ''}`}>
+                            <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={handleDepositUpload}
+                                disabled={!!uploading}
+                                className="hidden"
+                            />
+                            {uploading === 'deposit' ? <Loader2 size={16} className="animate-spin" /> : 'Upload'}
+                        </label>
+                    )}
+                </div>
+            </div>
+
             {/* ROOM PHOTOs */}
             <div className="space-y-4">
                 {rooms.map(room => (
@@ -661,7 +765,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                                                     className="w-full h-full"
                                                 >
                                                     {photo.signedUrl ? (
-                                                        <img src={photo.signedUrl} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                                                        <img src={photo.signedUrl} alt={`Photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <div className="w-full h-full bg-slate-100 flex items-center justify-center text-xs text-slate-400">
                                                             Photo {i + 1}

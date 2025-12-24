@@ -921,7 +921,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                                             <div className="relative group">
                                                 <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
                                                     {data.photo_url ? (
-                                                        <img src={data.photo_url} alt={meter} className="w-full h-full object-cover" />
+                                                        <img src={data.photo_url} alt={meter} loading="lazy" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <Check size={16} className="text-green-600" />
                                                     )}
