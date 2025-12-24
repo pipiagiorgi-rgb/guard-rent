@@ -219,6 +219,53 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
         await loadData(id)
     }
 
+    const getNextRoomName = (baseName: string): string => {
+        // Find all rooms with similar names
+        const sameTypeRooms = rooms.filter(r =>
+            r.name === baseName || r.name.startsWith(`${baseName} `)
+        )
+
+        if (sameTypeRooms.length === 0) {
+            return baseName
+        }
+
+        // Find the highest number
+        let maxNum = 1
+        sameTypeRooms.forEach(r => {
+            if (r.name === baseName) {
+                maxNum = Math.max(maxNum, 1)
+            } else {
+                const match = r.name.match(new RegExp(`^${baseName} (\\d+)$`))
+                if (match) {
+                    maxNum = Math.max(maxNum, parseInt(match[1]))
+                }
+            }
+        })
+
+        return `${baseName} ${maxNum + 1}`
+    }
+
+    const handleQuickAddRoom = async (baseName: string) => {
+        if (isLocked) return
+        const roomName = getNextRoomName(baseName)
+
+        try {
+            const supabase = createClient()
+            const { error } = await supabase
+                .from('rooms')
+                .insert({
+                    case_id: caseId,
+                    name: roomName,
+                    room_type: baseName.toLowerCase().replace(' ', '_')
+                })
+
+            if (error) throw error
+            await loadData(caseId)
+        } catch (err) {
+            console.error('Failed to add room:', err)
+        }
+    }
+
     const handleAddRoom = async () => {
         if (!newRoomName.trim()) return
         setAddingRoom(true)
@@ -656,8 +703,14 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                                     </div>
                                 </div>
                             ) : (
-                                <div className="py-8 text-center border-2 border-dashed border-slate-100 rounded-xl">
-                                    <p className="text-slate-400 text-sm">No photos added yet</p>
+                                <div className="py-6 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Camera size={24} className="text-slate-300" />
+                                        <p className="text-slate-500 text-sm font-medium">Document this room&apos;s condition</p>
+                                        <p className="text-slate-400 text-xs max-w-[200px]">
+                                            Photos create timestamped proof for deposit disputes
+                                        </p>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -665,25 +718,50 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 ))}
 
                 {/* Add room card */}
-                <div className="bg-white rounded-xl border-2 border-dashed border-slate-200 p-6 flex flex-col items-center justify-center min-h-[100px]">
-                    {addingRoom ? (
-                        <div className="w-full max-w-md flex gap-2">
-                            <input
-                                type="text"
-                                value={newRoomName}
-                                onChange={(e) => setNewRoomName(e.target.value)}
-                                placeholder="Room name"
-                                className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                                autoFocus
-                            />
-                            <button onClick={handleAddRoom} disabled={!newRoomName.trim()} className="px-4 py-2 bg-slate-900 text-white rounded-lg font-medium">Add</button>
-                            <button onClick={() => setAddingRoom(false)} className="px-4 py-2 text-slate-600">Cancel</button>
+                <div className="bg-white rounded-xl border-2 border-dashed border-slate-200 p-6">
+                    {isLocked ? (
+                        <p className="text-center text-slate-400 text-sm">Check-in is locked</p>
+                    ) : addingRoom ? (
+                        <div className="flex flex-col items-center gap-3">
+                            <p className="text-sm text-slate-500">Enter custom room name</p>
+                            <div className="w-full max-w-md flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newRoomName}
+                                    onChange={(e) => setNewRoomName(e.target.value)}
+                                    placeholder="e.g. Laundry, Garage, Balcony"
+                                    className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                                    autoFocus
+                                    onKeyDown={(e) => e.key === 'Enter' && handleAddRoom()}
+                                />
+                                <button onClick={handleAddRoom} disabled={!newRoomName.trim()} className="px-4 py-2 bg-slate-900 text-white rounded-lg font-medium disabled:opacity-50">Add</button>
+                                <button onClick={() => setAddingRoom(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+                            </div>
                         </div>
                     ) : (
-                        <button onClick={() => setAddingRoom(true)} disabled={isLocked} className={`flex items-center gap-2 text-slate-500 hover:text-slate-700 ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                            <Plus size={20} />
-                            <span className="font-medium">Add another room</span>
-                        </button>
+                        <div className="flex flex-col items-center gap-4">
+                            <p className="text-sm text-slate-500">Add more rooms to document</p>
+                            <div className="flex flex-wrap justify-center gap-2">
+                                <button
+                                    onClick={() => handleQuickAddRoom('Bedroom')}
+                                    className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Bedroom
+                                </button>
+                                <button
+                                    onClick={() => handleQuickAddRoom('Bathroom')}
+                                    className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Bathroom
+                                </button>
+                                <button
+                                    onClick={() => setAddingRoom(true)}
+                                    className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Other room
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>

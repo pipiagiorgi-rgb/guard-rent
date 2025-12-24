@@ -16,6 +16,7 @@ interface Room {
     room_id: string
     name: string
     handover_photos: number
+    checkin_photos: number
     photos: Asset[]
 }
 
@@ -161,11 +162,20 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 const dp = assets?.find(a => a.type === 'deposit_proof') || null
                 setDepositProof(dp)
 
+                // Also fetch check-in photos to show count for before/after comparison
+                const { data: checkinAssets } = await supabase
+                    .from('assets')
+                    .select('room_id')
+                    .eq('case_id', id)
+                    .eq('type', 'photo')
+
                 const roomsWithPhotos = roomsData.map(room => {
                     const roomAssets = assets?.filter(a => a.room_id === room.room_id && a.type === 'handover_photo') || []
+                    const checkinCount = checkinAssets?.filter(a => a.room_id === room.room_id).length || 0
                     return {
                         ...room,
                         handover_photos: roomAssets.length,
+                        checkin_photos: checkinCount,
                         photos: roomAssets
                     }
                 })
@@ -701,6 +711,11 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         <span className="font-medium">{room.name}</span>
+                                        {room.checkin_photos > 0 && (
+                                            <span className="text-xs text-slate-400 bg-slate-200 px-2 py-0.5 rounded">
+                                                {room.checkin_photos} check-in
+                                            </span>
+                                        )}
                                         {room.handover_photos > 0 && (
                                             <span className="text-sm text-green-600 flex items-center gap-1">
                                                 <Check size={14} /> {room.handover_photos}
@@ -726,6 +741,19 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                                         )}
                                     </label>
                                 </div>
+
+                                {/* Before/after prompt if check-in has photos but handover doesn't */}
+                                {room.photos.length === 0 && room.checkin_photos > 0 && (
+                                    <div className="py-4 text-center border-2 border-dashed border-blue-100 rounded-xl bg-blue-50/50 mb-3">
+                                        <div className="flex flex-col items-center gap-1">
+                                            <Camera size={20} className="text-blue-300" />
+                                            <p className="text-blue-600 text-sm font-medium">Add move-out photos</p>
+                                            <p className="text-blue-400 text-xs">
+                                                Compare with your {room.checkin_photos} check-in photo{room.checkin_photos > 1 ? 's' : ''}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Thumbnails */}
                                 {room.photos.length > 0 && (
