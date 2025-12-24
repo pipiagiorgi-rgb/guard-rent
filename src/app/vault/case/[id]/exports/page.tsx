@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { PhotoComparison } from '@/components/features/PhotoComparison'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { Footer } from '@/components/layout/Footer'
+import { isAdminEmail } from '@/lib/admin'
 
 interface Issue {
     issue_id: string
@@ -120,6 +121,9 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
     // Issues state
     const [issues, setIssues] = useState<Issue[]>([])
+
+    // Admin state
+    const [isAdmin, setIsAdmin] = useState(false)
 
     useEffect(() => {
         async function load() {
@@ -233,6 +237,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         setLoading(true)
         try {
             const supabase = createClient()
+
+            // Check if user is admin
+            const { data: { user } } = await supabase.auth.getUser()
+            setIsAdmin(isAdminEmail(user?.email))
 
             // Fetch case data
             const { data: caseData } = await supabase
@@ -761,6 +769,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             <UpgradeBanner
                 caseId={caseId}
                 currentPack={evidence.purchasedPacks.length > 0 ? evidence.purchasedPacks[0] : null}
+                isAdmin={isAdmin}
             />
 
             {/* Email me a copy panel - shows after PDF generation for paid packs */}
