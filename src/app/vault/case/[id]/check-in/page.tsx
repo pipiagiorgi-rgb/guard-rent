@@ -123,20 +123,6 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 setIsLocked(!!caseData.checkin_completed_at)
             }
 
-            if (caseData?.checkin_meter_readings) {
-                const raw = caseData.checkin_meter_readings
-                const normalized: MeterReadings = {}
-                const normalize = (val: any): MeterReading | undefined => {
-                    if (!val) return undefined
-                    if (typeof val === 'string') return { value: val }
-                    return val as MeterReading
-                }
-                if (raw.electricity) normalized.electricity = normalize(raw.electricity)
-                if (raw.gas) normalized.gas = normalize(raw.gas)
-                if (raw.water) normalized.water = normalize(raw.water)
-                setMeterReadings(normalized)
-            }
-
             // Fetch rooms
             const { data: roomsData } = await supabase
                 .from('rooms')
@@ -149,20 +135,21 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 return
             }
 
-            // Fetch assets for all rooms
+            // Fetch assets for all rooms (including meter photos)
             const { data: assets } = await supabase
                 .from('assets')
                 .select('*')
                 .eq('case_id', id)
-                .in('type', ['checkin_photo', 'photo', 'deposit_proof'])
+                .in('type', ['checkin_photo', 'photo', 'deposit_proof', 'meter_photo'])
                 .order('created_at', { ascending: false })
 
             // Separate deposit proof from room photos
             const depositProofAsset = assets?.find(a => a.type === 'deposit_proof') || null
             setDepositProof(depositProofAsset)
-            const roomAssets = assets?.filter(a => a.type !== 'deposit_proof') || []
+            const roomAssets = assets?.filter(a => a.type !== 'deposit_proof' && a.type !== 'meter_photo') || []
+            const meterPhotoAssets = assets?.filter(a => a.type === 'meter_photo') || []
 
-            // Generate signed URLs for ALL photos
+            // Generate signed URLs for ALL photos (including meter photos)
             let signedMap = new Map<string, string>()
             if (assets && assets.length > 0) {
                 const paths = assets.map(a => a.storage_path)
@@ -177,6 +164,31 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                         }
                     })
                 }
+            }
+
+            // Update meter readings with signed URLs
+            if (caseData?.checkin_meter_readings) {
+                const raw = caseData.checkin_meter_readings
+                const updatedMeterReadings: MeterReadings = {}
+
+                const processReading = (key: keyof MeterReadings, val: any): MeterReading | undefined => {
+                    if (!val) return undefined
+                    if (typeof val === 'string') return { value: val }
+                    const reading = val as MeterReading
+                    // Find the meter photo asset and get its signed URL
+                    if (reading.asset_id) {
+                        const meterAsset = meterPhotoAssets.find(a => a.asset_id === reading.asset_id)
+                        if (meterAsset) {
+                            reading.photo_url = signedMap.get(meterAsset.storage_path) || undefined
+                        }
+                    }
+                    return reading
+                }
+
+                if (raw.electricity) updatedMeterReadings.electricity = processReading('electricity', raw.electricity)
+                if (raw.gas) updatedMeterReadings.gas = processReading('gas', raw.gas)
+                if (raw.water) updatedMeterReadings.water = processReading('water', raw.water)
+                setMeterReadings(updatedMeterReadings)
             }
 
             // Map photos to rooms with signed URLs

@@ -128,28 +128,6 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     // Fallback to purchase_type column
                     setHasPack(caseData.purchase_type === 'bundle' || caseData.purchase_type === 'moveout')
                 }
-
-                // Parse legacy string data for meters
-                const rawMeters = caseData.meter_readings || {}
-                const normalizedMeters: HandoverState['meterReadings'] = {}
-
-                const normalize = (val: any): MeterReading | undefined => {
-                    if (!val) return undefined
-                    if (typeof val === 'string') return { value: val }
-                    return val as MeterReading
-                }
-
-                if (rawMeters.electricity) normalizedMeters.electricity = normalize(rawMeters.electricity)
-                if (rawMeters.gas) normalizedMeters.gas = normalize(rawMeters.gas)
-                if (rawMeters.water) normalizedMeters.water = normalize(rawMeters.water)
-
-                setHandover({
-                    keysReturned: !!caseData.keys_returned_at,
-                    keysConfirmedAt: caseData.keys_returned_at,
-                    meterReadings: normalizedMeters,
-                    notes: caseData.handover_notes || '',
-                    completedAt: caseData.handover_completed_at
-                })
             }
 
             // Fetch rooms
@@ -160,16 +138,67 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 .order('created_at')
 
             if (roomsData) {
-                // Fetch assets separately and map
+                // Fetch assets separately and map (including meter photos)
                 const { data: assets } = await supabase
                     .from('assets')
                     .select('*')
                     .eq('case_id', id)
-                    .in('type', ['handover_photo', 'deposit_proof'])
+                    .in('type', ['handover_photo', 'deposit_proof', 'meter_photo'])
                     .order('created_at', { ascending: false })
 
                 const dp = assets?.find(a => a.type === 'deposit_proof') || null
                 setDepositProof(dp)
+
+                const meterPhotoAssets = assets?.filter(a => a.type === 'meter_photo') || []
+
+                // Generate signed URLs for all assets
+                let signedMap = new Map<string, string>()
+                if (assets && assets.length > 0) {
+                    const paths = assets.map(a => a.storage_path)
+                    const { data: signedData } = await supabase.storage
+                        .from('guard-rent')
+                        .createSignedUrls(paths, 3600) // 1 hour
+
+                    if (signedData) {
+                        signedData.forEach(item => {
+                            if (item.path && item.signedUrl) {
+                                signedMap.set(item.path, item.signedUrl)
+                            }
+                        })
+                    }
+                }
+
+                // Update meter readings with signed URLs
+                if (caseData) {
+                    const rawMeters = caseData.meter_readings || {}
+                    const updatedMeterReadings: HandoverState['meterReadings'] = {}
+
+                    const processReading = (val: any): MeterReading | undefined => {
+                        if (!val) return undefined
+                        if (typeof val === 'string') return { value: val }
+                        const reading = val as MeterReading
+                        // Find the meter photo asset and get its signed URL
+                        if (reading.asset_id) {
+                            const meterAsset = meterPhotoAssets.find(a => a.asset_id === reading.asset_id)
+                            if (meterAsset) {
+                                reading.photo_url = signedMap.get(meterAsset.storage_path) || undefined
+                            }
+                        }
+                        return reading
+                    }
+
+                    if (rawMeters.electricity) updatedMeterReadings.electricity = processReading(rawMeters.electricity)
+                    if (rawMeters.gas) updatedMeterReadings.gas = processReading(rawMeters.gas)
+                    if (rawMeters.water) updatedMeterReadings.water = processReading(rawMeters.water)
+
+                    setHandover({
+                        keysReturned: !!caseData.keys_returned_at,
+                        keysConfirmedAt: caseData.keys_returned_at,
+                        meterReadings: updatedMeterReadings,
+                        notes: caseData.handover_notes || '',
+                        completedAt: caseData.handover_completed_at
+                    })
+                }
 
                 // Also fetch check-in photos to show count for before/after comparison
                 const { data: checkinAssets } = await supabase
