@@ -323,10 +323,17 @@ export async function POST(request: Request) {
             if (uploadError) {
                 console.error('Contract storage error:', uploadError.message)
             } else {
-                // Create or update asset record for contract
+                // Delete any existing contract_pdf asset for this case first
+                await supabase
+                    .from('assets')
+                    .delete()
+                    .eq('case_id', caseId)
+                    .eq('type', 'contract_pdf')
+
+                // Create asset record for contract
                 const { error: assetError } = await supabase
                     .from('assets')
-                    .upsert({
+                    .insert({
                         case_id: caseId,
                         user_id: user.id,
                         type: 'contract_pdf',
@@ -335,9 +342,6 @@ export async function POST(request: Request) {
                         file_size: contractBuffer.length,
                         mime_type: 'application/pdf',
                         created_at: new Date().toISOString()
-                    }, {
-                        onConflict: 'case_id,type',
-                        ignoreDuplicates: false
                     })
 
                 if (assetError) {
