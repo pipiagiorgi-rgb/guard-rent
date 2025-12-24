@@ -270,16 +270,30 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
 
         try {
             const supabase = createClient()
-            const { error } = await supabase
+            const { data: newRoom, error } = await supabase
                 .from('rooms')
                 .insert({
                     case_id: caseId,
                     name: roomName,
                     room_type: baseName.toLowerCase().replace(' ', '_')
                 })
+                .select()
+                .single()
 
             if (error) throw error
-            await loadData(caseId)
+
+            // Optimistically add to local state - no full reload
+            if (newRoom) {
+                setRooms(prev => [...prev, {
+                    room_id: newRoom.room_id,
+                    name: newRoom.name,
+                    room_type: newRoom.room_type,
+                    photos: [],
+                    checkin_photos: 0
+                }])
+                // Auto-expand the new room
+                setExpandedRooms(prev => new Set(Array.from(prev).concat(newRoom.room_id)))
+            }
         } catch (err) {
             console.error('Failed to add room:', err)
         }
@@ -287,25 +301,40 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
 
     const handleAddRoom = async () => {
         if (!newRoomName.trim()) return
-        setAddingRoom(true)
+
+        const roomToAdd = newRoomName.trim()
+        setNewRoomName('')
+        setAddingRoom(false)
 
         try {
             const supabase = createClient()
-            const { error } = await supabase
+            const { data: newRoom, error } = await supabase
                 .from('rooms')
                 .insert({
                     case_id: caseId,
-                    name: newRoomName.trim(),
+                    name: roomToAdd,
                     room_type: 'custom'
                 })
+                .select()
+                .single()
 
             if (error) throw error
-            setNewRoomName('')
-            await loadData(caseId)
+
+            // Optimistically add to local state - no full reload
+            if (newRoom) {
+                setRooms(prev => [...prev, {
+                    room_id: newRoom.room_id,
+                    name: newRoom.name,
+                    room_type: newRoom.room_type,
+                    photos: [],
+                    checkin_photos: 0
+                }])
+                // Auto-expand the new room
+                setExpandedRooms(prev => new Set(Array.from(prev).concat(newRoom.room_id)))
+            }
         } catch (err) {
             console.error('Failed to add room:', err)
-        } finally {
-            setAddingRoom(false)
+            setError('Failed to add room')
         }
     }
 
