@@ -346,15 +346,15 @@ export default function Home() {
                                 One-time payment. No subscriptions. Choose what fits your needs.
                             </p>
                             <div className="flex flex-wrap justify-center gap-4 mb-6">
-                                <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
+                                <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer select-none">
                                     <span className="text-2xl font-bold">€19</span>
                                     <span className="text-slate-500 text-sm ml-1">Check-in</span>
                                 </Link>
-                                <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
+                                <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer select-none">
                                     <span className="text-2xl font-bold">€29</span>
                                     <span className="text-slate-500 text-sm ml-1">Move-out</span>
                                 </Link>
-                                <Link href="/pricing" className="bg-slate-900 text-white rounded-xl px-5 py-3 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+                                <Link href="/pricing" className="bg-slate-900 text-white rounded-xl px-5 py-3 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer select-none">
                                     <span className="text-2xl font-bold">€39</span>
                                     <span className="text-slate-300 text-sm ml-1">Full bundle</span>
                                 </Link>
