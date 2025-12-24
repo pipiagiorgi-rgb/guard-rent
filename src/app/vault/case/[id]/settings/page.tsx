@@ -102,6 +102,8 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                     .delete()
                     .eq('case_id', caseId)
 
+
+
                 // Log to audit
                 await supabase.from('deletion_audit').insert({
                     case_id: caseId,
@@ -109,6 +111,15 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                     objects_deleted: assets.length
                 })
             }
+
+            // Reset completion timestamps to unlock flow (ALWAYS run this)
+            await supabase
+                .from('cases')
+                .update({
+                    checkin_completed_at: null,
+                    handover_completed_at: null
+                })
+                .eq('case_id', caseId)
 
             setShowDeleteConfirm(null)
             setConfirmText('')
