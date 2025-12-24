@@ -266,6 +266,13 @@ export async function POST(request: Request) {
             totalHandover += r.handoverPhotos.length
         })
 
+        // Fetch issues for this case
+        const { data: issues } = await supabase
+            .from('issues')
+            .select('issue_id, room_name, incident_date, description, created_at')
+            .eq('case_id', caseId)
+            .order('incident_date', { ascending: false })
+
         // Create PDF
         const pdfDoc = await PDFDocument.create()
         const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman)
@@ -370,6 +377,7 @@ export async function POST(request: Request) {
                 : 'Not sealed'],
             ['Handover photos', `${totalHandover} photos`],
             ['Rooms documented', `${roomPhotos.length} rooms`],
+            ['Issues reported', issues && issues.length > 0 ? `${issues.length} incident${issues.length !== 1 ? 's' : ''}` : 'None'],
             ['Handover completed', rentalCase.handover_completed_at
                 ? new Date(rentalCase.handover_completed_at).toLocaleDateString('en-GB')
                 : 'Not completed'],
@@ -482,7 +490,7 @@ export async function POST(request: Request) {
         // Notes if present
         if (rentalCase.handover_notes) {
             yPos -= 20
-            coverPage.drawText('Handover Notes', {
+            coverPage.drawText('Move-out Notes', {
                 x: MARGIN,
                 y: yPos,
                 size: 14,
@@ -497,6 +505,67 @@ export async function POST(request: Request) {
                     y: yPos,
                     size: 10,
                     font: helvetica,
+                })
+                yPos -= 14
+            }
+        }
+
+        // Issues section - show all documented issues with timestamps
+        if (issues && issues.length > 0) {
+            yPos -= 25
+            coverPage.drawText('Issues Documented During Tenancy', {
+                x: MARGIN,
+                y: yPos,
+                size: 14,
+                font: helveticaBold,
+            })
+            yPos -= 20
+
+            for (const issue of issues.slice(0, 5)) { // Limit to 5 issues on cover
+                const issueDate = new Date(issue.incident_date).toLocaleDateString('en-GB', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                })
+                const loggedDate = new Date(issue.created_at).toLocaleDateString('en-GB', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                })
+
+                coverPage.drawText(`• ${issue.room_name} — ${issueDate}`, {
+                    x: MARGIN,
+                    y: yPos,
+                    size: 11,
+                    font: helveticaBold,
+                })
+                yPos -= 14
+
+                // Truncate description to fit
+                const descPreview = issue.description.length > 70
+                    ? issue.description.substring(0, 70) + '...'
+                    : issue.description
+                coverPage.drawText(descPreview, {
+                    x: MARGIN + 10,
+                    y: yPos,
+                    size: 10,
+                    font: helvetica,
+                })
+                yPos -= 12
+
+                coverPage.drawText(`Logged: ${loggedDate}`, {
+                    x: MARGIN + 10,
+                    y: yPos,
+                    size: 8,
+                    font: helvetica,
+                    color: rgb(0.5, 0.5, 0.5),
+                })
+                yPos -= 18
+            }
+
+            if (issues.length > 5) {
+                coverPage.drawText(`+ ${issues.length - 5} more issues (see Issues Log for full details)`, {
+                    x: MARGIN,
+                    y: yPos,
+                    size: 9,
+                    font: helvetica,
+                    color: rgb(0.4, 0.4, 0.4),
                 })
                 yPos -= 14
             }

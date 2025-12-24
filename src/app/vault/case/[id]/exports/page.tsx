@@ -6,13 +6,20 @@ import {
     FileText, Camera, Download, Lock, Check,
     Loader2, Calendar, Shield, AlertCircle,
     ChevronRight, Eye, Mail, CheckCircle2,
-    ChevronDown, ChevronUp, PenLine, Star, X, Video
+    ChevronDown, ChevronUp, PenLine, Star, X, Video, AlertTriangle
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import Link from 'next/link'
 import { PhotoComparison } from '@/components/features/PhotoComparison'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { Footer } from '@/components/layout/Footer'
+
+interface Issue {
+    issue_id: string
+    room_name: string
+    incident_date: string
+    description: string
+}
 
 interface EvidenceState {
     checkinPhotos: number
@@ -110,6 +117,9 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const [contractAsset, setContractAsset] = useState<{ assetId: string; fileName: string; storagePath: string } | null>(null)
     const [depositAsset, setDepositAsset] = useState<{ assetId: string; fileName: string; storagePath: string; uploadedAt: string } | null>(null)
     const [downloadingDoc, setDownloadingDoc] = useState<string | null>(null)
+
+    // Issues state
+    const [issues, setIssues] = useState<Issue[]>([])
 
     useEffect(() => {
         async function load() {
@@ -330,6 +340,17 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                     })
                 }
             }
+
+            // Fetch issues for this case
+            const { data: issuesData } = await supabase
+                .from('issues')
+                .select('issue_id, room_name, incident_date, description')
+                .eq('case_id', id)
+                .order('incident_date', { ascending: false })
+
+            if (issuesData) {
+                setIssues(issuesData)
+            }
         } catch (err) {
             console.error('Failed to load evidence:', err)
         } finally {
@@ -482,8 +503,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 ? '/api/pdf/checkin-report'
                 : '/api/pdf/deposit-pack'
 
-            // Update message before API call
-            setGeneratingMessage('Building PDF...')
+            // Update message before API call - more informative
+            setGeneratingMessage('Building PDF (this may take a moment)')
 
             // Include custom sections if any are filled
             const hasCustomContent = customSections.personalNotes ||
@@ -515,16 +536,14 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 setPreviewType(packType)
                 setPreviewOpen(true)
             } else if (url) {
-                // Use hidden iframe for download (no visible tab on mobile)
-                const iframe = document.createElement('iframe')
-                iframe.style.display = 'none'
-                iframe.src = url
-                document.body.appendChild(iframe)
-
-                // Clean up iframe after download starts
-                setTimeout(() => {
-                    document.body.removeChild(iframe)
-                }, 5000)
+                // Use proper anchor tag for direct download
+                const link = document.createElement('a')
+                link.href = url
+                link.download = `RentVault_${packType === 'checkin_pack' ? 'Check-in_Report' : 'Deposit_Recovery_Pack'}.pdf`
+                link.style.display = 'none'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
 
                 const hasPack = packType === 'checkin_pack' ? hasCheckinPack : hasDepositPack
                 if (hasPack) {
@@ -920,6 +939,29 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                             Go to check-in <ChevronRight size={16} />
                         </Link>
                     )}
+                </div>
+
+                {/* Issues Log */}
+                <div className="bg-white rounded-xl border border-slate-200 p-5 transition-shadow hover:shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${issues.length > 0 ? 'bg-orange-50 text-orange-600' : 'bg-slate-100 text-slate-400'}`}>
+                            <AlertTriangle size={20} />
+                        </div>
+                        <div>
+                            <h3 className="font-medium">Issues reported</h3>
+                            <p className="text-sm text-slate-500">
+                                {issues.length > 0
+                                    ? `${issues.length} incident${issues.length !== 1 ? 's' : ''} documented`
+                                    : 'No issues reported'}
+                            </p>
+                        </div>
+                    </div>
+                    <Link
+                        href={`/vault/case/${caseId}/issues`}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                    >
+                        {issues.length > 0 ? 'View issues' : 'Go to issues'} <ChevronRight size={16} />
+                    </Link>
                 </div>
 
             </div>
