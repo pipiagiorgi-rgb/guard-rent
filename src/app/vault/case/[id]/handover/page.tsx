@@ -928,8 +928,8 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                             <FileText size={16} />
                         </div>
                         <div className="text-left">
-                            <h2 className="font-medium">Document changes (optional)</h2>
-                            <p className="text-sm text-slate-500">Note any damage or issues</p>
+                            <h2 className="font-medium">Move-out notes (optional)</h2>
+                            <p className="text-sm text-slate-500">Note any damage, issues, or property condition</p>
                         </div>
                     </div>
                     {expandedSections.has('notes') ? <ChevronUp size={20} /> : <ChevronDown size={20} />}

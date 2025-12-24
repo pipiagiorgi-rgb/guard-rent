@@ -12,7 +12,8 @@ import {
     Database,
     HardDrive,
     ChevronLeft,
-    MessageSquarePlus
+    MessageSquarePlus,
+    AlertTriangle
 } from 'lucide-react'
 import { useState } from 'react'
 import { FeedbackDialog } from '@/components/features/FeedbackDialog'
@@ -30,6 +31,7 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
         { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
         { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText },
         { href: `/vault/case/${caseId}/check-in`, label: 'Check-in', icon: Camera },
+        { href: `/vault/case/${caseId}/issues`, label: 'Issues', icon: AlertTriangle },
         { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
         { href: `/vault/case/${caseId}/handover`, label: 'Handover', icon: KeyRound },
         { href: `/vault/case/${caseId}/exports`, label: 'Exports', icon: Download },

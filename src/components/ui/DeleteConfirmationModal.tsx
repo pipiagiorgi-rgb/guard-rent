@@ -16,9 +16,9 @@ interface DeleteConfirmationModalProps {
     onConfirm: () => Promise<void>
     title?: string
     description?: string
-    itemType?: 'photo' | 'video' | 'file' | 'room'
+    itemType?: 'photo' | 'video' | 'file' | 'room' | 'issue'
     itemName?: string
-    context?: 'check-in' | 'handover' | 'general'
+    context?: 'check-in' | 'handover' | 'general' | 'issues'
     customMessage?: string
 }
 
@@ -49,7 +49,9 @@ export function DeleteConfirmationModal({
             ? 'check-in evidence record'
             : context === 'handover'
                 ? 'handover evidence record'
-                : 'rental records'
+                : context === 'issues'
+                    ? 'issues log'
+                    : 'rental records'
 
         return `This ${itemType} is part of your ${contextText}. Once deleted, it cannot be recovered and will no longer appear in any generated PDFs.`
     }
