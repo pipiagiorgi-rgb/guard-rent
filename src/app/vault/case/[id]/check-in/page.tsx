@@ -1038,15 +1038,40 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 COMPLETE & LOCK SECTION (matching handover pattern)
             ═══════════════════════════════════════════════════════════ */}
             {isLocked ? (
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-3">
-                    <div className="p-2 bg-slate-100 rounded-full">
-                        <ShieldCheck className="text-slate-700" size={24} />
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                    <div className="flex items-start gap-4 mb-6">
+                        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <ShieldCheck size={24} className="text-slate-600" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-slate-900 text-lg mb-2">Check-in evidence sealed</h3>
+                            <div className="space-y-2 text-slate-600">
+                                <p className="flex items-start gap-2">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                    <span>Evidence has been completed and timestamped</span>
+                                </p>
+                                <p className="flex items-start gap-2">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                    <span>A confirmation email has been sent as a backup record</span>
+                                </p>
+                                <p className="flex items-start gap-2">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                    <span>Records can be reviewed or exported from the Exports page</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p className="font-semibold text-slate-900">Check-in Evidence Locked</p>
-                        <p className="text-sm text-slate-600">
-                            Photos are sealed with system timestamps and cannot be changed.
+
+                    <div className="pl-0 sm:pl-16">
+                        <p className="text-sm text-slate-500 bg-slate-100 p-4 rounded-lg">
+                            Records remain accessible after expiry. You&apos;ll be notified well in advance if any action is needed.
                         </p>
+
+                        {!hasPack && (
+                            <p className="text-sm text-slate-500 mt-4 leading-relaxed">
+                                When you move out, you can also document the handover and generate a full before-and-after record if you choose.
+                            </p>
+                        )}
                     </div>
                 </div>
             ) : (

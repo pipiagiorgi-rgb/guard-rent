@@ -739,8 +739,21 @@ export async function sendEvidenceLockedEmail({
     const subject = `Evidence sealed: ${lockType === 'check-in' ? 'Check-in' : 'Handover'} for ${rentalLabel}`
     const title = `${lockType === 'check-in' ? 'Check-in' : 'Handover'} evidence sealed`
 
+    const storageNotice = "Your records are stored securely for 12 months. We’ll notify you well in advance before any changes to access or retention."
+
+    // Custom copy based on lock type
+    const introText = lockType === 'check-in'
+        ? `<p style="margin: 0 0 16px 0;">This email is a <strong>backup confirmation</strong> of your sealed evidence record.</p>`
+        : `<p style="margin: 0 0 16px 0;">We hope this gave you a clear and secure way to record your rental handover.</p>
+           <p style="margin: 0 0 16px 0;">This email is a <strong>backup confirmation</strong> of your sealed evidence record.</p>`
+
+    const closingText = lockType === 'check-in'
+        ? `<p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">${storageNotice}</p>`
+        : `<p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">${storageNotice}</p>
+           <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">If you rent again in the future, you can use RentVault to keep the same kind of clear records from day one.</p>`
+
     const bodyContent = `
-        <p style="margin: 0 0 16px 0;">This email is a <strong>backup confirmation</strong> of your sealed evidence record.</p>
+        ${introText}
         
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 16px;">
             <tr>
@@ -773,14 +786,24 @@ export async function sendEvidenceLockedEmail({
             <li>You can generate a PDF report from your dashboard</li>
         </ul>
 
-        <p style="margin: 0; font-size: 13px; color: #64748b;">
+        ${closingText}
+
+        <p style="margin: 0; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 24px;">
             Keep this email as a backup record. In case of a deposit dispute, this confirms when your evidence was sealed.
         </p>
     `
 
+    const introTextPlain = lockType === 'check-in'
+        ? "This email is a backup confirmation of your sealed evidence record."
+        : "We hope this gave you a clear and secure way to record your rental handover.\n\nThis email is a backup confirmation of your sealed evidence record."
+
+    const closingTextPlain = lockType === 'check-in'
+        ? storageNotice
+        : `${storageNotice}\n\nIf you rent again in the future, you can use RentVault to keep the same kind of clear records from day one.`
+
     const text = `Evidence sealed: ${lockType === 'check-in' ? 'Check-in' : 'Handover'} for ${rentalLabel}
 
-This email is a backup confirmation of your sealed evidence record.
+${introTextPlain}
 
 Evidence Status: 🔒 Permanently Sealed
 
@@ -792,6 +815,8 @@ What this means:
 - Photos and timestamps are now immutable
 - Evidence cannot be added, edited, or deleted
 - You can generate a PDF report from your dashboard
+
+${closingTextPlain}
 
 Keep this email as a backup record. In case of a deposit dispute, this confirms when your evidence was sealed.
 

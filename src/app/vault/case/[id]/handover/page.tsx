@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
     Camera, Check, Loader2, Upload, FileText,
     Key, Gauge, ChevronDown, ChevronUp, AlertCircle,
-    X, ImageIcon, Eye, Lock, CheckCircle2, Plus
+    X, ImageIcon, Eye, Lock, CheckCircle2, Plus, ShieldCheck
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
@@ -1056,36 +1056,67 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             {/* ═══════════════════════════════════════════════════════════
                 COMPLETE HANDOVER BUTTON
             ═══════════════════════════════════════════════════════════ */}
-            <div className="pt-4">
-                <button
-                    onClick={() => setShowLockModal(true)}
-                    disabled={!canComplete || saving}
-                    className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${canComplete
-                        ? 'bg-slate-900 text-white hover:bg-slate-800'
-                        : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                        }`}
-                >
-                    {saving ? (
-                        <Loader2 className="animate-spin" size={24} />
+            {handover.completedAt ? (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                    <div className="flex items-start gap-4 mb-6">
+                        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <ShieldCheck size={24} className="text-slate-600" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-slate-900 text-lg mb-2">Handover evidence sealed</h3>
+                            <div className="space-y-2 text-slate-600">
+                                <p className="flex items-start gap-2">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                    <span>Evidence has been completed and timestamped</span>
+                                </p>
+                                <p className="flex items-start gap-2">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                    <span>A confirmation email has been sent as a backup record</span>
+                                </p>
+                                <p className="flex items-start gap-2">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                    <span>Records remain accessible in Exports</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="pl-0 sm:pl-16">
+                        <p className="text-sm text-slate-500 bg-slate-100 p-4 rounded-lg">
+                            Records remain accessible after expiry. You&apos;ll be notified well in advance if any action is needed.
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <div className="pt-4">
+                    <button
+                        onClick={() => setShowLockModal(true)}
+                        disabled={!canComplete || saving}
+                        className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${canComplete
+                            ? 'bg-slate-900 text-white hover:bg-slate-800'
+                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            }`}
+                    >
+                        {saving ? (
+                            <Loader2 className="animate-spin" size={24} />
+                        ) : (
+                            <>
+                                <Lock size={20} />
+                                Complete & Lock Handover
+                            </>
+                        )}
+                    </button>
+                    {!canComplete ? (
+                        <p className="text-sm text-slate-500 text-center mt-2">
+                            Add at least one handover photo to complete
+                        </p>
                     ) : (
-                        <>
-                            <Lock size={20} />
-                            Complete & Lock Handover
-                        </>
+                        <p className="text-xs text-slate-500 text-center mt-2">
+                            Seals evidence with immutable timestamps.
+                        </p>
                     )}
-                </button>
-                {!canComplete ? (
-                    <p className="text-sm text-slate-500 text-center mt-2">
-                        Add at least one handover photo to complete
-                    </p>
-                ) : (
-                    <p className="text-xs text-slate-500 text-center mt-2">
-                        Seals evidence with immutable timestamps.
-                    </p>
-                )}
-            </div>
-
-
+                </div>
+            )}
         </div>
     )
 }

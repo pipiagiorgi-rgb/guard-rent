@@ -58,7 +58,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
         // 4. Send backup confirmation email
         if (user.email) {
-            await sendEvidenceLockedEmail({
+            const emailRes = await sendEvidenceLockedEmail({
                 to: user.email,
                 rentalLabel: rentalCase.label || 'Your rental',
                 lockType: 'check-in',
@@ -66,6 +66,18 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 caseId,
                 photoCount: photoCount || 0
             })
+
+            if (emailRes.success) {
+                await supabase.from('audit_logs').insert({
+                    case_id: caseId,
+                    user_id: user.id,
+                    action: 'checkin_lock_email_sent',
+                    details: {
+                        timestamp: new Date().toISOString(),
+                        recipient: user.email
+                    }
+                })
+            }
         }
 
         return NextResponse.json({ success: true, lockedAt: now })
