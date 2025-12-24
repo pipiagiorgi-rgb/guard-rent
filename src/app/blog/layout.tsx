@@ -18,7 +18,7 @@ export default function BlogLayout({
                             className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5 font-medium transition-colors"
                         >
                             <ArrowLeft size={16} />
-                            RentVault
+                            Home
                         </Link>
                     </div>
                 </div>
