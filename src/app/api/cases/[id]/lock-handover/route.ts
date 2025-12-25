@@ -53,6 +53,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
         // 4. Send backup confirmation email
         if (user.email) {
+            console.log('[Lock Handover] Sending confirmation email to:', user.email)
             const emailRes = await sendEvidenceLockedEmail({
                 to: user.email,
                 rentalLabel: rentalCase.label || 'Your rental',
@@ -72,7 +73,22 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                         recipient: user.email
                     }
                 })
+                console.log('[Lock Handover] Confirmation email sent successfully')
+            } else {
+                console.error('[Lock Handover] Email failed:', emailRes.error)
+                // Log failure to audit
+                await supabase.from('audit_logs').insert({
+                    case_id: caseId,
+                    user_id: user.id,
+                    action: 'handover_lock_email_failed',
+                    details: {
+                        timestamp: new Date().toISOString(),
+                        error: emailRes.error
+                    }
+                })
             }
+        } else {
+            console.warn('[Lock Handover] No user email available for confirmation')
         }
 
         return NextResponse.json({ success: true, timestamp: now })

@@ -3,13 +3,29 @@ import { Resend } from 'resend'
 // Lazy initialization of Resend client (only when API key is available)
 function getResendClient(): Resend | null {
     if (!process.env.RESEND_API_KEY) {
+        console.warn('[Email] RESEND_API_KEY not configured - emails will be logged only')
         return null
     }
     return new Resend(process.env.RESEND_API_KEY)
 }
 
-// Email sender address
+// Email sender address - MUST be from a verified Resend domain for production
 const FROM_EMAIL = process.env.FROM_EMAIL || 'RentVault <onboarding@resend.dev>'
+
+// Log email configuration on first use
+let configLogged = false
+function logEmailConfig() {
+    if (configLogged) return
+    configLogged = true
+    console.log('[Email] Configuration:', {
+        hasResendKey: !!process.env.RESEND_API_KEY,
+        fromEmail: FROM_EMAIL,
+        isUsingDefault: !process.env.FROM_EMAIL
+    })
+    if (!process.env.FROM_EMAIL) {
+        console.warn('[Email] Using default sandbox FROM_EMAIL - only verified emails can receive! Set FROM_EMAIL to a verified domain.')
+    }
+}
 
 // ============================================================
 // HTML EMAIL TEMPLATE (Supabase-inspired minimal design)
@@ -161,6 +177,7 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, text, html, tags }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
+    logEmailConfig() // Log config on first email
     const resend = getResendClient()
 
     // If no API key, log to console (development mode)
@@ -175,7 +192,9 @@ export async function sendEmail({ to, subject, text, html, tags }: SendEmailOpti
     }
 
     try {
-        const { error } = await resend.emails.send({
+        console.log('[Email] Sending to:', to, '| Subject:', subject)
+
+        const { data, error } = await resend.emails.send({
             from: FROM_EMAIL,
             to,
             subject,
@@ -185,13 +204,14 @@ export async function sendEmail({ to, subject, text, html, tags }: SendEmailOpti
         })
 
         if (error) {
-            console.error('Resend error:', error)
+            console.error('[Email] Resend error:', error)
             return { success: false, error: error.message }
         }
 
+        console.log('[Email] Sent successfully:', data?.id)
         return { success: true }
     } catch (err: any) {
-        console.error('Email send error:', err)
+        console.error('[Email] Send error:', err)
         return { success: false, error: err.message || 'Failed to send email' }
     }
 }

@@ -58,6 +58,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
         // 4. Send backup confirmation email
         if (user.email) {
+            console.log('[Lock Check-in] Sending confirmation email to:', user.email)
             const emailRes = await sendEvidenceLockedEmail({
                 to: user.email,
                 rentalLabel: rentalCase.label || 'Your rental',
@@ -77,7 +78,22 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                         recipient: user.email
                     }
                 })
+                console.log('[Lock Check-in] Confirmation email sent successfully')
+            } else {
+                console.error('[Lock Check-in] Email failed:', emailRes.error)
+                // Log failure to audit
+                await supabase.from('audit_logs').insert({
+                    case_id: caseId,
+                    user_id: user.id,
+                    action: 'checkin_lock_email_failed',
+                    details: {
+                        timestamp: new Date().toISOString(),
+                        error: emailRes.error
+                    }
+                })
             }
+        } else {
+            console.warn('[Lock Check-in] No user email available for confirmation')
         }
 
         return NextResponse.json({ success: true, lockedAt: now })
