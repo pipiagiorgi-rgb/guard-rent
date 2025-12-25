@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen, AlertCircle } from 'lucide-react'
+import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen, AlertCircle, Lock, Hash, Clock } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
@@ -302,35 +302,88 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Guides for Tenants - Country Specific */}
+                {/* Evidence Technology - First of its kind */}
+                <section className="py-10 md:py-14 px-4 md:px-6 bg-slate-900">
+                    <div className="max-w-[1120px] mx-auto">
+                        <div className="text-center mb-10">
+                            <span className="inline-block px-3 py-1 bg-white/10 text-white/70 text-sm font-medium rounded-full mb-4">First of its kind</span>
+                            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Evidence that stands up</h2>
+                            <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+                                RentVault is the first platform built specifically to secure the entire tenant journey —
+                                from signing the lease to getting your deposit back.
+                            </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <div className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10">
+                                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
+                                    <Clock size={24} className="text-blue-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">System timestamps</h3>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    Every photo and document is recorded with the exact date and time. You can't fake when it was taken.
+                                </p>
+                            </div>
+                            <div className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10">
+                                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4">
+                                    <Hash size={24} className="text-green-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">File integrity hashing</h3>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    Each file gets a unique cryptographic hash. If anyone tampers with it, the hash breaks.
+                                </p>
+                            </div>
+                            <div className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10">
+                                <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center mb-4">
+                                    <Lock size={24} className="text-amber-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Sealed evidence</h3>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    Lock your check-in and handover. Once sealed, evidence can't be edited or deleted.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="text-center mt-8">
+                            <Link
+                                href="/guides/deposit-protection"
+                                className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
+                            >
+                                Learn more about protecting your deposit
+                                <ArrowRight size={16} />
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Guides for Tenants - Global */}
                 <section className="py-8 md:py-10 px-4 md:px-6">
                     <div className="max-w-[720px] mx-auto">
                         <div className="flex items-center justify-center gap-2 mb-6">
                             <BookOpen size={18} className="text-slate-400" />
-                            <span className="text-sm font-medium text-slate-500 uppercase tracking-wide">Rental guides</span>
+                            <span className="text-sm font-medium text-slate-500 uppercase tracking-wide">Guides for tenants</span>
                         </div>
 
-                        {/* Country flags */}
-                        <div className="flex justify-center gap-4 mb-6">
-                            <Link href="/guides" className="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group">
-                                <span className="text-3xl">🇧🇪</span>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">Belgium</span>
-                            </Link>
-                            <Link href="/guides" className="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group">
-                                <span className="text-3xl">🇫🇷</span>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">France</span>
-                            </Link>
-                            <Link href="/guides" className="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group">
-                                <span className="text-3xl">🇱🇺</span>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">Luxembourg</span>
-                            </Link>
-                        </div>
-
-                        <p className="text-center text-sm text-slate-500">
-                            Practical guides for tenants renting in Belgium, France, and Luxembourg.
+                        <p className="text-center text-slate-600 mb-6">
+                            Free guides for tenants renting anywhere in Europe or the UK.
                         </p>
 
-                        <div className="text-center mt-4">
+                        <div className="grid grid-cols-2 gap-3 mb-6">
+                            <Link href="/guides/move-in-photos" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-center">
+                                <span className="text-sm font-medium text-slate-700">Move-in photos</span>
+                            </Link>
+                            <Link href="/guides/notice-periods" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-center">
+                                <span className="text-sm font-medium text-slate-700">Notice periods</span>
+                            </Link>
+                            <Link href="/guides/deposit-protection" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-center">
+                                <span className="text-sm font-medium text-slate-700">Deposit protection</span>
+                            </Link>
+                            <Link href="/guides/mid-tenancy-issues" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-center">
+                                <span className="text-sm font-medium text-slate-700">Mid-tenancy issues</span>
+                            </Link>
+                        </div>
+
+                        <div className="text-center">
                             <Link href="/guides" className="text-sm font-medium text-slate-900 hover:underline">
                                 View all guides →
                             </Link>

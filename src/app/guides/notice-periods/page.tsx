@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Clock, Camera, Shield } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Clock, Bell, Calendar, FileText, Lock } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-    title: 'Notice Periods Guide | RentVault',
-    description: 'Understand rental notice periods in Belgium, France, and Luxembourg. Missing your deadline can cost months of extra rent.',
+    title: 'Notice Periods: Miss Your Deadline, Pay Extra Rent | RentVault',
+    description: 'Missing your notice deadline can cost you months of extra rent. Learn how to track deadlines and never miss one again.',
     alternates: {
         canonical: 'https://rentvault.ai/guides/notice-periods'
     }
@@ -32,10 +32,11 @@ export default function NoticePeriodsGuide() {
                     </div>
 
                     <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                        Understanding notice periods
+                        Miss your notice deadline. Pay extra rent.
                     </h1>
                     <p className="text-lg text-slate-600 max-w-2xl">
-                        Missing your notice deadline doesn't just delay your move — it can lock you into paying rent for months you didn't plan on.
+                        Most rental contracts require 1-3 months notice. Miss that window by a day,
+                        and you're legally bound to pay rent you didn't plan for.
                     </p>
                 </div>
             </section>
@@ -44,147 +45,128 @@ export default function NoticePeriodsGuide() {
             <section className="py-12 px-4 md:px-6">
                 <div className="max-w-[800px] mx-auto">
 
-                    {/* The Stakes */}
+                    {/* The Problem */}
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-4">The problem</h2>
+                        <p className="text-slate-700 leading-relaxed mb-4">
+                            You find a great new apartment. You want to move next month.
+                            But your contract requires 3 months notice. Now you're either paying double rent or losing the new place.
+                        </p>
+                        <div className="bg-red-50 border border-red-100 rounded-xl p-5 mb-4">
+                            <p className="text-red-800">
+                                <strong>Real scenario:</strong> A tenant in the UK gave 2 months notice on a 3-month contract.
+                                The landlord pursued them for the extra month's rent — and won.
+                            </p>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed">
+                            Rental contracts are written in legal language. The key dates — renewal, termination, notice deadlines —
+                            are buried in dense paragraphs. Most people don't read them until it's too late.
+                        </p>
+                    </div>
+
+                    {/* The Solution - RentVault */}
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-4">How RentVault solves this</h2>
+                        <p className="text-slate-700 leading-relaxed mb-6">
+                            RentVault scans your contract and extracts the dates that matter.
+                            Then it reminds you before deadlines hit — so you never miss a notice window.
+                        </p>
+
+                        <div className="space-y-4">
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
+                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <FileText size={20} className="text-blue-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-900 mb-1">AI contract scanning</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Upload your lease and RentVault extracts key dates automatically —
+                                        start date, end date, notice period, renewal terms.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
+                                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Bell size={20} className="text-amber-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-900 mb-1">Deadline reminders</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Get email alerts before critical dates. You'll know when to give notice,
+                                        when renewal happens, and when your lease ends.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
+                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Calendar size={20} className="text-green-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-900 mb-1">Contract Q&A</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Not sure what a clause means? Ask questions about your contract in plain language.
+                                        RentVault's AI finds the answer and quotes the source.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* What You Need to Know */}
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-4">What you need to know about notice periods</h2>
+                        <div className="bg-slate-50 rounded-xl p-6">
+                            <ul className="space-y-4">
+                                <li className="flex gap-3">
+                                    <span className="text-green-500 flex-shrink-0 mt-1">✓</span>
+                                    <span className="text-slate-700">
+                                        <strong>Notice starts when received</strong> — not when sent.
+                                        If you email on the 1st but the landlord reads it on the 3rd, the clock starts on the 3rd.
+                                    </span>
+                                </li>
+                                <li className="flex gap-3">
+                                    <span className="text-green-500 flex-shrink-0 mt-1">✓</span>
+                                    <span className="text-slate-700">
+                                        <strong>Registered mail creates proof</strong> — in most countries,
+                                        sending notice by registered post proves the delivery date.
+                                    </span>
+                                </li>
+                                <li className="flex gap-3">
+                                    <span className="text-green-500 flex-shrink-0 mt-1">✓</span>
+                                    <span className="text-slate-700">
+                                        <strong>Fixed-term leases are different</strong> — you may not be able to leave early
+                                        without paying out the remainder or finding a replacement tenant.
+                                    </span>
+                                </li>
+                                <li className="flex gap-3">
+                                    <span className="text-green-500 flex-shrink-0 mt-1">✓</span>
+                                    <span className="text-slate-700">
+                                        <strong>Some contracts auto-renew</strong> — if you don't give notice before the renewal date,
+                                        you're locked in for another term.
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Why This Matters */}
                     <div className="mb-12">
                         <h2 className="text-2xl font-bold text-slate-900 mb-4">Why this matters</h2>
                         <p className="text-slate-700 leading-relaxed mb-4">
-                            If your contract requires 3 months notice and you only give 2, you're legally bound to pay that extra month.
-                            Landlords can pursue this through courts, and they usually win.
+                            Rental contracts across Europe, the UK, and beyond all have notice requirements.
+                            Whether you're in London, Berlin, Paris, Amsterdam, Dublin, or Luxembourg —
+                            the consequences of missing a deadline are the same: you pay.
                         </p>
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-                            <p className="text-amber-800 text-sm">
-                                <strong>Example:</strong> You find a great new apartment and want to move next month.
-                                But your contract requires 3 months notice. You're now either paying double rent or losing the new place.
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Country-specific notice periods */}
-                    <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-6">Notice periods by country</h2>
-
-                        <div className="space-y-6">
-                            {/* Belgium */}
-                            <div className="border border-slate-200 rounded-xl overflow-hidden">
-                                <div className="bg-slate-50 px-5 py-4 border-b border-slate-200">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-2xl">🇧🇪</span>
-                                        <h3 className="font-bold text-slate-900">Belgium</h3>
-                                    </div>
-                                </div>
-                                <div className="p-5">
-                                    <div className="space-y-4 text-sm text-slate-700">
-                                        <div>
-                                            <p className="font-semibold text-slate-900 mb-1">Standard lease (9-year "bail de résidence principale")</p>
-                                            <p>3 months notice. Can leave at any time, but compensation may apply in early years:</p>
-                                            <ul className="mt-2 ml-4 space-y-1">
-                                                <li>• Year 1: 3 months rent compensation</li>
-                                                <li>• Year 2: 2 months rent compensation</li>
-                                                <li>• Year 3: 1 month rent compensation</li>
-                                                <li>• Year 4+: No compensation</li>
-                                            </ul>
-                                        </div>
-                                        <div>
-                                            <p className="font-semibold text-slate-900 mb-1">Short-term lease (≤3 years)</p>
-                                            <p>Cannot terminate early unless both parties agree. You're bound until the end date.</p>
-                                        </div>
-                                        <div className="bg-blue-50 rounded-lg p-3">
-                                            <p className="text-blue-800"><strong>Regional differences:</strong> Brussels, Flanders, and Wallonia have different rules. Always check your regional housing code.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* France */}
-                            <div className="border border-slate-200 rounded-xl overflow-hidden">
-                                <div className="bg-slate-50 px-5 py-4 border-b border-slate-200">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-2xl">🇫🇷</span>
-                                        <h3 className="font-bold text-slate-900">France</h3>
-                                    </div>
-                                </div>
-                                <div className="p-5">
-                                    <div className="space-y-4 text-sm text-slate-700">
-                                        <div>
-                                            <p className="font-semibold text-slate-900 mb-1">Unfurnished rental</p>
-                                            <p>3 months notice (standard), reduced to 1 month in "zones tendues" (high-demand areas like Paris, Lyon, Marseille).</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-semibold text-slate-900 mb-1">Furnished rental</p>
-                                            <p>1 month notice regardless of location.</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-semibold text-slate-900 mb-1">Reduced notice (1 month) also applies if:</p>
-                                            <ul className="mt-2 ml-4 space-y-1">
-                                                <li>• Job loss or new job requiring relocation</li>
-                                                <li>• Health reasons (with medical certificate)</li>
-                                                <li>• First social housing allocation</li>
-                                                <li>• Receiving RSA or AAH benefits</li>
-                                            </ul>
-                                        </div>
-                                        <div className="bg-blue-50 rounded-lg p-3">
-                                            <p className="text-blue-800"><strong>How to send notice:</strong> "Lettre recommandée avec accusé de réception" (registered letter with acknowledgment). Keep the receipt.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Luxembourg */}
-                            <div className="border border-slate-200 rounded-xl overflow-hidden">
-                                <div className="bg-slate-50 px-5 py-4 border-b border-slate-200">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-2xl">🇱🇺</span>
-                                        <h3 className="font-bold text-slate-900">Luxembourg</h3>
-                                    </div>
-                                </div>
-                                <div className="p-5">
-                                    <div className="space-y-4 text-sm text-slate-700">
-                                        <div>
-                                            <p className="font-semibold text-slate-900 mb-1">Indefinite lease ("bail à durée indéterminée")</p>
-                                            <p>3 months notice, typically to end on the 15th or last day of the month.</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-semibold text-slate-900 mb-1">Fixed-term lease ("bail à durée déterminée")</p>
-                                            <p>Ends automatically on the agreed date. Early termination requires landlord consent unless the contract specifies otherwise.</p>
-                                        </div>
-                                        <div className="bg-blue-50 rounded-lg p-3">
-                                            <p className="text-blue-800"><strong>Important:</strong> Always check your specific contract. Many Luxembourg leases have custom notice clauses.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* How to give notice */}
-                    <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-4">How to give notice properly</h2>
-                        <div className="bg-slate-50 rounded-xl p-6">
-                            <ol className="space-y-4">
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
-                                    <span className="text-slate-700"><strong>Check your contract</strong> — Find the exact notice period and any specific requirements.</span>
-                                </li>
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
-                                    <span className="text-slate-700"><strong>Calculate your end date</strong> — Notice usually starts from when the landlord receives your letter, not when you send it.</span>
-                                </li>
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
-                                    <span className="text-slate-700"><strong>Send by registered mail</strong> — This gives you proof of delivery date. Keep the receipt.</span>
-                                </li>
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
-                                    <span className="text-slate-700"><strong>State clearly</strong> — Include your name, address, intention to terminate, and proposed end date.</span>
-                                </li>
-                            </ol>
-                        </div>
+                        <p className="text-slate-700 leading-relaxed">
+                            RentVault puts your deadlines front and center. No more digging through PDFs.
+                            No more forgetting until it's too late.
+                        </p>
                     </div>
 
                     {/* CTA */}
                     <div className="bg-slate-900 rounded-2xl p-8 text-center">
                         <h3 className="text-xl font-bold text-white mb-3">Never miss a deadline</h3>
-                        <p className="text-slate-300 mb-6">RentVault extracts key dates from your contract and sends reminders.</p>
+                        <p className="text-slate-300 mb-6">Upload your contract and let RentVault track the dates that matter.</p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link
                                 href="/login"
@@ -212,13 +194,13 @@ export default function NoticePeriodsGuide() {
                     <div className="grid md:grid-cols-2 gap-4">
                         <Link href="/guides/move-in-photos" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-slate-300 transition-colors">
                             <div className="flex items-center gap-3">
-                                <Camera size={20} className="text-slate-400" />
+                                <Clock size={20} className="text-slate-400" />
                                 <span className="font-medium text-slate-900">Why move-in photos matter</span>
                             </div>
                         </Link>
                         <Link href="/guides/deposit-protection" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-slate-300 transition-colors">
                             <div className="flex items-center gap-3">
-                                <Shield size={20} className="text-slate-400" />
+                                <Lock size={20} className="text-slate-400" />
                                 <span className="font-medium text-slate-900">Protecting your deposit</span>
                             </div>
                         </Link>

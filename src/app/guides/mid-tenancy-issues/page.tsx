@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, AlertCircle, Camera, Shield, Clock } from 'lucide-react'
+import { ArrowLeft, ArrowRight, AlertCircle, Camera, Shield, Clock, FileText, Hash } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-    title: 'Mid-Tenancy Issues Guide | RentVault',
-    description: 'How to document problems and damage during your tenancy. Build a timeline of evidence for Belgium, France, and Luxembourg rentals.',
+    title: 'Mid-Tenancy Issues: Document Problems Before They Cost You | RentVault',
+    description: 'When something breaks, document it immediately. Learn how to build a timeline of evidence that protects you at move-out.',
     alternates: {
         canonical: 'https://rentvault.ai/guides/mid-tenancy-issues'
     }
@@ -32,11 +32,11 @@ export default function MidTenancyIssuesGuide() {
                     </div>
 
                     <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                        Logging mid-tenancy issues
+                        The leak you reported 8 months ago? Prove it.
                     </h1>
                     <p className="text-lg text-slate-600 max-w-2xl">
-                        Problems don't just happen at move-in and move-out.
-                        What you document during your tenancy can make the difference in a dispute.
+                        When you move out and the landlord blames you for damage,
+                        can you prove you reported it months ago? If not, you pay.
                     </p>
                 </div>
             </section>
@@ -45,18 +45,82 @@ export default function MidTenancyIssuesGuide() {
             <section className="py-12 px-4 md:px-6">
                 <div className="max-w-[800px] mx-auto">
 
-                    {/* Why It Matters */}
+                    {/* The Problem */}
                     <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-4">Why document issues as they happen?</h2>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-4">The problem</h2>
                         <p className="text-slate-700 leading-relaxed mb-4">
-                            When you move out and the landlord claims you damaged the heating system,
-                            you need to prove it was already broken when you reported it 8 months ago.
+                            Things break during a tenancy. Pipes leak, appliances fail, paint chips.
+                            You tell the landlord. Maybe you email, maybe you call, maybe you mention it in passing.
                         </p>
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-                            <p className="text-amber-800 text-sm">
-                                <strong>Common scenario:</strong> The shower leaked for months. You told the landlord verbally.
-                                At move-out, they deduct €800 for water damage. Without written evidence, it's your word against theirs.
+                        <div className="bg-red-50 border border-red-100 rounded-xl p-5 mb-4">
+                            <p className="text-red-800">
+                                <strong>8 months later at move-out:</strong> "There's water damage under the sink.
+                                That'll be €800 from your deposit." You know you reported it. But can you prove it?
                             </p>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed">
+                            Verbal reports don't count. Text messages get deleted.
+                            Without a clear, dated record, you're responsible for damage you didn't cause.
+                        </p>
+                    </div>
+
+                    {/* The Solution - RentVault */}
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-4">How RentVault solves this</h2>
+                        <p className="text-slate-700 leading-relaxed mb-6">
+                            RentVault's Issues Log lets you document problems as they happen —
+                            with photos, descriptions, and timestamps that create a verifiable timeline.
+                        </p>
+
+                        <div className="space-y-4">
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
+                                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <AlertCircle size={20} className="text-red-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-900 mb-1">Log issues instantly</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Something breaks? Open RentVault, snap photos, add a description.
+                                        The date and time are recorded automatically.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
+                                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Clock size={20} className="text-amber-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-900 mb-1">Build a timeline</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Every issue is recorded chronologically.
+                                        At move-out, you have a complete history of what happened and when.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
+                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Hash size={20} className="text-blue-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-900 mb-1">Tamper-proof evidence</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Photos are stored with cryptographic hashes.
+                                        If anyone tries to edit or backdate them, the evidence is broken.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
+                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <FileText size={20} className="text-green-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-900 mb-1">Include in your Deposit Recovery Pack</h3>
+                                    <p className="text-sm text-slate-600">
+                                        When you need to dispute deductions, your issues timeline is included in the
+                                        official PDF export — showing exactly what was reported and when.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -66,141 +130,55 @@ export default function MidTenancyIssuesGuide() {
                         <div className="grid md:grid-cols-2 gap-4">
                             <div className="border border-slate-200 rounded-xl p-5">
                                 <h3 className="font-bold text-slate-900 mb-2">Maintenance issues</h3>
-                                <ul className="text-sm text-slate-700 space-y-1">
+                                <ul className="text-sm text-slate-600 space-y-1">
                                     <li>• Broken appliances</li>
                                     <li>• Plumbing problems</li>
                                     <li>• Heating/cooling failures</li>
                                     <li>• Electrical issues</li>
-                                    <li>• Lock or security problems</li>
                                 </ul>
                             </div>
                             <div className="border border-slate-200 rounded-xl p-5">
-                                <h3 className="font-bold text-slate-900 mb-2">Damage</h3>
-                                <ul className="text-sm text-slate-700 space-y-1">
+                                <h3 className="font-bold text-slate-900 mb-2">Property damage</h3>
+                                <ul className="text-sm text-slate-600 space-y-1">
                                     <li>• Water leaks and stains</li>
                                     <li>• Mold or damp</li>
                                     <li>• Cracks in walls or ceilings</li>
                                     <li>• Window or door damage</li>
-                                    <li>• Flooring issues</li>
-                                </ul>
-                            </div>
-                            <div className="border border-slate-200 rounded-xl p-5">
-                                <h3 className="font-bold text-slate-900 mb-2">Safety concerns</h3>
-                                <ul className="text-sm text-slate-700 space-y-1">
-                                    <li>• Fire safety issues</li>
-                                    <li>• Gas leaks or smells</li>
-                                    <li>• Security breaches</li>
-                                    <li>• Structural concerns</li>
-                                </ul>
-                            </div>
-                            <div className="border border-slate-200 rounded-xl p-5">
-                                <h3 className="font-bold text-slate-900 mb-2">External factors</h3>
-                                <ul className="text-sm text-slate-700 space-y-1">
-                                    <li>• Pest infestations</li>
-                                    <li>• Noise from construction</li>
-                                    <li>• Common area issues</li>
-                                    <li>• Building-wide problems</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    {/* How to Document */}
+                    {/* The Full Picture */}
                     <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-4">How to document properly</h2>
-                        <div className="bg-slate-50 rounded-xl p-6">
-                            <ol className="space-y-4">
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
-                                    <div>
-                                        <span className="font-semibold text-slate-900">Take photos and videos</span>
-                                        <p className="text-sm text-slate-600 mt-1">Show the issue clearly. Include context (whole room, then close-up of the problem).</p>
-                                    </div>
-                                </li>
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
-                                    <div>
-                                        <span className="font-semibold text-slate-900">Write a description</span>
-                                        <p className="text-sm text-slate-600 mt-1">What's the issue? When did you first notice it? How does it affect you?</p>
-                                    </div>
-                                </li>
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
-                                    <div>
-                                        <span className="font-semibold text-slate-900">Notify your landlord in writing</span>
-                                        <p className="text-sm text-slate-600 mt-1">Email or registered letter. Keep a copy. Verbal reports are hard to prove later.</p>
-                                    </div>
-                                </li>
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
-                                    <div>
-                                        <span className="font-semibold text-slate-900">Save their response</span>
-                                        <p className="text-sm text-slate-600 mt-1">Whether they fix it, ignore it, or claim it's your fault — keep records.</p>
-                                    </div>
-                                </li>
-                                <li className="flex gap-3">
-                                    <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">5</span>
-                                    <div>
-                                        <span className="font-semibold text-slate-900">Document resolution</span>
-                                        <p className="text-sm text-slate-600 mt-1">When it's fixed, photograph the repair. This closes the loop on your evidence.</p>
-                                    </div>
-                                </li>
-                            </ol>
-                        </div>
-                    </div>
-
-                    {/* Country-specific */}
-                    <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-6">Landlord obligations by country</h2>
-
-                        <div className="space-y-4">
-                            {/* Belgium */}
-                            <div className="border border-slate-200 rounded-xl p-5">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <span className="text-2xl">🇧🇪</span>
-                                    <h3 className="font-bold text-slate-900">Belgium</h3>
-                                </div>
-                                <p className="text-slate-700 text-sm leading-relaxed">
-                                    Landlords must maintain the property in a habitable condition throughout the tenancy.
-                                    Major repairs (roof, heating, plumbing) are typically the landlord's responsibility.
-                                    Minor repairs due to normal wear are often the tenant's.
-                                    Document issues and send a registered letter ("lettre recommandée") if they're not addressed.
-                                </p>
-                            </div>
-
-                            {/* France */}
-                            <div className="border border-slate-200 rounded-xl p-5">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <span className="text-2xl">🇫🇷</span>
-                                    <h3 className="font-bold text-slate-900">France</h3>
-                                </div>
-                                <p className="text-slate-700 text-sm leading-relaxed">
-                                    Under French law, landlords must provide a "logement décent" (decent housing) that meets minimum standards.
-                                    Major repairs and maintenance of essential equipment are the landlord's responsibility.
-                                    Tenants handle minor repairs ("réparations locatives").
-                                    Send a formal notice by registered mail if issues aren't resolved within a reasonable time.
-                                </p>
-                            </div>
-
-                            {/* Luxembourg */}
-                            <div className="border border-slate-200 rounded-xl p-5">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <span className="text-2xl">🇱🇺</span>
-                                    <h3 className="font-bold text-slate-900">Luxembourg</h3>
-                                </div>
-                                <p className="text-slate-700 text-sm leading-relaxed">
-                                    The landlord must ensure the property is in good repair and safe for habitation.
-                                    Structural issues, major systems (heating, plumbing, electrical), and exterior maintenance are the landlord's responsibility.
-                                    Always report issues promptly and in writing. If unresolved, you may contact the "Commission des Loyers" (Rent Commission).
-                                </p>
-                            </div>
-                        </div>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-4">The full picture at move-out</h2>
+                        <p className="text-slate-700 leading-relaxed mb-4">
+                            When you leave, RentVault has everything:
+                        </p>
+                        <ul className="space-y-2 text-slate-700">
+                            <li className="flex gap-3">
+                                <span className="text-green-500">✓</span>
+                                <span><strong>Check-in evidence</strong> — how the property looked when you moved in</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="text-green-500">✓</span>
+                                <span><strong>Issues timeline</strong> — everything you reported during the tenancy</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="text-green-500">✓</span>
+                                <span><strong>Handover evidence</strong> — how you left the property</span>
+                            </li>
+                        </ul>
+                        <p className="text-slate-700 leading-relaxed mt-4">
+                            This is the evidence you need to dispute unfair deductions.
+                            All in one place, all timestamped, all verifiable.
+                        </p>
                     </div>
 
                     {/* CTA */}
                     <div className="bg-slate-900 rounded-2xl p-8 text-center">
-                        <h3 className="text-xl font-bold text-white mb-3">Keep a timeline of issues</h3>
-                        <p className="text-slate-300 mb-6">RentVault's Issues log lets you document problems with photos, dates, and descriptions.</p>
+                        <h3 className="text-xl font-bold text-white mb-3">Start logging issues today</h3>
+                        <p className="text-slate-300 mb-6">Build your evidence timeline for free. Pay only when you need exports.</p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link
                                 href="/login"

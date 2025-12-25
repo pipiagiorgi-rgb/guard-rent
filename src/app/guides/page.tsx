@@ -1,82 +1,88 @@
-'use client'
-
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, FileText, Camera, Shield, Clock, AlertCircle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, Clock, Shield, AlertCircle, Lock, Hash, FileDown, Video } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 
-// Country data with flags, names, and rental context
-const countries = [
-    {
-        code: 'BE',
-        flag: '🇧🇪',
-        name: 'Belgium',
-        slug: 'belgium',
-        language: 'Dutch, French, or German',
-        depositNote: 'Typically 2-3 months rent, held in a blocked bank account',
-        noticeNote: '3-month notice period is common for standard leases',
-        keyTips: [
-            'Request a detailed "état des lieux" (inventory) at move-in',
-            'Keep copies of all registered letters (recommandé)',
-            'Know your regional rules — Brussels, Flanders, and Wallonia differ'
-        ]
-    },
-    {
-        code: 'FR',
-        flag: '🇫🇷',
-        name: 'France',
-        slug: 'france',
-        language: 'French',
-        depositNote: 'Usually 1-2 months rent, returned within 2 months after move-out',
-        noticeNote: '1-3 month notice depending on location and reason',
-        keyTips: [
-            'The "état des lieux" is legally required — take photos too',
-            'Furnished rentals have different rules than unfurnished',
-            'Send notice via "lettre recommandée avec accusé de réception"'
-        ]
-    },
-    {
-        code: 'LU',
-        flag: '🇱🇺',
-        name: 'Luxembourg',
-        slug: 'luxembourg',
-        language: 'French, German, or Luxembourgish',
-        depositNote: 'Maximum 3 months rent, often held in escrow',
-        noticeNote: '3-month notice period is standard',
-        keyTips: [
-            'Ensure the "bail de location" clearly states deposit amount',
-            'Document property condition in writing and photos',
-            'Check if your lease is fixed-term or indefinite'
-        ]
+export const metadata: Metadata = {
+    title: 'Tenant Guides: Protect Your Deposit | RentVault',
+    description: 'Free guides for tenants. Learn how to document your rental, protect your deposit, and build evidence that stands up in disputes.',
+    alternates: {
+        canonical: 'https://rentvault.ai/guides'
     }
-]
+}
 
-// Common topics for all countries - now with links
-const commonTopics = [
+// Guide topics with links
+const guides = [
     {
         icon: Camera,
         title: 'Why move-in photos matter',
-        description: 'Timestamped photos protect you if there\'s a dispute about property condition.',
-        slug: 'move-in-photos'
+        description: 'Without timestamped evidence, landlords can blame you for damage that was already there.',
+        slug: 'move-in-photos',
+        color: 'green'
     },
     {
         icon: Clock,
         title: 'Understanding notice periods',
-        description: 'Missing your deadline can mean extra months of rent. Know when to act.',
-        slug: 'notice-periods'
+        description: 'Miss your deadline and you are legally bound to pay rent you did not plan for.',
+        slug: 'notice-periods',
+        color: 'amber'
     },
     {
         icon: Shield,
         title: 'Protecting your deposit',
-        description: 'Most disputes come down to evidence. Keep records from day one.',
-        slug: 'deposit-protection'
+        description: 'One in four renters do not get their full deposit back. Evidence decides who wins.',
+        slug: 'deposit-protection',
+        color: 'blue'
     },
     {
         icon: AlertCircle,
         title: 'Logging mid-tenancy issues',
-        description: 'Document problems as they happen, not months later.',
-        slug: 'mid-tenancy-issues'
+        description: 'Document problems as they happen. Build a timeline that protects you at move-out.',
+        slug: 'mid-tenancy-issues',
+        color: 'red'
     }
 ]
+
+// RentVault features
+const features = [
+    {
+        icon: Clock,
+        title: 'System timestamps',
+        description: 'Every photo and document is recorded with exact date and time.'
+    },
+    {
+        icon: Hash,
+        title: 'File integrity hashing',
+        description: 'Cryptographic hashes prove files have not been tampered with.'
+    },
+    {
+        icon: Lock,
+        title: 'Sealed evidence',
+        description: 'Lock your check-in and handover. No edits, no deletions.'
+    },
+    {
+        icon: FileDown,
+        title: 'Official PDF reports',
+        description: 'Export Check-in Packs and Deposit Recovery Packs.'
+    },
+    {
+        icon: Video,
+        title: 'Walkthrough videos',
+        description: 'Upload video evidence with the same protection as photos.'
+    },
+    {
+        icon: Shield,
+        title: '12-month retention',
+        description: 'Your evidence is stored securely for the full tenancy period.'
+    }
+]
+
+const colorClasses: Record<string, { bg: string; text: string; hoverText: string }> = {
+    green: { bg: 'bg-green-100', text: 'text-green-600', hoverText: 'group-hover:text-green-600' },
+    amber: { bg: 'bg-amber-100', text: 'text-amber-600', hoverText: 'group-hover:text-amber-600' },
+    blue: { bg: 'bg-blue-100', text: 'text-blue-600', hoverText: 'group-hover:text-blue-600' },
+    red: { bg: 'bg-red-100', text: 'text-red-600', hoverText: 'group-hover:text-red-600' }
+}
 
 export default function GuidesPage() {
     return (
@@ -93,82 +99,68 @@ export default function GuidesPage() {
                     </Link>
 
                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-                        Rental guides for tenants
+                        Guides for tenants
                     </h1>
                     <p className="text-lg text-slate-600 max-w-2xl">
-                        Practical information about renting in Belgium, France, and Luxembourg.
-                        Know your rights, understand the process, and protect your deposit.
+                        Renting anywhere in Europe or the UK? These guides cover the common problems tenants face —
+                        and how to protect yourself with proper evidence.
                     </p>
                 </div>
             </section>
 
-            {/* Country Cards */}
+            {/* Guide Cards */}
             <section className="py-12 px-4 md:px-6">
                 <div className="max-w-[900px] mx-auto">
-                    <h2 className="text-xl font-bold text-slate-900 mb-6">Choose your country</h2>
-
-                    <div className="grid md:grid-cols-3 gap-4">
-                        {countries.map((country) => (
-                            <div
-                                key={country.code}
-                                className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-slate-300 hover:shadow-lg transition-all group"
-                            >
-                                <div className="text-5xl mb-4">{country.flag}</div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
-                                    {country.name}
-                                </h3>
-                                <p className="text-sm text-slate-500 mb-4">
-                                    Contracts typically in {country.language}
-                                </p>
-
-                                <div className="space-y-3 text-sm">
-                                    <div>
-                                        <span className="font-medium text-slate-700">Deposit: </span>
-                                        <span className="text-slate-600">{country.depositNote}</span>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {guides.map((guide) => {
+                            const colors = colorClasses[guide.color]
+                            return (
+                                <Link
+                                    key={guide.slug}
+                                    href={`/guides/${guide.slug}`}
+                                    className="bg-white rounded-xl border border-slate-200 p-6 hover:border-slate-300 hover:shadow-lg transition-all group"
+                                >
+                                    <div className={`w-12 h-12 ${colors.bg} rounded-xl flex items-center justify-center mb-4`}>
+                                        <guide.icon size={24} className={colors.text} />
                                     </div>
-                                    <div>
-                                        <span className="font-medium text-slate-700">Notice: </span>
-                                        <span className="text-slate-600">{country.noticeNote}</span>
+                                    <h3 className={`text-xl font-bold text-slate-900 mb-2 ${colors.hoverText} transition-colors`}>
+                                        {guide.title}
+                                    </h3>
+                                    <p className="text-slate-600 text-sm leading-relaxed">
+                                        {guide.description}
+                                    </p>
+                                    <div className="mt-4 text-sm font-medium text-slate-400 group-hover:text-slate-600 transition-colors flex items-center gap-1">
+                                        Read guide <ArrowRight size={14} />
                                     </div>
-                                </div>
-
-                                <div className="mt-6 pt-4 border-t border-slate-100">
-                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Key tips</p>
-                                    <ul className="space-y-2">
-                                        {country.keyTips.map((tip, i) => (
-                                            <li key={i} className="text-sm text-slate-600 flex gap-2">
-                                                <span className="text-green-500 flex-shrink-0">✓</span>
-                                                {tip}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        ))}
+                                </Link>
+                            )
+                        })}
                     </div>
                 </div>
             </section>
 
-            {/* Common Topics */}
+            {/* How RentVault Helps */}
             <section className="py-12 px-4 md:px-6 bg-slate-50">
                 <div className="max-w-[900px] mx-auto">
-                    <h2 className="text-xl font-bold text-slate-900 mb-6">Essential topics</h2>
+                    <div className="text-center mb-8">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-3">How RentVault protects you</h2>
+                        <p className="text-slate-600 max-w-xl mx-auto">
+                            The first platform built to secure your entire tenancy — from signing the lease to getting your deposit back.
+                        </p>
+                    </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
-                        {commonTopics.map((topic) => (
-                            <Link
-                                key={topic.title}
-                                href={`/guides/${topic.slug}`}
-                                className="bg-white rounded-xl border border-slate-200 p-5 flex gap-4 items-start hover:border-slate-300 hover:shadow-md transition-all group"
+                    <div className="grid md:grid-cols-3 gap-4">
+                        {features.map((feature) => (
+                            <div
+                                key={feature.title}
+                                className="bg-white rounded-xl border border-slate-200 p-5"
                             >
-                                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-slate-200 transition-colors">
-                                    <topic.icon size={20} className="text-slate-600" />
+                                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-3">
+                                    <feature.icon size={20} className="text-slate-600" />
                                 </div>
-                                <div>
-                                    <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">{topic.title}</h3>
-                                    <p className="text-sm text-slate-600">{topic.description}</p>
-                                </div>
-                            </Link>
+                                <h3 className="font-semibold text-slate-900 mb-1">{feature.title}</h3>
+                                <p className="text-sm text-slate-600">{feature.description}</p>
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -178,10 +170,10 @@ export default function GuidesPage() {
             <section className="py-16 px-4 md:px-6">
                 <div className="max-w-[600px] mx-auto text-center">
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-                        Ready to protect your deposit?
+                        Protect your next rental
                     </h2>
                     <p className="text-slate-600 mb-8">
-                        Start documenting your rental for free. Pay only when you need official exports.
+                        Document for free. Pay only when you need official exports.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
@@ -205,8 +197,8 @@ export default function GuidesPage() {
             <section className="py-8 px-4 md:px-6 border-t border-slate-100">
                 <div className="max-w-[900px] mx-auto">
                     <p className="text-xs text-slate-400 text-center">
-                        This information is for general guidance only and does not constitute legal advice.
-                        Rental laws vary by region and may change. Consult local authorities or a legal professional for specific situations.
+                        These guides are for general information only and do not constitute legal advice.
+                        Rental laws vary by country and region. Consult local authorities or a legal professional for specific situations.
                     </p>
                 </div>
             </section>
