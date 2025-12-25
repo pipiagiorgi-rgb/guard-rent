@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen } from 'lucide-react'
+import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen, AlertCircle } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
@@ -196,7 +196,7 @@ export default function Home() {
                             RentVault is designed specifically for tenants to organise records, evidence, and deadlines throughout a rental.
                         </p>
 
-                        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                             {/* Contract clarity */}
                             <div className="feature-card group">
                                 <div className="icon-container icon-container-blue mb-6">
@@ -216,6 +216,17 @@ export default function Home() {
                                 <h3 className="text-xl font-bold mb-3 group-hover:text-green-600 transition-colors">Photo evidence</h3>
                                 <p className="text-slate-600 text-sm leading-relaxed">
                                     Document the property condition at move-in and before handover. Photos are stored with timestamps.
+                                </p>
+                            </div>
+
+                            {/* Issues log */}
+                            <div className="feature-card group">
+                                <div className="icon-container icon-container-red mb-6">
+                                    <AlertCircle size={24} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3 group-hover:text-red-600 transition-colors">Issues log</h3>
+                                <p className="text-slate-600 text-sm leading-relaxed">
+                                    Log damage or problems as they happen with photos and timestamps. Build a timeline of evidence.
                                 </p>
                             </div>
 
@@ -291,25 +302,37 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Guides for Tenants */}
+                {/* Guides for Tenants - Country Specific */}
                 <section className="py-8 md:py-10 px-4 md:px-6">
-                    <div className="max-w-[600px] mx-auto">
-                        <div className="flex items-center justify-center gap-2 mb-5">
+                    <div className="max-w-[720px] mx-auto">
+                        <div className="flex items-center justify-center gap-2 mb-6">
                             <BookOpen size={18} className="text-slate-400" />
-                            <span className="text-sm font-medium text-slate-500 uppercase tracking-wide">Guides for tenants</span>
+                            <span className="text-sm font-medium text-slate-500 uppercase tracking-wide">Rental guides</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                            <Link href="/guides/move-in-photos" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
-                                Why move-in photos matter
+
+                        {/* Country flags */}
+                        <div className="flex justify-center gap-4 mb-6">
+                            <Link href="/guides" className="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group">
+                                <span className="text-3xl">🇧🇪</span>
+                                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">Belgium</span>
                             </Link>
-                            <Link href="/guides/notice-periods" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
-                                Understanding notice periods
+                            <Link href="/guides" className="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group">
+                                <span className="text-3xl">🇫🇷</span>
+                                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">France</span>
                             </Link>
-                            <Link href="/guides/renting-abroad" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
-                                Renting abroad: what to watch for
+                            <Link href="/guides" className="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group">
+                                <span className="text-3xl">🇱🇺</span>
+                                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">Luxembourg</span>
                             </Link>
-                            <Link href="/guides/deposit-protection" className="p-3 bg-slate-50 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-center">
-                                How to protect your deposit
+                        </div>
+
+                        <p className="text-center text-sm text-slate-500">
+                            Practical guides for tenants renting in Belgium, France, and Luxembourg.
+                        </p>
+
+                        <div className="text-center mt-4">
+                            <Link href="/guides" className="text-sm font-medium text-slate-900 hover:underline">
+                                View all guides →
                             </Link>
                         </div>
                     </div>

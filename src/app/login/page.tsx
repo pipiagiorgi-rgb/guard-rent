@@ -190,6 +190,11 @@ export default function LoginPage() {
                                     Passwordless login. No password to remember.
                                 </p>
 
+                                {/* 24h session benefit */}
+                                <p className="text-xs text-slate-400 text-center mt-3">
+                                    You'll stay signed in for 24 hours — convenient for documenting your move-in day.
+                                </p>
+
                                 {/* Back to home */}
                                 <a
                                     href="https://rentvault.ai"

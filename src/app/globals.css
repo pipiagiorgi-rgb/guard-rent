@@ -348,6 +348,11 @@ html {
   color: #7C3AED;
 }
 
+.icon-container-red {
+  background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+  color: #DC2626;
+}
+
 .feature-card:hover .icon-container {
   transform: scale(1.1);
 }
