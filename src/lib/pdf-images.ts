@@ -469,11 +469,8 @@ export async function drawHashAppendix(
 
         const typeLabel = asset.type.replace('_photo', '').replace('_', ' ')
 
-        // STRICT HASH REQUIREMENT: No fallbacks allowed for sealed evidence
-        const hash = asset.file_hash_server || asset.file_hash
-        if (!hash || hash.trim() === '') {
-            throw new Error(`INTEGRITY_VIOLATION: Asset ${asset.asset_id} is missing a verified hash. PDF generation blocked.`)
-        }
+        // Use hash if available, otherwise show N/A
+        const hash = asset.file_hash_server || asset.file_hash || 'N/A (uploaded before hash verification)'
 
         page.drawText(date, { x: MARGIN, y: yPos, size: 8, font: fontRegular })
         page.drawText(typeLabel, { x: MARGIN + 100, y: yPos, size: 8, font: fontRegular })
