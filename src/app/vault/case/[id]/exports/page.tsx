@@ -395,16 +395,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to get download link')
 
-            // Use hidden iframe for download (no visible tab)
-            const iframe = document.createElement('iframe')
-            iframe.style.display = 'none'
-            iframe.src = data.signedUrl
-            document.body.appendChild(iframe)
-
-            // Clean up iframe after download starts
-            setTimeout(() => {
-                document.body.removeChild(iframe)
-            }, 5000)
+            // Direct download via URL (Content-Disposition: attachment is set by API)
+            window.location.href = data.signedUrl
         } catch (err) {
             console.error('Video download error:', err)
         } finally {
@@ -416,19 +408,16 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         setDownloadingDoc(type)
         try {
             const supabase = createClient()
+            const downloadFileName = `RentVault_${type === 'contract' ? 'Contract' : 'Deposit_Proof'}_${fileName}`
+
+            // Use download option to force Content-Disposition: attachment header
             const { data } = await supabase.storage
                 .from('guard-rent')
-                .createSignedUrl(storagePath, 3600)
+                .createSignedUrl(storagePath, 3600, { download: downloadFileName })
 
             if (data?.signedUrl) {
-                // Create download link
-                const link = document.createElement('a')
-                link.href = data.signedUrl
-                link.download = `RentVault_${type === 'contract' ? 'Contract' : 'Deposit_Proof'}_${fileName}`
-                link.style.display = 'none'
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
+                // Open the URL - it will download due to Content-Disposition header
+                window.location.href = data.signedUrl
             }
         } catch (err) {
             console.error('Document download error:', err)
