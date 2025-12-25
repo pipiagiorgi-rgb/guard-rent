@@ -4,8 +4,8 @@ import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRigh
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-    title: 'RentVault | Protect Your Rental Deposit — Organise Documents, Photos & Deadlines',
-    description: 'A secure, private vault for tenants to organise rental documents, move-in and move-out photos, and key notice dates. Evidence-based protection before disputes arise.',
+    title: 'RentVault | Protect Your Rental Deposit',
+    description: 'Organise rental documents, photos, and key dates in one secure vault. Built for tenants to protect deposits before disputes arise.',
     keywords: 'rental deposit protection, tenant documentation, move-in photos, rental contract storage, deposit dispute evidence, tenancy organiser, expat rental, property condition report, notice period reminders',
     icons: {
         icon: '/favicon.png',
