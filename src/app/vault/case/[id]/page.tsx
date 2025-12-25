@@ -6,7 +6,6 @@ import { formatCountryWithCode } from '@/lib/countries'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { Footer } from '@/components/layout/Footer'
 import { isAdminEmail } from '@/lib/admin'
-import { RelatedContractsSection } from '@/components/features/RelatedContractsSection'
 
 // Helper to format country for display (handles custom countries)
 function formatCountry(code: string | null): string {
@@ -134,9 +133,6 @@ export default async function CaseOverviewPage({ params }: { params: { id: strin
                     </Link>
                 )}
             </div>
-
-            {/* Related Contracts - Optional Upsell (NOT evidence) */}
-            <RelatedContractsSection caseId={params.id} />
 
             {/* Compact footer disclaimer */}
 

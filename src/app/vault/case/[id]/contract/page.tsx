@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Lock, Info } from 'lucide-react'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { isAdminEmail } from '@/lib/admin'
+import { RelatedContractsSection } from '@/components/features/RelatedContractsSection'
 
 export default async function ContractPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
@@ -38,7 +39,6 @@ export default async function ContractPage({ params }: { params: { id: string } 
             <UpgradeBanner caseId={params.id} currentPack={rentalCase?.purchase_type} isAdmin={isAdmin} />
 
             {/* Preview mode banner - only show when not purchased */}
-            {/* Preview mode banner - only show when not purchased */}
             {!hasPurchasedPack && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
                     <Info size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
@@ -50,7 +50,8 @@ export default async function ContractPage({ params }: { params: { id: string } 
 
             <ContractScanClient caseId={params.id} hasPurchasedPack={hasPurchasedPack} />
 
-            {/* Compact disclaimer */}
+            {/* Related Contracts - Optional €9 Add-on (reference only, not sealed evidence) */}
+            <RelatedContractsSection caseId={params.id} />
 
         </div>
     )
