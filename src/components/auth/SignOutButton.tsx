@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { LogOut, AlertTriangle, ShoppingBag, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { isAdminEmail } from '@/lib/admin'
 
 interface SignOutButtonProps {
     className?: string
@@ -23,6 +24,13 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
                 const { data: { user } } = await supabase.auth.getUser()
                 if (!user) return
 
+                // Admin users never see the warning
+                if (isAdminEmail(user.email)) {
+                    setHasUnpaidCases(false)
+                    setLoading(false)
+                    return
+                }
+
                 // Get all user's cases with purchase_type
                 const { data: cases } = await supabase
                     .from('cases')
@@ -35,18 +43,22 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
                     return
                 }
 
-                // Check if any case has purchase_type set (older system)
+                // Check if ANY case has a purchase_type set (checkin, bundle, moveout)
                 const hasPurchaseType = cases.some(c =>
-                    c.purchase_type && c.purchase_type !== 'none' && c.purchase_type !== ''
+                    c.purchase_type &&
+                    c.purchase_type !== 'none' &&
+                    c.purchase_type !== '' &&
+                    c.purchase_type !== null
                 )
 
                 if (hasPurchaseType) {
+                    // User has at least one paid case
                     setHasUnpaidCases(false)
                     setLoading(false)
                     return
                 }
 
-                // Check if any case has purchased packs (newer system)
+                // Also check purchases table for any purchases
                 const caseIds = cases.map(c => c.case_id)
                 const { data: purchases } = await supabase
                     .from('purchases')
