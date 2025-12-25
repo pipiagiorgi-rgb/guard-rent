@@ -4,8 +4,8 @@ import { ArrowLeft, ArrowRight, Shield, Camera, Lock, Hash, FileDown, Clock } fr
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-    title: 'Deposit Protection: Win Disputes With Evidence | RentVault',
-    description: 'Landlords deduct from your deposit. You dispute it. Who wins? The one with evidence. Learn how to build an unbreakable case.',
+    title: 'Deposit Protection: Build Your Case With Evidence | RentVault',
+    description: 'Landlords deduct from your deposit. You dispute it. The difference often comes down to documentation. Learn how to build a clear evidence record.',
     alternates: {
         canonical: 'https://rentvault.ai/guides/deposit-protection'
     }
@@ -36,7 +36,7 @@ export default function DepositProtectionGuide() {
                     </h1>
                     <p className="text-lg text-slate-600 max-w-2xl">
                         Around one in four renters don't get their full deposit back.
-                        The difference between winning and losing a dispute almost always comes down to one thing: evidence.
+                        When disputes happen, the outcome often comes down to one thing: documentation.
                     </p>
                 </div>
             </section>
@@ -76,8 +76,8 @@ export default function DepositProtectionGuide() {
                     <div className="mb-12">
                         <h2 className="text-2xl font-bold text-slate-900 mb-4">How RentVault protects your deposit</h2>
                         <p className="text-slate-700 leading-relaxed mb-6">
-                            RentVault gives you the evidence you need to win disputes.
-                            From the moment you move in to the day you hand over the keys, everything is documented with tamper-proof timestamps.
+                            RentVault helps you collect and organise the documentation you need.
+                            From the moment you move in to the day you hand over the keys, everything is recorded with timestamps.
                         </p>
 
                         <div className="space-y-4">
@@ -173,8 +173,8 @@ export default function DepositProtectionGuide() {
                             Photos on your phone are editable. Emails can be faked. Paper inventories get lost.
                         </p>
                         <p className="text-slate-700 leading-relaxed">
-                            RentVault is the first product of its kind — built specifically to protect the entire tenant journey,
-                            with evidence that stands up when it matters.
+                            RentVault is built specifically for tenants,
+                            with clear documentation when it matters.
                         </p>
                     </div>
 

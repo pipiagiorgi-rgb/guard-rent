@@ -305,10 +305,10 @@ export default function Home() {
                 <section className="py-10 md:py-14 px-4 md:px-6 bg-slate-900">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-10">
-                            <span className="inline-block px-3 py-1 bg-white/10 text-white/70 text-sm font-medium rounded-full mb-4">First of its kind</span>
-                            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Evidence that stands up</h2>
+                            <span className="inline-block px-3 py-1 bg-white/10 text-white/70 text-sm font-medium rounded-full mb-4">Built for tenants</span>
+                            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Evidence you can use</h2>
                             <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-                                RentVault is the first platform built specifically to secure the entire tenant journey —
+                                RentVault helps you document the entire tenant journey with timestamps and locked records,
                                 from signing the lease to getting your deposit back.
                             </p>
                         </div>

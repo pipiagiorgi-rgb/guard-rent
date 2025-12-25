@@ -80,7 +80,7 @@ export default function TermsPage() {
                             If you believe you were charged in error or experienced a technical issue that prevented you from using a paid feature, please contact us and we will review the request.
                         </p>
                         <p className="text-slate-600">
-                            Contact: <a href="mailto:contact@rentvault.ai" className="text-slate-900 underline hover:no-underline">contact@rentvault.ai</a>
+                            Contact: <a href="mailto:support@rentvault.ai" className="text-slate-900 underline hover:no-underline">support@rentvault.ai</a>
                         </p>
                     </section>
 
@@ -118,12 +118,6 @@ export default function TermsPage() {
                         <h2 className="text-xl font-bold mb-4">10. Contact</h2>
                         <p className="text-slate-600 mb-4">
                             For questions about these Terms, contact us at:
-                        </p>
-                        <p className="text-slate-600 mb-4">
-                            <a href="mailto:contact@rentvault.ai" className="text-slate-900 underline hover:no-underline">contact@rentvault.ai</a>
-                        </p>
-                        <p className="text-slate-600 mb-2">
-                            For privacy-related requests:
                         </p>
                         <p className="text-slate-600">
                             <a href="mailto:support@rentvault.ai" className="text-slate-900 underline hover:no-underline">support@rentvault.ai</a>

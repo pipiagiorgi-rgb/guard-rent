@@ -54,7 +54,7 @@ export function OrganizationSchema({
         sameAs: [],
         contactPoint: {
             '@type': 'ContactPoint',
-            email: 'connect@rentvault.ai',
+            email: 'support@rentvault.ai',
             contactType: 'customer service'
         }
     }

@@ -130,7 +130,7 @@ export default function PrivacyPage() {
                             If you have questions about this Privacy Policy or how your data is handled, you can contact us at:
                         </p>
                         <p className="text-slate-600">
-                            <a href="mailto:privacy@rentvault.ai" className="text-slate-900 underline hover:no-underline">privacy@rentvault.ai</a>
+                            <a href="mailto:support@rentvault.ai" className="text-slate-900 underline hover:no-underline">support@rentvault.ai</a>
                         </p>
                     </section>
                 </div>
