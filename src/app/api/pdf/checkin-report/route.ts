@@ -248,13 +248,10 @@ export async function POST(request: Request) {
         const { validateAssetHashes } = await import('@/lib/pdf-images')
         const hashValidation = validateAssetHashes(allAssets)
 
+        // Log warning if assets missing hashes, but don't block PDF generation
         if (!hashValidation.valid) {
-            console.error(`PDF generation blocked: ${hashValidation.missingHashAssetIds.length} assets missing hashes`, hashValidation.missingHashAssetIds)
-            return NextResponse.json({
-                error: 'This report cannot be generated because one or more evidence files have not completed integrity verification.',
-                code: 'HASH_VERIFICATION_INCOMPLETE',
-                missingCount: hashValidation.missingHashAssetIds.length
-            }, { status: 422 })
+            console.warn(`PDF generation warning: ${hashValidation.missingHashAssetIds.length} assets missing hashes`, hashValidation.missingHashAssetIds)
+            // Continue with PDF generation - don't block for missing hashes
         }
 
         // Create PDF
