@@ -435,7 +435,7 @@ export async function drawHashAppendix(
         })
 
         const typeLabel = asset.type.replace('_photo', '').replace('_', ' ')
-        const hash = asset.file_hash_server || asset.file_hash || 'Pending verification'
+        const hash = asset.file_hash_server || asset.file_hash || '(Hash not recorded — uploaded before verification system)'
 
         page.drawText(date, { x: MARGIN, y: yPos, size: 8, font: fontRegular })
         page.drawText(typeLabel, { x: MARGIN + 100, y: yPos, size: 8, font: fontRegular })
