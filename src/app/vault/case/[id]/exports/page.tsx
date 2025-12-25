@@ -710,9 +710,15 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         </button>
                                         <button
                                             onClick={() => {
-                                                // URL is already available, no async - window.open works
+                                                // Direct download - use anchor tag
                                                 if (previewUrl) {
-                                                    window.open(previewUrl, '_blank')
+                                                    const link = document.createElement('a')
+                                                    link.href = previewUrl
+                                                    link.download = `RentVault_${previewType === 'checkin_pack' ? 'Check-in_Report' : 'Deposit_Recovery_Pack'}.pdf`
+                                                    link.style.display = 'none'
+                                                    document.body.appendChild(link)
+                                                    link.click()
+                                                    document.body.removeChild(link)
                                                 }
                                             }}
                                             className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center gap-2"
@@ -1502,8 +1508,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         onClick={() => handleGenerate('deposit_pack')}
                                         disabled={generating === 'deposit_pack'}
                                         className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${evidence.handoverCompleted
-                                                ? 'bg-green-600 text-white hover:bg-green-700'
-                                                : 'bg-amber-500 text-white hover:bg-amber-600'
+                                            ? 'bg-green-600 text-white hover:bg-green-700'
+                                            : 'bg-amber-500 text-white hover:bg-amber-600'
                                             }`}
                                     >
                                         {generating === 'deposit_pack' ? (
