@@ -102,48 +102,72 @@ export async function POST(req: Request) {
         }
         // Handle pack purchases (checkin_pack, deposit_pack, bundle_pack)
         else if (caseId && packType && userId) {
-            // Calculate Retention: Now + 12 months
-            const purchaseDate = new Date()
-            const retentionDate = new Date(purchaseDate)
-            retentionDate.setMonth(retentionDate.getMonth() + 12)
+            // Special handling for related_contracts (reference only, no retention update)
+            if (packType === 'related_contracts') {
+                const amountCents = session.amount_total || 0
 
-            // Get amount from session
-            const amountCents = session.amount_total || 0
+                const { error: purchaseError } = await supabaseAdmin
+                    .from('purchases')
+                    .insert({
+                        case_id: caseId,
+                        user_id: userId,
+                        pack_type: 'related_contracts',
+                        amount_cents: amountCents,
+                        currency: session.currency?.toUpperCase() || 'EUR',
+                        stripe_payment_id: session.payment_intent as string
+                    })
 
-            // 1. Insert into purchases table
-            const { error: purchaseError } = await supabaseAdmin
-                .from('purchases')
-                .insert({
-                    case_id: caseId,
-                    user_id: userId,
-                    pack_type: packType,
-                    amount_cents: amountCents,
-                    currency: session.currency?.toUpperCase() || 'EUR',
-                    stripe_payment_id: session.payment_intent as string
-                })
+                if (purchaseError) {
+                    console.error('Failed to insert related_contracts purchase:', purchaseError)
+                    return NextResponse.json({ error: 'DB Insert Failed' }, { status: 500 })
+                }
 
-            if (purchaseError) {
-                console.error('Failed to insert purchase record:', purchaseError)
-                // Continue anyway - case update is more critical
+                console.log(`Added related_contracts pack to case ${caseId}`)
+            } else {
+                // Standard evidence pack handling
+                // Calculate Retention: Now + 12 months
+                const purchaseDate = new Date()
+                const retentionDate = new Date(purchaseDate)
+                retentionDate.setMonth(retentionDate.getMonth() + 12)
+
+                // Get amount from session
+                const amountCents = session.amount_total || 0
+
+                // 1. Insert into purchases table
+                const { error: purchaseError } = await supabaseAdmin
+                    .from('purchases')
+                    .insert({
+                        case_id: caseId,
+                        user_id: userId,
+                        pack_type: packType,
+                        amount_cents: amountCents,
+                        currency: session.currency?.toUpperCase() || 'EUR',
+                        stripe_payment_id: session.payment_intent as string
+                    })
+
+                if (purchaseError) {
+                    console.error('Failed to insert purchase record:', purchaseError)
+                    // Continue anyway - case update is more critical
+                }
+
+                // 2. Update Case in DB
+                const { error } = await supabaseAdmin
+                    .from('cases')
+                    .update({
+                        purchase_type: packType,
+                        purchase_at: purchaseDate.toISOString(),
+                        retention_until: retentionDate.toISOString(),
+                        last_activity_at: purchaseDate.toISOString()
+                    })
+                    .eq('case_id', caseId)
+
+                if (error) {
+                    console.error('Failed to update case after payment:', error)
+                    return NextResponse.json({ error: 'DB Update Failed' }, { status: 500 })
+                }
+
+                console.log(`Updated case ${caseId} with pack ${packType}, retention until ${retentionDate.toISOString()}`)
             }
-
-            // 2. Update Case in DB
-            const { error } = await supabaseAdmin
-                .from('cases')
-                .update({
-                    purchase_type: packType,
-                    purchase_at: purchaseDate.toISOString(),
-                    retention_until: retentionDate.toISOString(),
-                    last_activity_at: purchaseDate.toISOString()
-                })
-                .eq('case_id', caseId)
-
-            if (error) {
-                console.error('Failed to update case after payment:', error)
-                return NextResponse.json({ error: 'DB Update Failed' }, { status: 500 })
-            }
-
-            console.log(`Updated case ${caseId} with pack ${packType}, retention until ${retentionDate.toISOString()}`)
         }
     }
 

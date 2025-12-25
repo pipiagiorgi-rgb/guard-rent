@@ -279,6 +279,12 @@ export default function PricingPage() {
                     <span>Optional walkthrough video evidence can be uploaded and referenced in exports.</span>
                 </div>
 
+                {/* Related Contracts Add-on */}
+                <div className="max-w-3xl mx-auto mt-4 flex items-center justify-center gap-2 text-sm text-slate-500">
+                    <FileText size={16} />
+                    <span>Optional add-on: Related contracts tracking (reference only) — €9 one-time</span>
+                </div>
+
                 {/* Footnote */}
                 <div className="text-center mt-10 md:mt-12 space-y-1 text-sm text-slate-500">
                     <p>Delete your data at any time.</p>
