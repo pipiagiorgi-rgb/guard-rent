@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, AlertCircle, Camera, Shield, Clock, FileText, Hash } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
+import { Logo } from '@/components/brand/Logo'
+import { ScrollToTop } from '@/components/ui/ScrollToTop'
 
 export const metadata: Metadata = {
     title: 'Mid-Tenancy Issues: Document Problems Before They Cost You | RentVault',
@@ -40,8 +42,18 @@ export default function MidTenancyIssuesGuide() {
         <div className="min-h-screen bg-white">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+
+            {/* Logo Header */}
+            <header className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-slate-100">
+                <div className="max-w-[800px] mx-auto px-4 md:px-6 h-16 flex items-center">
+                    <Link href="/" className="hover:opacity-80 transition-opacity">
+                        <Logo size="sm" />
+                    </Link>
+                </div>
+            </header>
+
             {/* Hero */}
-            <section className="pt-20 pb-12 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
+            <section className="pt-24 pb-12 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
                 <div className="max-w-[800px] mx-auto">
                     <Link
                         href="/guides"
@@ -246,6 +258,7 @@ export default function MidTenancyIssuesGuide() {
                 </div>
             </section>
 
+            <ScrollToTop />
             <Footer />
         </div>
     )
