@@ -399,7 +399,7 @@ export default function Home() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">Deposit protection</h3>
-                                        <p className="text-sm text-slate-500">Build evidence that wins disputes</p>
+                                        <p className="text-sm text-slate-500">Build evidence that supports your case</p>
                                     </div>
                                 </div>
                             </Link>
