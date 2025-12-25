@@ -243,6 +243,20 @@ export async function POST(request: Request) {
         const roomPhotos = await getPhotosGroupedByRoom(caseId)
         const totalPhotos = roomPhotos.reduce((sum, r) => sum + r.checkinPhotos.length, 0)
 
+        // HASH VALIDATION: Collect all assets and validate hashes before PDF generation
+        const allAssets = roomPhotos.flatMap(r => r.checkinPhotos)
+        const { validateAssetHashes } = await import('@/lib/pdf-images')
+        const hashValidation = validateAssetHashes(allAssets)
+
+        if (!hashValidation.valid) {
+            console.error(`PDF generation blocked: ${hashValidation.missingHashAssetIds.length} assets missing hashes`, hashValidation.missingHashAssetIds)
+            return NextResponse.json({
+                error: 'This report cannot be generated because one or more evidence files have not completed integrity verification.',
+                code: 'HASH_VERIFICATION_INCOMPLETE',
+                missingCount: hashValidation.missingHashAssetIds.length
+            }, { status: 422 })
+        }
+
         // Create PDF
         const pdfDoc = await PDFDocument.create()
         const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman)
@@ -523,7 +537,7 @@ export async function POST(request: Request) {
         }
 
         // === APPENDIX: FILE INTEGRITY ===
-        const allAssets = roomPhotos.flatMap(r => r.checkinPhotos)
+        // Reuse allAssets from earlier validation
         await drawHashAppendix(pdfDoc, allAssets, helveticaBold, helvetica)
 
         // Add page numbers to all pages

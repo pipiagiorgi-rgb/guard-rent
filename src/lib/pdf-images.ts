@@ -18,6 +18,38 @@ interface RoomPhotos {
     handoverPhotos: Asset[]
 }
 
+/**
+ * Result of hash validation check
+ */
+export interface HashValidationResult {
+    valid: boolean
+    missingHashAssetIds: string[]
+    totalAssets: number
+}
+
+/**
+ * Validate that all assets have verified hashes before PDF generation.
+ * This is a HARD REQUIREMENT for sealed evidence integrity.
+ * 
+ * @returns HashValidationResult with valid=false if any asset lacks a hash
+ */
+export function validateAssetHashes(assets: Asset[]): HashValidationResult {
+    const missingHashAssetIds: string[] = []
+
+    for (const asset of assets) {
+        const hash = asset.file_hash_server || asset.file_hash
+        if (!hash || hash.trim() === '') {
+            missingHashAssetIds.push(asset.asset_id)
+        }
+    }
+
+    return {
+        valid: missingHashAssetIds.length === 0,
+        missingHashAssetIds,
+        totalAssets: assets.length
+    }
+}
+
 // Constants for COURT-GRADE layout (dense, utilitarian)
 const THUMBNAIL_WIDTH = 160   // Larger for better evidence visibility
 const THUMBNAIL_HEIGHT = 120  // 4:3 ratio
@@ -27,6 +59,7 @@ const MARGIN = 40             // Reduced margins
 const LABEL_HEIGHT = 12
 const TIMESTAMP_HEIGHT = 9
 const ROW_SPACING = 8         // Minimal spacing between rows
+
 
 /**
  * Fetch image bytes from Supabase Storage
@@ -435,11 +468,16 @@ export async function drawHashAppendix(
         })
 
         const typeLabel = asset.type.replace('_photo', '').replace('_', ' ')
-        const hash = asset.file_hash_server || asset.file_hash || '(Hash not recorded — uploaded before verification system)'
+
+        // STRICT HASH REQUIREMENT: No fallbacks allowed for sealed evidence
+        const hash = asset.file_hash_server || asset.file_hash
+        if (!hash || hash.trim() === '') {
+            throw new Error(`INTEGRITY_VIOLATION: Asset ${asset.asset_id} is missing a verified hash. PDF generation blocked.`)
+        }
 
         page.drawText(date, { x: MARGIN, y: yPos, size: 8, font: fontRegular })
         page.drawText(typeLabel, { x: MARGIN + 100, y: yPos, size: 8, font: fontRegular })
-        page.drawText(hash.substring(0, 64), { x: MARGIN + 180, y: yPos, size: 7, font: fontRegular }) // Truncate if somehow too long, though sha256 hex is 64 chars
+        page.drawText(hash.substring(0, 64), { x: MARGIN + 180, y: yPos, size: 7, font: fontRegular })
 
         yPos -= 14
     }

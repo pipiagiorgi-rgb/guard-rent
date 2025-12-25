@@ -273,6 +273,20 @@ export async function POST(request: Request) {
             .eq('case_id', caseId)
             .order('incident_date', { ascending: false })
 
+        // HASH VALIDATION: Collect all evidence assets and validate hashes before PDF generation
+        const allEvidenceAssets = roomPhotos.flatMap(r => [...r.checkinPhotos, ...r.handoverPhotos])
+        const { validateAssetHashes } = await import('@/lib/pdf-images')
+        const hashValidation = validateAssetHashes(allEvidenceAssets)
+
+        if (!hashValidation.valid) {
+            console.error(`PDF generation blocked: ${hashValidation.missingHashAssetIds.length} assets missing hashes`, hashValidation.missingHashAssetIds)
+            return NextResponse.json({
+                error: 'This report cannot be generated because one or more evidence files have not completed integrity verification.',
+                code: 'HASH_VERIFICATION_INCOMPLETE',
+                missingCount: hashValidation.missingHashAssetIds.length
+            }, { status: 422 })
+        }
+
         // Create PDF
         const pdfDoc = await PDFDocument.create()
         const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman)
@@ -678,8 +692,8 @@ export async function POST(request: Request) {
         }
 
         // === APPENDIX: FILE INTEGRITY ===
-        const allAssets = roomPhotos.flatMap(r => [...r.checkinPhotos, ...r.handoverPhotos])
-        await drawHashAppendix(pdfDoc, allAssets, helveticaBold, helvetica)
+        // Reuse allEvidenceAssets from earlier validation
+        await drawHashAppendix(pdfDoc, allEvidenceAssets, helveticaBold, helvetica)
 
         // Add page numbers to all pages
         const totalPages = pages.length
