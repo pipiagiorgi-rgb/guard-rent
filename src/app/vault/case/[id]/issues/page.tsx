@@ -628,9 +628,22 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                             </button>
                                         </div>
                                     ))}
+                                    {/* Camera button for direct capture */}
+                                    <label className="w-20 h-20 border-2 border-dashed border-blue-200 bg-blue-50 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:bg-blue-100">
+                                        <Camera size={20} className="text-blue-500" />
+                                        <span className="text-xs text-blue-600 mt-1">Camera</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            capture="environment"
+                                            onChange={handlePhotoSelect}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                    {/* Gallery button for file picker */}
                                     <label className="w-20 h-20 border-2 border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-slate-300 hover:bg-slate-50">
-                                        <Camera size={20} className="text-slate-400" />
-                                        <span className="text-xs text-slate-500 mt-1">Add</span>
+                                        <Plus size={20} className="text-slate-400" />
+                                        <span className="text-xs text-slate-500 mt-1">Gallery</span>
                                         <input
                                             type="file"
                                             accept="image/*"
