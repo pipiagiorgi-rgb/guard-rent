@@ -339,7 +339,7 @@ export async function POST(request: Request) {
                         type: 'contract_pdf',
                         original_name: fileName || 'contract.pdf',
                         storage_path: storagePath,
-                        file_size: contractBuffer.length,
+                        size_bytes: contractBuffer.length,
                         mime_type: 'application/pdf',
                         created_at: new Date().toISOString()
                     })
