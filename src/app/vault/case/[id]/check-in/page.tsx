@@ -74,6 +74,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
 
     // Deposit proof state
     const [depositProof, setDepositProof] = useState<Asset | null>(null)
+    const [hasContract, setHasContract] = useState(false)
 
     // Room deletion state
     const [roomToDelete, setRoomToDelete] = useState<Room | null>(null)
@@ -142,6 +143,14 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 .eq('case_id', id)
                 .in('type', ['checkin_photo', 'photo', 'deposit_proof', 'meter_photo'])
                 .order('created_at', { ascending: false })
+
+            // Check if contract has been uploaded (locks deposit proof deletion)
+            const { count: contractCount } = await supabase
+                .from('assets')
+                .select('*', { count: 'exact', head: true })
+                .eq('case_id', id)
+                .eq('type', 'contract_pdf')
+            setHasContract((contractCount || 0) > 0)
 
             // Separate deposit proof from room photos
             const depositProofAsset = assets?.find(a => a.type === 'deposit_proof') || null
@@ -861,12 +870,14 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                             >
                                 View
                             </button>
-                            <button
-                                onClick={() => setPhotoToDelete(depositProof)}
-                                className="text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 px-3 py-1 rounded-md"
-                            >
-                                Remove
-                            </button>
+                            {!hasContract && (
+                                <button
+                                    onClick={() => setPhotoToDelete(depositProof)}
+                                    className="text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 px-3 py-1 rounded-md"
+                                >
+                                    Remove
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <label className={`px-4 py-2 bg-white border border-slate-200 rounded-lg font-medium cursor-pointer hover:bg-slate-50 flex items-center gap-2 ${uploading === 'deposit' ? 'opacity-50' : ''}`}>
