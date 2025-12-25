@@ -105,9 +105,27 @@ export default function PricingPage() {
             router.push('/vault')
         }
     }
+    // Generate FAQ Schema for SEO
+    const faqSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqItems.map(({ question, answer }) => ({
+            '@type': 'Question',
+            name: question,
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: answer
+            }
+        }))
+    }
 
     return (
         <div className="min-h-screen bg-white">
+            {/* FAQ Schema for SEO */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+            />
             <main className="max-w-[1120px] mx-auto px-4 md:px-6 py-12 md:py-20">
                 {/* Title */}
                 <div className="text-center mb-12 md:mb-16">

@@ -492,6 +492,32 @@ export default function Home() {
                     </div>
                 </section>
 
+                {/* Security at a Glance */}
+                <section className="py-8 px-4 md:px-6 border-t border-slate-100">
+                    <div className="max-w-[900px] mx-auto">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                            <div>
+                                <h3 className="font-semibold text-slate-900 mb-1">Security at a glance</h3>
+                                <p className="text-sm text-slate-500">Your data is protected using industry-standard practices.</p>
+                            </div>
+                            <div className="flex flex-wrap gap-4 text-sm">
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <Lock size={14} className="text-slate-400" />
+                                    <span>TLS encryption</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <Hash size={14} className="text-slate-400" />
+                                    <span>SHA-256 integrity</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <Shield size={14} className="text-slate-400" />
+                                    <span>Access controlled</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Final CTA */}
                 <section className="py-14 md:py-20 px-4 md:px-6">
                     <div className="max-w-[720px] mx-auto text-center">
