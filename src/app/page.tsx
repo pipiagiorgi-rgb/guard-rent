@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen, AlertCircle, Lock, Hash, Clock } from 'lucide-react'
+import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen, AlertCircle, Lock, Hash, Clock, Globe, Home as HomeIcon, Calendar } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
@@ -198,10 +198,10 @@ export default function Home() {
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                             {/* Contract clarity */}
                             <div className="feature-card group">
-                                <div className="icon-container icon-container-blue mb-6">
-                                    <FileText size={24} />
+                                <div className="icon-container icon-container-blue mb-4">
+                                    <FileText size={20} />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors">Contract clarity</h3>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-blue-600 transition-colors">Contract clarity</h3>
                                 <p className="text-slate-600 text-sm leading-relaxed">
                                     Upload your lease to see key dates and notice periods. Translate terms to your language if needed.
                                 </p>
@@ -209,10 +209,10 @@ export default function Home() {
 
                             {/* Photo evidence */}
                             <div className="feature-card group">
-                                <div className="icon-container icon-container-green mb-6">
-                                    <Camera size={24} />
+                                <div className="icon-container icon-container-green mb-4">
+                                    <Camera size={20} />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3 group-hover:text-green-600 transition-colors">Photo evidence</h3>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-green-600 transition-colors">Photo evidence</h3>
                                 <p className="text-slate-600 text-sm leading-relaxed">
                                     Document the property condition at move-in and before handover. Photos are stored with timestamps.
                                 </p>
@@ -220,10 +220,10 @@ export default function Home() {
 
                             {/* Issues log */}
                             <div className="feature-card group">
-                                <div className="icon-container icon-container-red mb-6">
-                                    <AlertCircle size={24} />
+                                <div className="icon-container icon-container-red mb-4">
+                                    <AlertCircle size={20} />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3 group-hover:text-red-600 transition-colors">Issues log</h3>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-red-600 transition-colors">Issues log</h3>
                                 <p className="text-slate-600 text-sm leading-relaxed">
                                     Log damage or problems as they happen with photos and timestamps. Build a timeline of evidence.
                                 </p>
@@ -231,10 +231,10 @@ export default function Home() {
 
                             {/* Deadline reminders */}
                             <div className="feature-card group">
-                                <div className="icon-container icon-container-amber mb-6">
-                                    <Bell size={24} />
+                                <div className="icon-container icon-container-amber mb-4">
+                                    <Bell size={20} />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3 group-hover:text-amber-600 transition-colors">Deadline alerts</h3>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-amber-600 transition-colors">Deadline alerts</h3>
                                 <p className="text-slate-600 text-sm leading-relaxed">
                                     Get reminded about contract renewal, termination dates, and other key deadlines.
                                 </p>
@@ -436,22 +436,22 @@ export default function Home() {
                         </div>
                         <div className="grid md:grid-cols-3 gap-4">
                             <div className="bg-slate-50 rounded-xl p-5 text-center">
-                                <div className="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center mx-auto mb-3">
-                                    <span className="text-2xl">🌍</span>
+                                <div className="w-10 h-10 bg-white rounded-lg border border-slate-200 flex items-center justify-center mx-auto mb-3">
+                                    <Globe size={18} className="text-slate-600" />
                                 </div>
                                 <h3 className="font-semibold text-slate-900 mb-1">Renting abroad</h3>
                                 <p className="text-sm text-slate-500">Translate contracts and understand local rules</p>
                             </div>
                             <div className="bg-slate-50 rounded-xl p-5 text-center">
-                                <div className="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center mx-auto mb-3">
-                                    <span className="text-2xl">🏠</span>
+                                <div className="w-10 h-10 bg-white rounded-lg border border-slate-200 flex items-center justify-center mx-auto mb-3">
+                                    <HomeIcon size={18} className="text-slate-600" />
                                 </div>
                                 <h3 className="font-semibold text-slate-900 mb-1">First rental</h3>
                                 <p className="text-sm text-slate-500">Know what to document and when</p>
                             </div>
                             <div className="bg-slate-50 rounded-xl p-5 text-center">
-                                <div className="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center mx-auto mb-3">
-                                    <span className="text-2xl">⏰</span>
+                                <div className="w-10 h-10 bg-white rounded-lg border border-slate-200 flex items-center justify-center mx-auto mb-3">
+                                    <Calendar size={18} className="text-slate-600" />
                                 </div>
                                 <h3 className="font-semibold text-slate-900 mb-1">Busy schedule</h3>
                                 <p className="text-sm text-slate-500">Get deadline reminders so nothing slips</p>
