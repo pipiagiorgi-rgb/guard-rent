@@ -645,7 +645,16 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             }
         } catch (err: any) {
             console.error('Upload error:', err)
-            setError('Failed to upload photo. Please try again.')
+            // More specific error messages for mobile debugging
+            if (err?.message?.includes('Failed to get upload URL')) {
+                setError('Could not prepare upload. Please check your connection and try again.')
+            } else if (err?.message?.includes('Upload failed')) {
+                setError('Photo upload failed. Try taking a smaller photo or using a different format.')
+            } else if (err?.message?.includes('Not authenticated')) {
+                setError('Session expired. Please refresh the page and try again.')
+            } else {
+                setError('Failed to upload photo. Please try again.')
+            }
         } finally {
             setUploading(null)
             e.target.value = ''

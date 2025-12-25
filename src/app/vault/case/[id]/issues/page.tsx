@@ -64,6 +64,9 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
     const [videoError, setVideoError] = useState<string | null>(null)
     const videoInputRef = useRef<HTMLInputElement>(null)
 
+    // Expanded issue for viewing details
+    const [expandedIssue, setExpandedIssue] = useState<string | null>(null)
+
     // Delete state
     const [deleteIssue, setDeleteIssue] = useState<Issue | null>(null)
     const [deleting, setDeleting] = useState(false)
@@ -400,72 +403,137 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        {issues.map(issue => (
-                            <div key={issue.issue_id} className="bg-white border border-slate-200 rounded-xl p-4">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
-                                                {issue.room_name}
-                                            </span>
-                                            <span className="text-sm text-slate-500 flex items-center gap-1">
-                                                <Calendar size={14} />
-                                                {new Date(issue.incident_date).toLocaleDateString('en-GB', {
-                                                    day: 'numeric', month: 'short', year: 'numeric'
-                                                })}
-                                            </span>
-                                        </div>
-                                        <p className="text-slate-700">{issue.description}</p>
+                        {issues.map(issue => {
+                            const isExpanded = expandedIssue === issue.issue_id
+                            const photos = issue.media.filter(m => m.type === 'issue_photo')
+                            const videos = issue.media.filter(m => m.type === 'issue_video')
 
-                                        {/* Media */}
-                                        {issue.media.length > 0 && (
-                                            <div className="flex gap-2 mt-3 flex-wrap">
-                                                {issue.media.map((item) => (
-                                                    item.type === 'issue_photo' ? (
-                                                        <button
-                                                            key={item.asset_id}
-                                                            onClick={() => openPhotoLightbox(issue.media)}
-                                                            className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-100 group"
-                                                        >
-                                                            {item.signedUrl && (
-                                                                <img
-                                                                    src={item.signedUrl}
-                                                                    alt=""
-                                                                    className="w-full h-full object-cover"
-                                                                />
-                                                            )}
-                                                            <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1">
-                                                                <ImageIcon size={10} className="text-white" />
-                                                            </div>
-                                                        </button>
-                                                    ) : (
-                                                        <a
-                                                            key={item.asset_id}
-                                                            href={item.signedUrl}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center group"
-                                                        >
-                                                            <Play size={20} className="text-white" />
-                                                            <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1">
-                                                                <Video size={10} className="text-white" />
-                                                            </div>
-                                                        </a>
-                                                    )
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
+                            return (
+                                <div key={issue.issue_id} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                                    {/* Clickable header */}
                                     <button
-                                        onClick={() => setDeleteIssue(issue)}
-                                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                        onClick={() => setExpandedIssue(isExpanded ? null : issue.issue_id)}
+                                        className="w-full p-4 flex items-start justify-between gap-4 text-left hover:bg-slate-50 transition-colors"
                                     >
-                                        <Trash2 size={18} />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                                <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                                                    {issue.room_name}
+                                                </span>
+                                                <span className="text-sm text-slate-500 flex items-center gap-1">
+                                                    <Calendar size={14} />
+                                                    {new Date(issue.incident_date).toLocaleDateString('en-GB', {
+                                                        day: 'numeric', month: 'short', year: 'numeric'
+                                                    })}
+                                                </span>
+                                                {issue.media.length > 0 && (
+                                                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                                                        {photos.length > 0 && <><ImageIcon size={12} /> {photos.length}</>}
+                                                        {videos.length > 0 && <><Video size={12} className="ml-1" /> {videos.length}</>}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className={`text-slate-700 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                                                {issue.description}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            {isExpanded ? (
+                                                <ChevronUp size={20} className="text-slate-400" />
+                                            ) : (
+                                                <ChevronDown size={20} className="text-slate-400" />
+                                            )}
+                                        </div>
                                     </button>
+
+                                    {/* Expanded details */}
+                                    {isExpanded && (
+                                        <div className="px-4 pb-4 border-t border-slate-100 bg-slate-50">
+                                            {/* Full description */}
+                                            <div className="py-4">
+                                                <h4 className="text-sm font-medium text-slate-500 mb-2">Description</h4>
+                                                <p className="text-slate-700 whitespace-pre-wrap">{issue.description}</p>
+                                            </div>
+
+                                            {/* Media gallery */}
+                                            {issue.media.length > 0 && (
+                                                <div className="py-4 border-t border-slate-200">
+                                                    <h4 className="text-sm font-medium text-slate-500 mb-3">
+                                                        Evidence ({photos.length} photo{photos.length !== 1 ? 's' : ''}{videos.length > 0 ? `, ${videos.length} video${videos.length !== 1 ? 's' : ''}` : ''})
+                                                    </h4>
+                                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                                                        {issue.media.map((item) => (
+                                                            item.type === 'issue_photo' ? (
+                                                                <button
+                                                                    key={item.asset_id}
+                                                                    onClick={() => openPhotoLightbox(issue.media)}
+                                                                    className="relative aspect-square rounded-lg overflow-hidden bg-slate-100 group hover:ring-2 hover:ring-blue-500 transition-all"
+                                                                >
+                                                                    {item.signedUrl && (
+                                                                        <img
+                                                                            src={item.signedUrl}
+                                                                            alt=""
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    )}
+                                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                                                </button>
+                                                            ) : (
+                                                                <a
+                                                                    key={item.asset_id}
+                                                                    href={item.signedUrl}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="relative aspect-square rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center group hover:ring-2 hover:ring-blue-500 transition-all"
+                                                                >
+                                                                    <Play size={24} className="text-white" />
+                                                                    <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 text-xs text-white flex items-center gap-1">
+                                                                        <Video size={10} /> Video
+                                                                    </div>
+                                                                </a>
+                                                            )
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Metadata */}
+                                            <div className="py-4 border-t border-slate-200">
+                                                <div className="flex flex-wrap gap-4 text-sm text-slate-500">
+                                                    <div>
+                                                        <span className="text-slate-400">Logged:</span>{' '}
+                                                        {new Date(issue.created_at).toLocaleDateString('en-GB', {
+                                                            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                                                        })}
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-slate-400">Incident date:</span>{' '}
+                                                        {new Date(issue.incident_date).toLocaleDateString('en-GB', {
+                                                            day: 'numeric', month: 'long', year: 'numeric'
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Actions */}
+                                            <div className="pt-4 border-t border-slate-200 flex justify-end">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        setDeleteIssue(issue)
+                                                    }}
+                                                    className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                >
+                                                    <Trash2 size={16} />
+                                                    Delete issue
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 )}
             </div>
