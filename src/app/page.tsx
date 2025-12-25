@@ -102,7 +102,7 @@ export default function Home() {
                         </p>
 
                         {/* Trust Strip */}
-                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-14 pt-10 animate-fade-in-up opacity-0 delay-500">
+                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-10 pt-6 animate-fade-in-up opacity-0 delay-500">
                             <div className="trust-badge">
                                 <div className="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-50 rounded-xl flex items-center justify-center">
                                     <Users size={18} className="text-slate-600" />
@@ -143,7 +143,6 @@ export default function Home() {
                                 </p>
                                 <p className="text-slate-700 leading-relaxed text-base md:text-lg">
                                     These situations are <strong className="text-slate-900">evidence-based</strong> and <strong className="text-slate-900">deadline-driven</strong>.
-                                    <br />
                                     Clear records, accurate timestamps, and preserved files can make a material difference.
                                 </p>
                                 <p className="text-slate-700 leading-relaxed text-base md:text-lg">
@@ -186,8 +185,8 @@ export default function Home() {
                 <section className="py-8 md:py-10 px-4 md:px-6">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-8">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-3">Everything in one place</h2>
-                            <p className="text-slate-600 text-lg max-w-xl mx-auto">Tools to protect your deposit and stay organised.</p>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-3">Your rental, organised</h2>
+                            <p className="text-slate-600 text-lg max-w-xl mx-auto">Evidence and deadlines in one secure place.</p>
                         </div>
 
                         {/* Differentiator line */}
@@ -356,58 +355,106 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Guides for Tenants - Global */}
-                <section className="py-8 md:py-10 px-4 md:px-6">
-                    <div className="max-w-[720px] mx-auto">
-                        <div className="flex items-center justify-center gap-2 mb-6">
-                            <BookOpen size={18} className="text-slate-400" />
-                            <span className="text-sm font-medium text-slate-500 uppercase tracking-wide">Guides for tenants</span>
+                {/* Guides for Tenants - Enhanced */}
+                <section className="py-10 md:py-12 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
+                    <div className="max-w-[900px] mx-auto">
+                        <div className="text-center mb-8">
+                            <div className="flex items-center justify-center gap-2 mb-3">
+                                <BookOpen size={18} className="text-slate-500" />
+                                <span className="text-sm font-medium text-slate-500 uppercase tracking-wide">Free resources</span>
+                            </div>
+                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">Guides for tenants</h2>
+                            <p className="text-slate-600 max-w-lg mx-auto">
+                                Moving soon? Learn what evidence you need and how to collect it properly.
+                            </p>
                         </div>
 
-                        <p className="text-center text-slate-600 mb-6">
-                            Free guides for tenants renting anywhere in Europe or the UK.
-                        </p>
-
-                        <div className="grid grid-cols-2 gap-3 mb-6">
-                            <Link href="/guides/move-in-photos" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-center">
-                                <span className="text-sm font-medium text-slate-700">Move-in photos</span>
+                        <div className="grid md:grid-cols-2 gap-4 mb-6">
+                            <Link href="/guides/move-in-photos" className="group p-5 bg-white rounded-xl border border-slate-200 hover:border-green-300 hover:shadow-md transition-all">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <Camera size={20} className="text-green-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-900 group-hover:text-green-700 transition-colors">Move-in photos</h3>
+                                        <p className="text-sm text-slate-500">Document condition on day one</p>
+                                    </div>
+                                </div>
                             </Link>
-                            <Link href="/guides/notice-periods" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-center">
-                                <span className="text-sm font-medium text-slate-700">Notice periods</span>
+                            <Link href="/guides/notice-periods" className="group p-5 bg-white rounded-xl border border-slate-200 hover:border-amber-300 hover:shadow-md transition-all">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <Clock size={20} className="text-amber-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-900 group-hover:text-amber-700 transition-colors">Notice periods</h3>
+                                        <p className="text-sm text-slate-500">Never miss a deadline</p>
+                                    </div>
+                                </div>
                             </Link>
-                            <Link href="/guides/deposit-protection" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-center">
-                                <span className="text-sm font-medium text-slate-700">Deposit protection</span>
+                            <Link href="/guides/deposit-protection" className="group p-5 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <Shield size={20} className="text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">Deposit protection</h3>
+                                        <p className="text-sm text-slate-500">Build evidence that wins disputes</p>
+                                    </div>
+                                </div>
                             </Link>
-                            <Link href="/guides/mid-tenancy-issues" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors text-center">
-                                <span className="text-sm font-medium text-slate-700">Mid-tenancy issues</span>
+                            <Link href="/guides/mid-tenancy-issues" className="group p-5 bg-white rounded-xl border border-slate-200 hover:border-red-300 hover:shadow-md transition-all">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <AlertCircle size={20} className="text-red-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-900 group-hover:text-red-700 transition-colors">Mid-tenancy issues</h3>
+                                        <p className="text-sm text-slate-500">Log problems as they happen</p>
+                                    </div>
+                                </div>
                             </Link>
                         </div>
 
                         <div className="text-center">
-                            <Link href="/guides" className="text-sm font-medium text-slate-900 hover:underline">
-                                View all guides →
+                            <Link href="/guides" className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+                                View all guides
+                                <ArrowRight size={14} />
                             </Link>
                         </div>
                     </div>
                 </section>
 
-                {/* Who it's for */}
-                <section className="py-10 md:py-14 px-4 md:px-6 bg-gradient-to-b from-white to-slate-50">
-                    <div className="max-w-[720px] mx-auto">
-                        <div className="feature-card text-center py-10 px-8">
-                            <div className="w-16 h-16 bg-gradient-to-br from-slate-900 to-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                                <Users size={28} className="text-white" />
-                            </div>
-                            <h2 className="text-2xl md:text-3xl font-bold mb-4">Built for tenants</h2>
-                            <p className="text-slate-600 text-lg leading-relaxed mb-6">
-                                For anyone renting who wants peace of mind. Useful if you are renting abroad or in a second language.
+                {/* Who it's for - Specific use cases */}
+                <section className="py-10 md:py-12 px-4 md:px-6">
+                    <div className="max-w-[900px] mx-auto">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl md:text-3xl font-bold mb-3">Built for tenants</h2>
+                            <p className="text-slate-600 max-w-lg mx-auto">
+                                Especially useful when renting abroad or in a second language.
                             </p>
-                            <div className="flex flex-wrap justify-center gap-3">
-                                {['Renting abroad', 'Students', 'First-time renters', 'Remote workers'].map((tag) => (
-                                    <span key={tag} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium">
-                                        {tag}
-                                    </span>
-                                ))}
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-4">
+                            <div className="bg-slate-50 rounded-xl p-5 text-center">
+                                <div className="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center mx-auto mb-3">
+                                    <span className="text-2xl">🌍</span>
+                                </div>
+                                <h3 className="font-semibold text-slate-900 mb-1">Renting abroad</h3>
+                                <p className="text-sm text-slate-500">Translate contracts and understand local rules</p>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 text-center">
+                                <div className="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center mx-auto mb-3">
+                                    <span className="text-2xl">🏠</span>
+                                </div>
+                                <h3 className="font-semibold text-slate-900 mb-1">First rental</h3>
+                                <p className="text-sm text-slate-500">Know what to document and when</p>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 text-center">
+                                <div className="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center mx-auto mb-3">
+                                    <span className="text-2xl">⏰</span>
+                                </div>
+                                <h3 className="font-semibold text-slate-900 mb-1">Busy schedule</h3>
+                                <p className="text-sm text-slate-500">Get deadline reminders so nothing slips</p>
                             </div>
                         </div>
                     </div>
@@ -486,25 +533,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* AI Disclosure - Small FAQ clarification */}
-                <section className="py-8 px-4 md:px-6 border-t border-slate-100">
-                    <div className="max-w-[720px] mx-auto">
-                        <details className="group">
-                            <summary className="text-sm font-medium text-slate-600 cursor-pointer hover:text-slate-900 list-none flex items-center gap-2">
-                                <span className="text-slate-400 group-open:rotate-90 transition-transform">▶</span>
-                                Does RentVault use automated assistance?
-                            </summary>
-                            <div className="mt-3 text-sm text-slate-600 pl-5">
-                                <p className="mb-2">
-                                    Yes. RentVault uses automated assistance to help identify key dates and summarise rental documents.
-                                </p>
-                                <p className="text-slate-500">
-                                    Your uploaded files and timestamps remain the authoritative record. Not legal advice.
-                                </p>
-                            </div>
-                        </details>
-                    </div>
-                </section>
+
 
                 {/* Footer */}
                 <Footer />

@@ -120,20 +120,10 @@ export default function PricingPage() {
                     </p>
                 </div>
 
-                {/* Preview Mode Banner */}
-                <div className="max-w-3xl mx-auto mb-12 p-6 bg-blue-50 border border-blue-200 rounded-2xl">
-                    <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
-                            <Eye size={20} />
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-blue-900 mb-1">Preview features</h3>
-                            <p className="text-sm text-blue-800">
-                                You can explore RentVault for free. Upload contracts, scan for dates,
-                                ask questions, and translate in preview mode. Data is cleared on refresh. Buy a pack to save your data.
-                            </p>
-                        </div>
-                    </div>
+                {/* Preview Mode Note */}
+                <div className="max-w-3xl mx-auto mb-10 flex items-center justify-center gap-3 text-sm text-slate-500">
+                    <Eye size={16} className="flex-shrink-0" />
+                    <span>Preview mode is free — data clears on refresh. Buy a pack to save permanently.</span>
                 </div>
 
                 {/* Pricing Cards - OUTCOME-FOCUSED BULLETS */}
@@ -175,8 +165,11 @@ export default function PricingPage() {
                         </p>
                     </div>
 
-                    {/* Full Bundle */}
-                    <div className="bg-slate-900 text-white p-6 md:p-8 rounded-2xl relative flex flex-col">
+                    {/* Full Bundle - POPULAR */}
+                    <div className="bg-slate-900 text-white p-6 md:p-8 rounded-2xl relative flex flex-col md:-mt-4 md:mb-4 shadow-xl">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                            <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Most popular</span>
+                        </div>
                         <div className="mb-6">
                             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-white mb-3">
                                 <Shield size={20} />
