@@ -458,7 +458,7 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
 
         try {
             const controller = new AbortController()
-            const timeoutId = setTimeout(() => controller.abort(), 60000)
+            const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minutes for long documents
 
             const res = await fetch('/api/ai/translate', {
                 method: 'POST',
@@ -484,7 +484,11 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                 setTranslationsRemaining(getTranslationsRemaining(caseId))
             }
         } catch (err: any) {
-            setTranslationError(err.message || 'Translation failed.')
+            if (err.name === 'AbortError') {
+                setTranslationError('Translation took too long. Please try again with a shorter document.')
+            } else {
+                setTranslationError(err.message || 'Translation failed.')
+            }
         } finally {
             setTranslating(false)
         }
