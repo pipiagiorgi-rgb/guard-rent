@@ -978,3 +978,85 @@ Thank you for using RentVault.
         tags: [{ name: 'type', value: 'storage_extension' }]
     })
 }
+
+/**
+ * Send Related Contracts Purchase Confirmation Email
+ * REAL USERS ONLY - not sent for admin access
+ */
+export async function sendRelatedContractsPurchaseEmail({
+    to,
+    rentalLabel,
+    dashboardUrl
+}: {
+    to: string
+    rentalLabel: string
+    dashboardUrl: string
+}) {
+    const subject = 'Related contracts added to your rental'
+
+    const text = `You've added Related contracts to your rental "${rentalLabel}" in RentVault.
+
+You can now:
+• Upload and store contracts linked to your rental (internet, utilities, parking, insurance)
+• Translate these contracts for easier reading
+• Set reminder emails for notice periods when they're clearly stated
+
+This applies for the entire duration of this rental, including any extensions.
+No further action is required.
+
+Related contracts are stored for reference and reminders only.
+They are not sealed evidence and are not included in evidence reports.
+
+You can manage related contracts anytime from your rental dashboard:
+${dashboardUrl}
+
+© RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.`
+
+    const html = emailTemplate({
+        title: 'Related contracts added',
+        previewText: `Related contracts enabled for "${rentalLabel}"`,
+        bodyContent: `
+            <p style="color: #1e293b; font-size: 15px; line-height: 24px; margin-bottom: 16px;">
+                You've added <strong>Related contracts</strong> to your rental <strong>"${rentalLabel}"</strong> in RentVault.
+            </p>
+
+            <p style="color: #1e293b; font-size: 15px; line-height: 24px; margin-bottom: 8px;">
+                You can now:
+            </p>
+            <ul style="color: #1e293b; font-size: 15px; line-height: 24px; margin-bottom: 16px; padding-left: 20px;">
+                <li>Upload and store contracts linked to your rental (internet, utilities, parking, insurance)</li>
+                <li>Translate these contracts for easier reading</li>
+                <li>Set reminder emails for notice periods when they're clearly stated</li>
+            </ul>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <p style="color: #166534; font-size: 14px; line-height: 22px; margin: 0;">
+                    <strong>✓ This applies for the entire duration of this rental, including any extensions.</strong><br>
+                    No further action is required.
+                </p>
+            </div>
+
+            <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <p style="color: #854d0e; font-size: 14px; line-height: 22px; margin: 0;">
+                    <strong>Reference only:</strong> Related contracts are stored for reference and reminders only.
+                    They are not sealed evidence and are not included in evidence reports.
+                </p>
+            </div>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 22px;">
+                You can manage related contracts anytime from your rental dashboard.
+            </p>
+        `,
+        ctaText: 'View Your Rental',
+        ctaUrl: dashboardUrl
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'related_contracts_purchase' }]
+    })
+}
+

@@ -60,6 +60,10 @@ const faqItems = [
     {
         question: "What payment methods do you accept?",
         answer: "Payments are processed securely by Stripe. You can pay with major credit and debit cards. VAT may apply depending on your location."
+    },
+    {
+        question: "What are Related Contracts?",
+        answer: "Related contracts is an optional €9 add-on that lets you track utility and service contracts (internet, electricity, parking, insurance) linked to your rental. It's a one-time purchase that lasts for the entire duration of your rental, including any extensions. Related contracts are reference-only — they are not sealed evidence and are not included in evidence reports."
     }
 ]
 

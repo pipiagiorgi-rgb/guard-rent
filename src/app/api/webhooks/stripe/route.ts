@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { headers } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
+import { sendRelatedContractsPurchaseEmail } from '@/lib/email'
 
 export async function POST(req: Request) {
     const body = await req.text()
@@ -120,6 +121,37 @@ export async function POST(req: Request) {
                 if (purchaseError) {
                     console.error('Failed to insert related_contracts purchase:', purchaseError)
                     return NextResponse.json({ error: 'DB Insert Failed' }, { status: 500 })
+                }
+
+                // Send confirmation email for real purchases
+                try {
+                    // Get rental label and user email for the email
+                    const { data: rentalCase } = await supabaseAdmin
+                        .from('cases')
+                        .select('label, address')
+                        .eq('case_id', caseId)
+                        .single()
+
+                    const { data: userData } = await supabaseAdmin
+                        .from('profiles')
+                        .select('email')
+                        .eq('user_id', userId)
+                        .single()
+
+                    if (userData?.email) {
+                        const rentalLabel = rentalCase?.label || rentalCase?.address || 'Your rental'
+                        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+
+                        await sendRelatedContractsPurchaseEmail({
+                            to: userData.email,
+                            rentalLabel,
+                            dashboardUrl: `${siteUrl}/vault/case/${caseId}`
+                        })
+                        console.log(`Sent related_contracts purchase email to ${userData.email}`)
+                    }
+                } catch (emailError) {
+                    console.error('Failed to send related_contracts email (non-critical):', emailError)
+                    // Don't fail the webhook for email errors
                 }
 
                 console.log(`Added related_contracts pack to case ${caseId}`)
