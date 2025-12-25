@@ -50,27 +50,31 @@ const countries = [
     }
 ]
 
-// Common topics for all countries
+// Common topics for all countries - now with links
 const commonTopics = [
     {
         icon: Camera,
         title: 'Why move-in photos matter',
-        description: 'Timestamped photos protect you if there\'s a dispute about property condition.'
+        description: 'Timestamped photos protect you if there\'s a dispute about property condition.',
+        slug: 'move-in-photos'
     },
     {
         icon: Clock,
         title: 'Understanding notice periods',
-        description: 'Missing your deadline can mean extra months of rent. Know when to act.'
+        description: 'Missing your deadline can mean extra months of rent. Know when to act.',
+        slug: 'notice-periods'
     },
     {
         icon: Shield,
         title: 'Protecting your deposit',
-        description: 'Most disputes come down to evidence. Keep records from day one.'
+        description: 'Most disputes come down to evidence. Keep records from day one.',
+        slug: 'deposit-protection'
     },
     {
         icon: AlertCircle,
         title: 'Logging mid-tenancy issues',
-        description: 'Document problems as they happen, not months later.'
+        description: 'Document problems as they happen, not months later.',
+        slug: 'mid-tenancy-issues'
     }
 ]
 
@@ -152,18 +156,19 @@ export default function GuidesPage() {
 
                     <div className="grid md:grid-cols-2 gap-4">
                         {commonTopics.map((topic) => (
-                            <div
+                            <Link
                                 key={topic.title}
-                                className="bg-white rounded-xl border border-slate-200 p-5 flex gap-4 items-start"
+                                href={`/guides/${topic.slug}`}
+                                className="bg-white rounded-xl border border-slate-200 p-5 flex gap-4 items-start hover:border-slate-300 hover:shadow-md transition-all group"
                             >
-                                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-slate-200 transition-colors">
                                     <topic.icon size={20} className="text-slate-600" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-slate-900 mb-1">{topic.title}</h3>
+                                    <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">{topic.title}</h3>
                                     <p className="text-sm text-slate-600">{topic.description}</p>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>
