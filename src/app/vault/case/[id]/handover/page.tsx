@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
     Camera, Check, Loader2, Upload, FileText,
     Key, Gauge, ChevronDown, ChevronUp, AlertCircle,
-    X, ImageIcon, Eye, Lock, CheckCircle2, Plus, ShieldCheck
+    X, ImageIcon, Eye, Lock, CheckCircle2, Plus, ShieldCheck, ArrowRight
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
@@ -1108,18 +1108,43 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                                     <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
                                     <span>A confirmation email has been sent as a backup record</span>
                                 </p>
-                                <p className="flex items-start gap-2">
-                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
-                                    <span>Records remain accessible in Exports</span>
-                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="pl-0 sm:pl-16">
-                        <p className="text-sm text-slate-500 bg-slate-100 p-4 rounded-lg">
-                            Records remain accessible after expiry. You&apos;ll be notified well in advance if any action is needed.
-                        </p>
+                    {/* What happens next */}
+                    <div className="pl-0 sm:pl-16 space-y-4">
+                        <div className="bg-slate-100 p-4 rounded-lg">
+                            <h4 className="font-medium text-slate-900 mb-2">What happens next</h4>
+                            <p className="text-sm text-slate-600 leading-relaxed">
+                                Your evidence is now sealed and stored exactly as recorded.
+                                You can generate a PDF snapshot at any time from Exports.
+                                Exporting creates a portable copy you can keep or share if needed.
+                            </p>
+                        </div>
+
+                        {/* CTA with helper text */}
+                        <div className="text-center space-y-3">
+                            <a
+                                href={`/vault/case/${caseId}/exports`}
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors"
+                            >
+                                Go to Exports
+                                <ArrowRight size={18} />
+                            </a>
+                            <p className="text-sm text-slate-500">
+                                Most tenants export a copy for their records once evidence is sealed.
+                            </p>
+                            <p className="text-sm text-slate-500">
+                                Exporting combines your move-in and move-out records into one document.
+                            </p>
+                            <a
+                                href={`/vault/case/${caseId}/exports`}
+                                className="text-sm text-slate-500 underline hover:text-slate-700"
+                            >
+                                Preview what the PDF includes
+                            </a>
+                        </div>
                     </div>
                 </div>
             ) : (
