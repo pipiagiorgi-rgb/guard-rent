@@ -189,6 +189,14 @@ export default function LoginPage() {
                                 <p className="text-sm text-slate-500 text-center mt-6">
                                     Passwordless login. No password to remember.
                                 </p>
+
+                                {/* Back to home */}
+                                <a
+                                    href="https://rentvault.ai"
+                                    className="block text-sm text-slate-400 text-center mt-4 hover:text-slate-600 transition-colors"
+                                >
+                                    ← Back to RentVault home
+                                </a>
                             </>
                         )}
 

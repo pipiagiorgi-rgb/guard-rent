@@ -23,10 +23,10 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
                 const { data: { user } } = await supabase.auth.getUser()
                 if (!user) return
 
-                // Get all user's cases
+                // Get all user's cases with purchase_type
                 const { data: cases } = await supabase
                     .from('cases')
-                    .select('case_id')
+                    .select('case_id, purchase_type')
                     .eq('user_id', user.id)
 
                 if (!cases || cases.length === 0) {
@@ -35,17 +35,30 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
                     return
                 }
 
-                // Check if any case has purchased packs
+                // Check if any case has purchase_type set (older system)
+                const hasPurchaseType = cases.some(c =>
+                    c.purchase_type && c.purchase_type !== 'none' && c.purchase_type !== ''
+                )
+
+                if (hasPurchaseType) {
+                    setHasUnpaidCases(false)
+                    setLoading(false)
+                    return
+                }
+
+                // Check if any case has purchased packs (newer system)
                 const caseIds = cases.map(c => c.case_id)
                 const { data: purchases } = await supabase
                     .from('purchases')
                     .select('case_id')
                     .in('case_id', caseIds)
 
-                // If no purchases found, user has unpaid cases
+                // If no purchases found via either method, user has unpaid cases
                 setHasUnpaidCases(!purchases || purchases.length === 0)
             } catch (err) {
                 console.error('Error checking cases:', err)
+                // On error, don't block sign out
+                setHasUnpaidCases(false)
             } finally {
                 setLoading(false)
             }
@@ -67,7 +80,8 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
         try {
             const supabase = createClient()
             await supabase.auth.signOut()
-            window.location.href = '/login'
+            // Redirect to home page after sign out
+            window.location.href = 'https://rentvault.ai'
         } catch (err) {
             console.error('Sign out error:', err)
             setSigningOut(false)
