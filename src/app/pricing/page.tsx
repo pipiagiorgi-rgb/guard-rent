@@ -63,7 +63,7 @@ const faqItems = [
     },
     {
         question: "What are Related Contracts?",
-        answer: "Related contracts is an optional €9 add-on that lets you track utility and service contracts (internet, electricity, parking, insurance) linked to your rental. It's a one-time purchase that lasts for the entire duration of your rental, including any extensions. Related contracts are reference-only — they are not sealed evidence and are not included in evidence reports."
+        answer: "Related contracts is an optional €9 add-on that lets you track utility and service contracts (internet, electricity, parking, insurance) linked to your rental. It's a one-time purchase that lasts for the entire duration of your rental, including any extensions. Related contracts are reference-only — they are not sealed evidence and are not included in evidence reports. Only sealed evidence (check-in photos, handover records, meter readings) is included in reports to keep your evidence clear and dispute-ready."
     }
 ]
 
