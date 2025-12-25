@@ -216,49 +216,83 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
-                SECTION B: RETENTION STATUS
+                SECTION B: RETENTION STATUS (4-state logic)
             ═══════════════════════════════════════════════════════════════ */}
             <div className="bg-white rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
-                        <Clock className="text-amber-600" size={20} />
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${data.purchaseType
+                            ? 'bg-green-50'
+                            : 'bg-slate-100'
+                        }`}>
+                        <Clock className={data.purchaseType ? 'text-green-600' : 'text-slate-500'} size={20} />
                     </div>
                     <h2 className="font-semibold text-lg">Retention status</h2>
                 </div>
 
-                {data.purchaseType ? (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div className="flex items-center gap-2 text-green-700">
-                            <Check size={18} />
-                            <span className="font-medium">Secure retention active</span>
+                {(() => {
+                    // Determine retention state
+                    const now = new Date()
+                    const retentionExpiry = data.retentionUntil ? new Date(data.retentionUntil) : null
+                    const formatDate = (date: Date) => date.toLocaleDateString('en-GB', {
+                        day: 'numeric', month: 'long', year: 'numeric'
+                    })
+
+                    // STATE A: Preview (no pack purchased)
+                    if (!data.purchaseType) {
+                        return (
+                            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                                <div className="flex items-center gap-2 text-slate-700 mb-1">
+                                    <Clock size={18} />
+                                    <span className="font-medium">Preview mode</span>
+                                </div>
+                                <p className="text-sm text-slate-600">
+                                    Your records are stored temporarily while you explore RentVault.
+                                    Purchase a pack in{' '}
+                                    <a href={`/vault/case/${caseId}/exports`} className="underline font-medium text-slate-700">Exports</a>{' '}
+                                    to unlock 12-month secure retention and official PDF exports.
+                                </p>
+                            </div>
+                        )
+                    }
+
+                    // STATE D: Expired (retention passed, no grace)
+                    // Note: In practice, grace period would come from a separate field
+                    // For now, if expiry is in the past with no grace_period_active field, treat as expired
+                    if (retentionExpiry && retentionExpiry < now) {
+                        return (
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                <div className="flex items-center gap-2 text-amber-700 mb-1">
+                                    <Clock size={18} />
+                                    <span className="font-medium">Retention expired</span>
+                                </div>
+                                <p className="text-sm text-amber-700">
+                                    Your retention period ended on {formatDate(retentionExpiry)}.
+                                    You can download any remaining files or extend storage if available.
+                                </p>
+                            </div>
+                        )
+                    }
+
+                    // STATE B: Paid (retention active)
+                    return (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div className="flex items-center gap-2 text-green-700 mb-1">
+                                <Check size={18} />
+                                <span className="font-medium">Storage active</span>
+                            </div>
+                            <p className="text-sm text-green-600">
+                                {data.storageYears > 1 && (
+                                    <>You have <span className="font-medium">{data.storageYears} years</span> of storage. </>
+                                )}
+                                Your rental records are securely stored until{' '}
+                                <span className="font-medium">
+                                    {retentionExpiry ? formatDate(retentionExpiry) : 'your retention period ends'}
+                                </span>.
+                                You&apos;ll be notified in advance if any action is needed.
+                            </p>
                         </div>
-                        <p className="text-sm text-green-600 mt-1">
-                            {data.storageYears > 1 ? (
-                                <>
-                                    You have <span className="font-medium">{data.storageYears} years</span> of storage.{' '}
-                                </>
-                            ) : null}
-                            Your data is securely stored until{' '}
-                            <span className="font-medium">
-                                {data.retentionUntil ? new Date(data.retentionUntil).toLocaleDateString('en-GB', {
-                                    day: 'numeric', month: 'long', year: 'numeric'
-                                }) : 'your retention period ends'}
-                            </span>
-                        </p>
-                    </div>
-                ) : (
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                        <div className="flex items-center gap-2 text-amber-700 mb-1">
-                            <Clock size={18} />
-                            <span className="font-medium">Preview mode</span>
-                        </div>
-                        <p className="text-sm text-amber-700">
-                            Your data is stored temporarily and may be deleted. Purchase a pack in{' '}
-                            <a href={`/vault/case/${caseId}/exports`} className="underline font-medium">Exports</a>{' '}
-                            to unlock 12-month secure retention.
-                        </p>
-                    </div>
-                )}
+                    )
+                })()}
 
                 <div className="mt-4 pt-4 border-t border-slate-100 text-sm text-slate-500">
                     <div className="flex justify-between">
