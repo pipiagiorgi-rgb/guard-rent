@@ -5,7 +5,7 @@ import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
     title: 'Tenant Guides: Protect Your Deposit | RentVault',
-    description: 'Free guides for tenants. Learn how to document your rental, protect your deposit, and build evidence that stands up in disputes.',
+    description: 'Free guides for tenants. Learn how to document your rental and protect your deposit with organised records and timestamps.',
     alternates: {
         canonical: 'https://rentvault.ai/guides'
     }
