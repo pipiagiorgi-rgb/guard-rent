@@ -408,7 +408,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 body: JSON.stringify({
                     caseId,
                     filename: file.name,
-                    mimeType: file.type,
+                    mimeType: file.type || 'image/jpeg',
                     type: 'meter_photo',
                 })
             })
@@ -416,10 +416,11 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             if (!res.ok) throw new Error('Failed to get upload URL')
             const { signedUrl, assetId } = await res.json()
 
+            const uploadMimeType = file.type || 'image/jpeg'
             const uploadRes = await fetch(signedUrl, {
                 method: 'PUT',
                 body: file,
-                headers: { 'Content-Type': file.type }
+                headers: { 'Content-Type': uploadMimeType }
             })
 
             if (!uploadRes.ok) throw new Error('Upload failed')
@@ -493,7 +494,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 body: JSON.stringify({
                     caseId,
                     filename: file.name,
-                    mimeType: file.type,
+                    mimeType: file.type || 'image/jpeg',
                     type: 'deposit_proof',
                 })
             })
@@ -501,10 +502,11 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             if (!res.ok) throw new Error('Failed to get upload URL')
             const { signedUrl, assetId, storagePath } = await res.json()
 
+            const uploadMimeType = file.type || 'image/jpeg'
             const uploadRes = await fetch(signedUrl, {
                 method: 'PUT',
                 body: file,
-                headers: { 'Content-Type': file.type }
+                headers: { 'Content-Type': uploadMimeType }
             })
 
             if (!uploadRes.ok) throw new Error('Upload failed')
@@ -599,22 +601,32 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                     body: JSON.stringify({
                         caseId,
                         filename: file.name,
-                        mimeType: file.type,
+                        mimeType: file.type || 'image/jpeg', // Fallback for iOS HEIC
                         type: 'checkin_photo',
                         roomId
                     })
                 })
 
-                if (!res.ok) throw new Error('Failed to get upload URL')
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}))
+                    console.error('Upload URL error:', errorData)
+                    throw new Error('Failed to get upload URL')
+                }
                 const { signedUrl, assetId, storagePath } = await res.json()
+
+                // Use image/jpeg fallback if file.type is empty (iOS HEIC handling)
+                const uploadMimeType = file.type || 'image/jpeg'
 
                 const uploadRes = await fetch(signedUrl, {
                     method: 'PUT',
                     body: file,
-                    headers: { 'Content-Type': file.type }
+                    headers: { 'Content-Type': uploadMimeType }
                 })
 
-                if (!uploadRes.ok) throw new Error('Upload failed')
+                if (!uploadRes.ok) {
+                    console.error('Upload failed:', uploadRes.status, uploadRes.statusText)
+                    throw new Error('Upload failed')
+                }
 
                 await supabase
                     .from('assets')
