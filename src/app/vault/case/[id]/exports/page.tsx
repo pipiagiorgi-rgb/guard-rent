@@ -583,8 +583,11 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             } else {
                 console.error('No URL returned from PDF API')
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error('Generate error:', err)
+            setToastMessage(err?.message || 'Failed to generate PDF. Please try again.')
+            setShowToast(true)
+            setTimeout(() => setShowToast(false), 5000)
         } finally {
             setGenerating(null)
             setPreviewing(null)

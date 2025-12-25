@@ -5,6 +5,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { isAdminEmail } from '@/lib/admin'
 import { getPhotosGroupedByRoom, drawComparisonGrid, drawPhotoGrid, drawHashAppendix } from '@/lib/pdf-images'
 
+// Extend function timeout for PDF generation (requires Pro plan for >10s)
+export const maxDuration = 60
+
 const MARGIN = 50
 const FOOTER_TEXT = '© RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.'
 
