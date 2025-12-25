@@ -883,3 +883,98 @@ RentVault securely stores and organises your rental documents. Not legal advice.
         tags: [{ name: 'type', value: 'evidence_locked' }]
     })
 }
+
+// ============================================================
+// STORAGE EXTENSION CONFIRMATION EMAIL
+// ============================================================
+interface StorageExtensionProps {
+    to: string
+    rentalLabel: string
+    yearsAdded: number
+    totalYears: number
+    newExpiryDate: string
+    caseId: string
+}
+
+export async function sendStorageExtensionEmail({
+    to,
+    rentalLabel,
+    yearsAdded,
+    totalYears,
+    newExpiryDate,
+    caseId
+}: StorageExtensionProps): Promise<{ success: boolean; error?: string }> {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+    const storageUrl = `${siteUrl}/vault/case/${caseId}/storage`
+    const exportsUrl = `${siteUrl}/vault/case/${caseId}/exports`
+
+    const formattedDate = new Date(newExpiryDate).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    })
+
+    const subject = `Storage extended — your RentVault records are secure until ${formattedDate}`
+
+    const text = `
+Storage Extended
+
+Your rental records for "${rentalLabel}" are now secured until ${formattedDate}.
+
+What was purchased: ${yearsAdded} year${yearsAdded > 1 ? 's' : ''} of additional storage
+Total storage: ${totalYears} year${totalYears > 1 ? 's' : ''}
+New expiry date: ${formattedDate}
+
+Your records remain sealed and unchanged. This extension only affects how long they are stored.
+
+View your storage status: ${storageUrl}
+Access your exports: ${exportsUrl}
+
+Thank you for using RentVault.
+`
+
+    const html = emailTemplate({
+        title: 'Storage Extended',
+        previewText: `Your records are secure until ${formattedDate}`,
+        bodyContent: `
+            <p style="color: #475569; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                Your rental records for <strong>${rentalLabel}</strong> are now secured until <strong>${formattedDate}</strong>.
+            </p>
+
+            <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <table style="width: 100%; font-size: 14px; color: #166534;">
+                    <tr>
+                        <td style="padding: 4px 0;"><strong>Storage added:</strong></td>
+                        <td style="text-align: right;">${yearsAdded} year${yearsAdded > 1 ? 's' : ''}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 0;"><strong>Total storage:</strong></td>
+                        <td style="text-align: right;">${totalYears} year${totalYears > 1 ? 's' : ''}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 0;"><strong>New expiry date:</strong></td>
+                        <td style="text-align: right;">${formattedDate}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 22px; margin-bottom: 24px;">
+                Your records remain sealed and unchanged. This extension only affects how long they are stored.
+            </p>
+
+            <p style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 24px;">
+                <a href="${exportsUrl}" style="color: #475569;">Access your exports</a>
+            </p>
+        `,
+        ctaText: 'View Storage Status',
+        ctaUrl: storageUrl
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'storage_extension' }]
+    })
+}

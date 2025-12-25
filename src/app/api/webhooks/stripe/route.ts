@@ -35,10 +35,10 @@ export async function POST(req: Request) {
         if (type === 'storage_extension' && caseId) {
             const yearsToAdd = parseInt(session.metadata?.years || '1', 10)
 
-            // Get current storage info
+            // Get current storage info and user email
             const { data: currentCase } = await supabaseAdmin
                 .from('cases')
-                .select('storage_expires_at, storage_years_purchased, retention_until')
+                .select('storage_expires_at, storage_years_purchased, retention_until, label, address, user_id')
                 .eq('case_id', caseId)
                 .single()
 
@@ -70,6 +70,34 @@ export async function POST(req: Request) {
                 }
 
                 console.log(`Extended storage for case ${caseId}: +${yearsToAdd}yr, total ${newYearsTotal}yr, expires ${newExpiry.toISOString()}`)
+
+                // Send confirmation email
+                if (currentCase.user_id) {
+                    const { data: userData } = await supabaseAdmin
+                        .from('users')
+                        .select('email')
+                        .eq('id', currentCase.user_id)
+                        .single()
+
+                    // Fallback to auth.users if users table doesn't have email
+                    const userEmail = userData?.email || session.customer_email
+
+                    if (userEmail) {
+                        const { sendStorageExtensionEmail } = await import('@/lib/email')
+                        const rentalLabel = currentCase.label || currentCase.address || 'Your rental'
+
+                        await sendStorageExtensionEmail({
+                            to: userEmail,
+                            rentalLabel,
+                            yearsAdded: yearsToAdd,
+                            totalYears: newYearsTotal,
+                            newExpiryDate: newExpiry.toISOString(),
+                            caseId
+                        })
+
+                        console.log(`Sent storage extension email to ${userEmail}`)
+                    }
+                }
             }
         }
         // Handle pack purchases (checkin_pack, deposit_pack, bundle_pack)

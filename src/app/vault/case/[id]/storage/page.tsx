@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Shield, Calendar, Clock, Plus, AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Shield, Calendar, Clock, Plus, AlertTriangle, CheckCircle, ExternalLink, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 interface StorageInfo {
@@ -16,16 +16,27 @@ interface StorageInfo {
 export default function StoragePage() {
     const params = useParams()
     const router = useRouter()
+    const searchParams = useSearchParams()
     const caseId = params.id as string
+    const success = searchParams.get('success')
 
     const [loading, setLoading] = useState(true)
     const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null)
     const [rentalLabel, setRentalLabel] = useState('')
     const [purchasing, setPurchasing] = useState(false)
+    const [showSuccess, setShowSuccess] = useState(false)
 
     useEffect(() => {
         loadStorageInfo()
-    }, [caseId])
+        // Show success message if returning from Stripe
+        if (success === 'true') {
+            setShowSuccess(true)
+            // Clear the URL param without reloading
+            router.replace(`/vault/case/${caseId}/storage`, { scroll: false })
+            // Auto-hide after 8 seconds
+            setTimeout(() => setShowSuccess(false), 8000)
+        }
+    }, [caseId, success])
 
     const loadStorageInfo = async () => {
         const supabase = createClient()
@@ -121,6 +132,21 @@ export default function StoragePage() {
                         Manage how long your rental records are securely stored.
                     </p>
                 </div>
+
+                {/* Success Banner */}
+                {showSuccess && (
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check className="text-green-600" size={20} />
+                        </div>
+                        <div>
+                            <p className="font-medium text-green-900">Storage extended successfully</p>
+                            <p className="text-sm text-green-700">
+                                Your records are now stored until {storageInfo?.expiresAt ? formatDate(storageInfo.expiresAt) : 'the new expiry date'}. A confirmation email has been sent.
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 {/* Current Status Card */}
                 <div className={`bg-white rounded-2xl border p-6 mb-6 ${storageInfo?.status === 'expired' ? 'border-red-200 bg-red-50' :
