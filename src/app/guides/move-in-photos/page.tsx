@@ -12,8 +12,34 @@ export const metadata: Metadata = {
 }
 
 export default function MoveInPhotosGuide() {
+    // Article schema for SEO
+    const articleSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: 'Move-In Photos: The Evidence That Saves Your Deposit',
+        description: 'Without timestamped move-in photos, landlords can blame you for damage that was already there. Learn how to protect yourself.',
+        datePublished: '2024-12-01',
+        dateModified: '2025-12-25',
+        author: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
+        publisher: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
+        mainEntityOfPage: 'https://rentvault.ai/guides/move-in-photos'
+    }
+
+    // Breadcrumb schema for navigation
+    const breadcrumbSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rentvault.ai' },
+            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://rentvault.ai/guides' },
+            { '@type': 'ListItem', position: 3, name: 'Move-In Photos', item: 'https://rentvault.ai/guides/move-in-photos' }
+        ]
+    }
+
     return (
         <div className="min-h-screen bg-white">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
             {/* Hero */}
             <section className="pt-20 pb-12 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
                 <div className="max-w-[800px] mx-auto">

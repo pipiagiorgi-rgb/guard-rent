@@ -12,8 +12,34 @@ export const metadata: Metadata = {
 }
 
 export default function NoticePeriodsGuide() {
+    // Article schema for SEO
+    const articleSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: 'Notice Periods: Miss Your Deadline, Pay Extra Rent',
+        description: 'Missing your notice deadline can cost you months of extra rent. Learn how to track deadlines and never miss one again.',
+        datePublished: '2024-12-01',
+        dateModified: '2025-12-25',
+        author: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
+        publisher: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
+        mainEntityOfPage: 'https://rentvault.ai/guides/notice-periods'
+    }
+
+    // Breadcrumb schema for navigation
+    const breadcrumbSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rentvault.ai' },
+            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://rentvault.ai/guides' },
+            { '@type': 'ListItem', position: 3, name: 'Notice Periods', item: 'https://rentvault.ai/guides/notice-periods' }
+        ]
+    }
+
     return (
         <div className="min-h-screen bg-white">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
             {/* Hero */}
             <section className="pt-20 pb-12 px-4 md:px-6 bg-gradient-to-b from-slate-50 to-white">
                 <div className="max-w-[800px] mx-auto">
