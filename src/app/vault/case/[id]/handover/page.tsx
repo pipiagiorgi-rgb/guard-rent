@@ -585,7 +585,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
 
     const totalHandoverPhotos = rooms.reduce((sum, r) => sum + r.handover_photos, 0)
     const hasMeterReadings = Object.values(handover.meterReadings).some(r => r?.value || r?.asset_id)
-    const canComplete = totalHandoverPhotos > 0
+    const canComplete = totalHandoverPhotos > 0 && handover.keysReturned
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-slate-400" /></div>
 
@@ -1141,11 +1141,17 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                             </>
                         )}
                     </button>
-                    {!canComplete ? (
-                        <p className="text-sm text-slate-500 text-center mt-2">
-                            Add at least one handover photo to complete
+                    {!canComplete && (
+                        <p className="text-sm text-amber-600 text-center mt-2 flex items-center justify-center gap-2">
+                            <AlertCircle size={16} />
+                            {totalHandoverPhotos === 0 && !handover.keysReturned
+                                ? 'Add photos and confirm keys returned to complete'
+                                : totalHandoverPhotos === 0
+                                    ? 'Add at least one handover photo to complete'
+                                    : 'Confirm keys returned before completing handover'}
                         </p>
-                    ) : (
+                    )}
+                    {canComplete && (
                         <p className="text-xs text-slate-500 text-center mt-2">
                             Seals evidence with immutable timestamps.
                         </p>
