@@ -152,31 +152,31 @@ export default function Home() {
                                 </p>
                             </div>
 
-                            {/* Screenshots - Evidence Sealed (Primary) + Reminder (Secondary) */}
+                            {/* Screenshots - Lock Modal (Primary) + Evidence Sealed (Secondary) */}
                             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                {/* Primary: Evidence Sealed */}
+                                {/* Primary: Lock Modal - Action Moment */}
+                                <div className="flex flex-col items-center">
+                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                                        <img
+                                            src="/screenshots/lock-modal.png"
+                                            alt="Lock check-in evidence confirmation modal"
+                                            className="w-full h-auto"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-3 text-center">Lock evidence with a single tap</p>
+                                </div>
+                                {/* Secondary: Evidence Sealed - Result */}
                                 <div className="flex flex-col items-center">
                                     <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
                                         <img
                                             src="/screenshots/evidence-sealed.png"
-                                            alt="Evidence sealed confirmation showing permanently sealed status with timestamp"
+                                            alt="Evidence sealed confirmation showing permanently sealed status"
                                             className="w-full h-auto"
                                             loading="lazy"
                                         />
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-3 text-center">Evidence is sealed with a system timestamp</p>
-                                </div>
-                                {/* Secondary: Reminder Email */}
-                                <div className="flex flex-col items-center">
-                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
-                                        <img
-                                            src="/screenshots/reminder-email.png"
-                                            alt="Deadline reminder email showing upcoming landlord inspection"
-                                            className="w-full h-auto"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                    <p className="text-xs text-slate-500 mt-3 text-center">Deadline reminder emails keep you informed</p>
+                                    <p className="text-xs text-slate-500 mt-3 text-center">Receive confirmation with timestamp</p>
                                 </div>
                             </div>
 
