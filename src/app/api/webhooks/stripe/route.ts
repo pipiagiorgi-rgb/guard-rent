@@ -108,7 +108,7 @@ export async function POST(req: Request) {
                 // Idempotency check - prevent duplicate purchases on webhook retry
                 const { data: existing } = await supabaseAdmin
                     .from('purchases')
-                    .select('id')
+                    .select('purchase_id')
                     .eq('case_id', caseId)
                     .eq('pack_type', 'related_contracts')
                     .single()

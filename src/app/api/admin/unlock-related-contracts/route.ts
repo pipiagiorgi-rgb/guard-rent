@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     // Check if already exists
     const { data: existing } = await supabase
         .from('purchases')
-        .select('id')
+        .select('purchase_id')
         .eq('case_id', caseId)
         .eq('pack_type', 'related_contracts')
         .single()
