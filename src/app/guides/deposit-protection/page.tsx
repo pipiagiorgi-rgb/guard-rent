@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Deposit Protection: Build Your Case With Evidence | RentVault',
     description: 'Landlords deduct from your deposit. You dispute it. The difference often comes down to documentation. Learn how to build a clear evidence record.',
     alternates: {
-        canonical: 'https://rentvault.ai/guides/deposit-protection'
+        canonical: 'https://rentvault.co/guides/deposit-protection'
     }
 }
 
@@ -22,9 +22,9 @@ export default function DepositProtectionGuide() {
         description: 'Learn how to document your rental to protect your deposit. The difference in disputes often comes down to documentation.',
         datePublished: '2024-12-01',
         dateModified: '2025-12-25',
-        author: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
-        publisher: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
-        mainEntityOfPage: 'https://rentvault.ai/guides/deposit-protection'
+        author: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.co' },
+        publisher: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.co' },
+        mainEntityOfPage: 'https://rentvault.co/guides/deposit-protection'
     }
 
     // Breadcrumb schema for navigation
@@ -32,9 +32,9 @@ export default function DepositProtectionGuide() {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rentvault.ai' },
-            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://rentvault.ai/guides' },
-            { '@type': 'ListItem', position: 3, name: 'Deposit Protection', item: 'https://rentvault.ai/guides/deposit-protection' }
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rentvault.co' },
+            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://rentvault.co/guides' },
+            { '@type': 'ListItem', position: 3, name: 'Deposit Protection', item: 'https://rentvault.co/guides/deposit-protection' }
         ]
     }
 

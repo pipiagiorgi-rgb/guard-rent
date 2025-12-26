@@ -58,7 +58,7 @@ export async function GET(request: Request) {
 
                     if (email) {
                         try {
-                            const renewalLink = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'}/vault/case/${c.case_id}/settings`
+                            const renewalLink = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'}/vault/case/${c.case_id}/settings`
 
                             await sendStorageReminderEmail({
                                 to: email,

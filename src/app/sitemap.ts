@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://rentvault.ai'
+    const baseUrl = 'https://rentvault.co'
 
     // Static pages
     const staticPages = [

@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
         const rentalLabel = rentalCase.label || rentalCase.address || 'Rental'
         const priceInCents = STORAGE_PRICES[years]
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
 
         // Create Stripe checkout session
         const session = await stripe.checkout.sessions.create({

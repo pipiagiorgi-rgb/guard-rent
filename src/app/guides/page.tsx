@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Tenant Guides: Protect Your Deposit | RentVault',
     description: 'Free guides for tenants. Learn how to document your rental and protect your deposit with organised records and timestamps.',
     alternates: {
-        canonical: 'https://rentvault.ai/guides'
+        canonical: 'https://rentvault.co/guides'
     }
 }
 

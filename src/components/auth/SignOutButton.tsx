@@ -93,7 +93,7 @@ export function SignOutButton({ className = '' }: SignOutButtonProps) {
             const supabase = createClient()
             await supabase.auth.signOut()
             // Redirect to home page after sign out
-            window.location.href = 'https://rentvault.ai'
+            window.location.href = 'https://rentvault.co'
         } catch (err) {
             console.error('Sign out error:', err)
             setSigningOut(false)

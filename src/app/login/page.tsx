@@ -197,7 +197,7 @@ function LoginContent() {
 
                                 {/* Back to home */}
                                 <a
-                                    href="https://rentvault.ai"
+                                    href="https://rentvault.co"
                                     className="block text-sm text-slate-400 text-center mt-4 hover:text-slate-600 transition-colors"
                                 >
                                     ← Back to RentVault home

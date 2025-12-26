@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Mid-Tenancy Issues: Document Problems Before They Cost You | RentVault',
     description: 'When something breaks, document it immediately. Learn how to build a timeline of evidence that protects you at move-out.',
     alternates: {
-        canonical: 'https://rentvault.ai/guides/mid-tenancy-issues'
+        canonical: 'https://rentvault.co/guides/mid-tenancy-issues'
     }
 }
 
@@ -22,9 +22,9 @@ export default function MidTenancyIssuesGuide() {
         description: 'When something breaks, document it immediately. Learn how to build a timeline of evidence that protects you at move-out.',
         datePublished: '2024-12-01',
         dateModified: '2025-12-25',
-        author: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
-        publisher: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
-        mainEntityOfPage: 'https://rentvault.ai/guides/mid-tenancy-issues'
+        author: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.co' },
+        publisher: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.co' },
+        mainEntityOfPage: 'https://rentvault.co/guides/mid-tenancy-issues'
     }
 
     // Breadcrumb schema for navigation
@@ -32,9 +32,9 @@ export default function MidTenancyIssuesGuide() {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rentvault.ai' },
-            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://rentvault.ai/guides' },
-            { '@type': 'ListItem', position: 3, name: 'Mid-Tenancy Issues', item: 'https://rentvault.ai/guides/mid-tenancy-issues' }
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rentvault.co' },
+            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://rentvault.co/guides' },
+            { '@type': 'ListItem', position: 3, name: 'Mid-Tenancy Issues', item: 'https://rentvault.co/guides/mid-tenancy-issues' }
         ]
     }
 

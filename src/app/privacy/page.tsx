@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     title: 'Privacy Policy | RentVault',
     description: 'Learn how RentVault protects your data. Privacy-first, no tracking, secure storage. Full transparency on data collection, retention, and your rights.',
     alternates: {
-        canonical: 'https://rentvault.ai/privacy'
+        canonical: 'https://rentvault.co/privacy'
     }
 }
 
@@ -130,7 +130,7 @@ export default function PrivacyPage() {
                             If you have questions about this Privacy Policy or how your data is handled, you can contact us at:
                         </p>
                         <p className="text-slate-600">
-                            <a href="mailto:support@rentvault.ai" className="text-slate-900 underline hover:no-underline">support@rentvault.ai</a>
+                            <a href="mailto:support@rentvault.co" className="text-slate-900 underline hover:no-underline">support@rentvault.co</a>
                         </p>
                     </section>
                 </div>

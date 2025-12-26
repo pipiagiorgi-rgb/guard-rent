@@ -5,7 +5,7 @@ import { OrganizationSchema, WebsiteSchema } from '@/lib/seo-schemas';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://rentvault.ai'),
+    metadataBase: new URL('https://rentvault.co'),
     title: 'RentVault | Rental Records, Secured',
     description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
     keywords: 'rental deposit, tenant protection, move-in photos, rental documents, lease organiser, rent evidence, deposit dispute, tenant rights',
@@ -19,11 +19,11 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'RentVault | Protect Your Rental Deposit',
         description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
-        url: 'https://rentvault.ai',
+        url: 'https://rentvault.co',
         siteName: 'RentVault',
         images: [
             {
-                url: 'https://rentvault.ai/og-image.png',
+                url: 'https://rentvault.co/og-image.png',
                 width: 1200,
                 height: 630,
                 alt: 'RentVault — Protect your rental deposit. Never miss an important deadline.',
@@ -36,10 +36,10 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'RentVault | Protect Your Rental Deposit',
         description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
-        images: ['https://rentvault.ai/og-image.png'],
+        images: ['https://rentvault.co/og-image.png'],
     },
     alternates: {
-        canonical: 'https://rentvault.ai',
+        canonical: 'https://rentvault.co',
     },
     robots: {
         index: true,

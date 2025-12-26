@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const getBaseUrl = () => {
         const isLocal = origin.includes('localhost')
         if (isLocal) return origin
-        return 'https://rentvault.ai'
+        return 'https://rentvault.co'
     }
 
     const baseUrl = getBaseUrl()

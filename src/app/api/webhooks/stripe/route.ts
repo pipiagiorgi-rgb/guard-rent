@@ -153,7 +153,7 @@ export async function POST(req: Request) {
 
                     if (userData?.email) {
                         const rentalLabel = rentalCase?.label || rentalCase?.address || 'Your rental'
-                        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+                        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
 
                         await sendRelatedContractsPurchaseEmail({
                             to: userData.email,

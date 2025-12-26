@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Notice Periods: Miss Your Deadline, Pay Extra Rent | RentVault',
     description: 'Missing your notice deadline can cost you months of extra rent. Learn how to track deadlines and never miss one again.',
     alternates: {
-        canonical: 'https://rentvault.ai/guides/notice-periods'
+        canonical: 'https://rentvault.co/guides/notice-periods'
     }
 }
 
@@ -22,9 +22,9 @@ export default function NoticePeriodsGuide() {
         description: 'Missing your notice deadline can cost you months of extra rent. Learn how to track deadlines and never miss one again.',
         datePublished: '2024-12-01',
         dateModified: '2025-12-25',
-        author: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
-        publisher: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.ai' },
-        mainEntityOfPage: 'https://rentvault.ai/guides/notice-periods'
+        author: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.co' },
+        publisher: { '@type': 'Organization', name: 'RentVault', url: 'https://rentvault.co' },
+        mainEntityOfPage: 'https://rentvault.co/guides/notice-periods'
     }
 
     // Breadcrumb schema for navigation
@@ -32,9 +32,9 @@ export default function NoticePeriodsGuide() {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rentvault.ai' },
-            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://rentvault.ai/guides' },
-            { '@type': 'ListItem', position: 3, name: 'Notice Periods', item: 'https://rentvault.ai/guides/notice-periods' }
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rentvault.co' },
+            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://rentvault.co/guides' },
+            { '@type': 'ListItem', position: 3, name: 'Notice Periods', item: 'https://rentvault.co/guides/notice-periods' }
         ]
     }
 

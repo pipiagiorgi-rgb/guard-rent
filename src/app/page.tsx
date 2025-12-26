@@ -12,12 +12,12 @@ export const metadata: Metadata = {
         apple: '/apple-icon.png',
     },
     alternates: {
-        canonical: 'https://rentvault.ai'
+        canonical: 'https://rentvault.co'
     },
     openGraph: {
         title: 'RentVault | Protect Your Rental Deposit',
         description: 'A secure, private vault for tenants to organise rental documents, move-in photos, and key notice dates — before disputes arise.',
-        url: 'https://rentvault.ai',
+        url: 'https://rentvault.co',
         siteName: 'RentVault',
         type: 'website',
         locale: 'en_GB',
@@ -40,7 +40,7 @@ export default function Home() {
         '@type': 'WebApplication',
         name: 'RentVault',
         description: 'A secure vault for tenants to organise rental documents, photos, and key dates. Evidence-based protection before disputes arise.',
-        url: 'https://rentvault.ai',
+        url: 'https://rentvault.co',
         applicationCategory: 'UtilitiesApplication',
         operatingSystem: 'Web',
         offers: {

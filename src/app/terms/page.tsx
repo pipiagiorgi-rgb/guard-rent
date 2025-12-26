@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     title: 'Terms of Service | RentVault',
     description: 'Terms of Service for RentVault. Understand your rights, responsibilities, pricing, refunds, and limitation of liability.',
     alternates: {
-        canonical: 'https://rentvault.ai/terms'
+        canonical: 'https://rentvault.co/terms'
     }
 }
 
@@ -80,7 +80,7 @@ export default function TermsPage() {
                             If you believe you were charged in error or experienced a technical issue that prevented you from using a paid feature, please contact us and we will review the request.
                         </p>
                         <p className="text-slate-600">
-                            Contact: <a href="mailto:support@rentvault.ai" className="text-slate-900 underline hover:no-underline">support@rentvault.ai</a>
+                            Contact: <a href="mailto:support@rentvault.co" className="text-slate-900 underline hover:no-underline">support@rentvault.co</a>
                         </p>
                     </section>
 
@@ -120,7 +120,7 @@ export default function TermsPage() {
                             For questions about these Terms, contact us at:
                         </p>
                         <p className="text-slate-600">
-                            <a href="mailto:support@rentvault.ai" className="text-slate-900 underline hover:no-underline">support@rentvault.ai</a>
+                            <a href="mailto:support@rentvault.co" className="text-slate-900 underline hover:no-underline">support@rentvault.co</a>
                         </p>
                     </section>
                 </div>

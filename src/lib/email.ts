@@ -76,7 +76,7 @@ function emailTemplate({
                     <!-- Brand Section (Text Only) -->
                     <tr>
                         <td align="center" style="padding: 48px 48px 0 48px;">
-                            <a href="https://rentvault.ai" target="_blank" style="text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 800; color: #011246; letter-spacing: -0.02em;">
+                            <a href="https://rentvault.co" target="_blank" style="text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 800; color: #011246; letter-spacing: -0.02em;">
                                 RentVault
                             </a>
                         </td>
@@ -122,7 +122,7 @@ function emailTemplate({
                                 <tr>
                                     <td style="padding: 20px;">
                                         <div style="font-size: 13px; color: #64748b; line-height: 1.5;">
-                                            <strong style="color: #475569;">Security Tip:</strong> RentVault will never ask for your verification code, bank details, or payment information by email. If you have questions, reply to this email or visit our <a href="https://rentvault.ai/guides" style="color: #011246; text-decoration: underline;">Help Center</a>.
+                                            <strong style="color: #475569;">Security Tip:</strong> RentVault will never ask for your verification code, bank details, or payment information by email. If you have questions, reply to this email or visit our <a href="https://rentvault.co/guides" style="color: #011246; text-decoration: underline;">Help Center</a>.
                                         </div>
                                     </td>
                                 </tr>
@@ -150,9 +150,9 @@ function emailTemplate({
                     <tr>
                         <td align="center">
                             <p style="margin: 0; font-size: 11px; color: #94a3b8;">
-                                <a href="https://rentvault.ai/privacy" style="color: #94a3b8; text-decoration: underline;">Privacy Policy</a> &nbsp;&bull;&nbsp; 
-                                <a href="https://rentvault.ai/terms" style="color: #94a3b8; text-decoration: underline;">Terms of Service</a> &nbsp;&bull;&nbsp;
-                                <a href="https://rentvault.ai/vault" style="color: #94a3b8; text-decoration: underline;">Dashboard</a>
+                                <a href="https://rentvault.co/privacy" style="color: #94a3b8; text-decoration: underline;">Privacy Policy</a> &nbsp;&bull;&nbsp; 
+                                <a href="https://rentvault.co/terms" style="color: #94a3b8; text-decoration: underline;">Terms of Service</a> &nbsp;&bull;&nbsp;
+                                <a href="https://rentvault.co/vault" style="color: #94a3b8; text-decoration: underline;">Dashboard</a>
                             </p>
                         </td>
                     </tr>
@@ -562,7 +562,7 @@ export async function sendRetentionWarningEmail({
         year: 'numeric'
     })
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
     const settingsUrl = `${siteUrl}/vault/case/${caseId}/settings`
 
     const subject = `Your rental records: ${rentalLabel}`
@@ -775,7 +775,7 @@ export async function sendEvidenceLockedEmail({
         timeZone: 'UTC'
     })
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
     const exportUrl = `${siteUrl}/vault/case/${caseId}/exports`
 
     const subject = `Evidence sealed: ${lockType === 'check-in' ? 'Check-in' : 'Handover'} for ${rentalLabel}`
@@ -904,7 +904,7 @@ export async function sendStorageExtensionEmail({
     newExpiryDate,
     caseId
 }: StorageExtensionProps): Promise<{ success: boolean; error?: string }> {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
     const storageUrl = `${siteUrl}/vault/case/${caseId}/storage`
     const exportsUrl = `${siteUrl}/vault/case/${caseId}/exports`
 

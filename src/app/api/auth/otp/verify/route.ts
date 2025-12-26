@@ -73,7 +73,7 @@ export async function POST(request: Request) {
             type: 'magiclink',
             email: email.toLowerCase(),
             options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'}/vault`
+                redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'}/vault`
             }
         })
 
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
         const type = actionUrl.searchParams.get('type')
 
         // Build callback URL with token
-        const callbackUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.ai'}/auth/callback?token_hash=${token}&type=${type}`
+        const callbackUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'}/auth/callback?token_hash=${token}&type=${type}`
 
         return NextResponse.json({
             success: true,

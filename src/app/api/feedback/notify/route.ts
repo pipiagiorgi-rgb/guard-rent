@@ -50,7 +50,7 @@ Time: ${new Date().toISOString()}
         `.trim()
 
         await sendEmail({
-            to: 'support@rentvault.ai',
+            to: 'support@rentvault.co',
             subject,
             html,
             text,

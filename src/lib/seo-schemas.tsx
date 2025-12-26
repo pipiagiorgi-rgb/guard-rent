@@ -41,8 +41,8 @@ interface FAQSchemaProps {
 export function OrganizationSchema({
     name = 'RentVault',
     description = 'A secure, private vault for tenants to organise rental documents, move-in photos, and key notice dates.',
-    url = 'https://rentvault.ai',
-    logo = 'https://rentvault.ai/og-image.png'
+    url = 'https://rentvault.co',
+    logo = 'https://rentvault.co/og-image.png'
 }: OrganizationSchemaProps = {}) {
     const schema = {
         '@context': 'https://schema.org',
@@ -54,7 +54,7 @@ export function OrganizationSchema({
         sameAs: [],
         contactPoint: {
             '@type': 'ContactPoint',
-            email: 'support@rentvault.ai',
+            email: 'support@rentvault.co',
             contactType: 'customer service'
         }
     }
@@ -71,7 +71,7 @@ export function OrganizationSchema({
 // Website Schema - for sitelinks search box
 export function WebsiteSchema({
     name = 'RentVault',
-    url = 'https://rentvault.ai',
+    url = 'https://rentvault.co',
     description = 'Protect your rental deposit with organised documentation'
 }: WebsiteSchemaProps = {}) {
     const schema = {
@@ -105,7 +105,7 @@ export function SoftwareApplicationSchema({
     description = 'A secure vault for tenants to store rental documents, photos, and track important dates',
     applicationCategory = 'FinanceApplication',
     operatingSystem = 'Web',
-    url = 'https://rentvault.ai'
+    url = 'https://rentvault.co'
 }: SoftwareApplicationSchemaProps = {}) {
     const schema = {
         '@context': 'https://schema.org',
@@ -158,15 +158,15 @@ export function ArticleSchema({
         author: {
             '@type': 'Organization',
             name: author,
-            url: 'https://rentvault.ai'
+            url: 'https://rentvault.co'
         },
         publisher: {
             '@type': 'Organization',
             name: 'RentVault',
-            url: 'https://rentvault.ai',
+            url: 'https://rentvault.co',
             logo: {
                 '@type': 'ImageObject',
-                url: 'https://rentvault.ai/og-image.png'
+                url: 'https://rentvault.co/og-image.png'
             }
         },
         mainEntityOfPage: {

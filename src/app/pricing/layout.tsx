@@ -9,12 +9,12 @@ export const metadata: Metadata = {
         apple: '/apple-icon.png',
     },
     alternates: {
-        canonical: 'https://rentvault.ai/pricing'
+        canonical: 'https://rentvault.co/pricing'
     },
     openGraph: {
         title: 'Pricing | RentVault',
         description: 'Simple, one-time payments. No subscriptions. Pay only when you need official exports or extended retention.',
-        url: 'https://rentvault.ai/pricing',
+        url: 'https://rentvault.co/pricing',
         siteName: 'RentVault',
         type: 'website',
     },
