@@ -45,3 +45,4 @@ export default process.env.NEXT_PUBLIC_SENTRY_DSN
     : nextConfig;
 
 // Trigger rebuild for Vercel CVE bypass
+// Trigger deploy Sat Dec 27 00:00:07 CET 2025
