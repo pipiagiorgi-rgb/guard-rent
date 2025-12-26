@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
     Camera, Check, Loader2, Upload, FileText,
     Key, Gauge, ChevronDown, ChevronUp, AlertCircle,
-    X, ImageIcon, Eye, Lock, CheckCircle2, Plus, ShieldCheck, ArrowRight
+    X, ImageIcon, Eye, Lock, CheckCircle2, Plus, ShieldCheck, ArrowRight, Trash2
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
@@ -1041,14 +1041,14 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                                                                 }}
                                                                 className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
                                                             >
-                                                                <Camera size={12} /> View photo
+                                                                <Eye size={12} /> View photo
                                                             </button>
                                                             <span className="text-slate-300">·</span>
                                                             <button
                                                                 onClick={() => removeMeterPhoto(meter)}
                                                                 className="text-red-500 hover:text-red-600 font-medium"
                                                             >
-                                                                Remove
+                                                                <Trash2 size={12} /> Remove
                                                             </button>
                                                         </div>
                                                     ) : (

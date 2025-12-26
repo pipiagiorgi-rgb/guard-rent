@@ -776,91 +776,176 @@ export async function sendEvidenceLockedEmail({
     })
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
+    const dashboardUrl = `${siteUrl}/vault/case/${caseId}`
+    const issuesUrl = `${siteUrl}/vault/case/${caseId}/issues`
+
+    // ─────────────────────────────────────────────────────────────
+    // MOVE-IN EMAIL: Warm, welcoming, introduces Issues feature
+    // ─────────────────────────────────────────────────────────────
+    if (lockType === 'check-in') {
+        const subject = `Welcome to your new home — your Move-In is complete`
+        const title = `Your Move-In is complete`
+
+        const bodyContent = `
+            <p style="margin: 0 0 16px 0; font-size: 16px;">
+                Congratulations on your move-in.
+            </p>
+            <p style="margin: 0 0 24px 0;">
+                We hope you enjoy settling into your new home. Your move-in record has now been securely completed and time-stamped. We're here to help you keep everything organised and protected throughout your tenancy.
+            </p>
+
+            <!-- Confirmation box -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 24px;">
+                <tr>
+                    <td style="padding: 16px;">
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Move-In Sealed</p>
+                        <p style="margin: 0 0 12px 0; font-weight: 600; color: #166534;">${formattedDate} (UTC)</p>
+                        <p style="margin: 0; font-size: 14px; color: #166534;">
+                            ${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Immutable · Downloadable anytime
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Issues feature introduction -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 24px;">
+                <tr>
+                    <td style="padding: 16px;">
+                        <p style="margin: 0 0 12px 0; font-weight: 600; color: #0f172a;">If anything comes up during your tenancy</p>
+                        <p style="margin: 0 0 12px 0; font-size: 14px; color: #475569;">
+                            For example, a small maintenance issue or unexpected damage — you can log it in RentVault at any time.
+                        </p>
+                        <p style="margin: 0; font-size: 14px; color: #64748b;">
+                            This is completely optional, but it helps you keep a clear, dated record if you ever need it later.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Storage & exports -->
+            <p style="margin: 0 0 24px 0; font-size: 14px; color: #475569;">
+                Your records are securely stored and accessible from your dashboard. You can generate official PDFs or extend storage later if you choose — nothing is required now.
+            </p>
+
+            <!-- Closing -->
+            <p style="margin: 0; font-size: 14px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                We'll be here throughout your tenancy if you need reminders, records, or exports. Enjoy your new place — and welcome.
+            </p>
+        `
+
+        const text = `Welcome to your new home — your Move-In is complete
+
+Congratulations on your move-in.
+
+We hope you enjoy settling into your new home. Your move-in record has now been securely completed and time-stamped. We're here to help you keep everything organised and protected throughout your tenancy.
+
+Move-In Sealed
+${formattedDate} (UTC)
+${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Immutable · Downloadable anytime
+
+If anything comes up during your tenancy
+For example, a small maintenance issue or unexpected damage — you can log it in RentVault at any time. This is completely optional, but it helps you keep a clear, dated record if you ever need it later.
+
+Your records are securely stored and accessible from your dashboard. You can generate official PDFs or extend storage later if you choose — nothing is required now.
+
+We'll be here throughout your tenancy if you need reminders, records, or exports. Enjoy your new place — and welcome.
+
+View your dashboard: ${dashboardUrl}
+
+---
+RentVault securely stores and organises your rental documents. Not legal advice.`
+
+        const html = emailTemplate({
+            title,
+            previewText: `Your move-in evidence is now complete and secured`,
+            bodyContent,
+            ctaText: 'Go to Dashboard',
+            ctaUrl: dashboardUrl
+        })
+
+        return sendEmail({
+            to,
+            subject,
+            text,
+            html,
+            tags: [{ name: 'type', value: 'evidence_locked' }]
+        })
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // MOVE-OUT EMAIL: Factual confirmation but still supportive
+    // ─────────────────────────────────────────────────────────────
     const exportUrl = `${siteUrl}/vault/case/${caseId}/exports`
-
-    const subject = `Evidence sealed: ${lockType === 'check-in' ? 'Check-in' : 'Handover'} for ${rentalLabel}`
-    const title = `${lockType === 'check-in' ? 'Check-in' : 'Handover'} evidence sealed`
-
-    const storageNotice = "Your records are stored securely for 12 months. We’ll notify you well in advance before any changes to access or retention."
-
-    // Custom copy based on lock type
-    const introText = lockType === 'check-in'
-        ? `<p style="margin: 0 0 16px 0;">This email is a <strong>backup confirmation</strong> of your sealed evidence record.</p>`
-        : `<p style="margin: 0 0 16px 0;">We hope this gave you a clear and secure way to record your rental handover.</p>
-           <p style="margin: 0 0 16px 0;">This email is a <strong>backup confirmation</strong> of your sealed evidence record.</p>`
-
-    const closingText = lockType === 'check-in'
-        ? `<p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">${storageNotice}</p>`
-        : `<p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">${storageNotice}</p>
-           <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">If you rent again in the future, you can use RentVault to keep the same kind of clear records from day one.</p>`
+    const subject = `Move-Out confirmed for ${rentalLabel}`
+    const title = `Your Move-Out is complete`
 
     const bodyContent = `
-        ${introText}
-        
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 16px;">
+        <p style="margin: 0 0 16px 0;">
+            We hope RentVault gave you a clear and secure way to record your rental handover.
+        </p>
+        <p style="margin: 0 0 24px 0;">
+            This email confirms your Move-Out evidence has been sealed and time-stamped.
+        </p>
+
+        <!-- Confirmation box -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 24px;">
             <tr>
                 <td style="padding: 16px;">
-                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Evidence Status</p>
-                    <p style="margin: 0; font-weight: 700; color: #166534; font-size: 16px;">🔒 Permanently Sealed</p>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Move-Out Sealed</p>
+                    <p style="margin: 0 0 12px 0; font-weight: 600; color: #166534;">${formattedDate} (UTC)</p>
+                    <p style="margin: 0; font-size: 14px; color: #166534;">
+                        ${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Evidence locked
+                    </p>
                 </td>
             </tr>
         </table>
 
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 8px; margin-bottom: 16px;">
+        <!-- Details box -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 8px; margin-bottom: 24px;">
             <tr>
                 <td style="padding: 16px;">
                     <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Rental</p>
                     <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${rentalLabel}</p>
-                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Sealed at (UTC)</p>
-                    <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a;">${formattedDate}</p>
-                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Evidence</p>
-                    <p style="margin: 0; font-weight: 600; color: #0f172a;">${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded</p>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">What this means</p>
+                    <ul style="margin: 0; padding-left: 16px; color: #475569; font-size: 14px;">
+                        <li style="margin-bottom: 4px;">Photos and timestamps are now immutable</li>
+                        <li style="margin-bottom: 4px;">Evidence cannot be added, edited, or deleted</li>
+                        <li>You can generate a PDF report from Exports</li>
+                    </ul>
                 </td>
             </tr>
         </table>
 
+        <!-- Storage notice -->
         <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">
-            <strong>What this means:</strong>
+            Your records are stored securely for 12 months. We'll notify you well in advance before any changes to access or retention.
         </p>
-        <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #475569; font-size: 14px;">
-            <li style="margin-bottom: 8px;">Photos and timestamps are now immutable</li>
-            <li style="margin-bottom: 8px;">Evidence cannot be added, edited, or deleted</li>
-            <li>You can generate a PDF report from your dashboard</li>
-        </ul>
 
-        ${closingText}
-
-        <p style="margin: 0; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 24px;">
-            Keep this email as a backup record. In case of a deposit dispute, this confirms when your evidence was sealed.
+        <p style="margin: 0; font-size: 14px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+            If you rent again in the future, you can use RentVault to keep the same kind of clear records from day one.
         </p>
     `
 
-    const introTextPlain = lockType === 'check-in'
-        ? "This email is a backup confirmation of your sealed evidence record."
-        : "We hope this gave you a clear and secure way to record your rental handover.\n\nThis email is a backup confirmation of your sealed evidence record."
+    const text = `Move-Out confirmed for ${rentalLabel}
 
-    const closingTextPlain = lockType === 'check-in'
-        ? storageNotice
-        : `${storageNotice}\n\nIf you rent again in the future, you can use RentVault to keep the same kind of clear records from day one.`
+We hope RentVault gave you a clear and secure way to record your rental handover.
 
-    const text = `Evidence sealed: ${lockType === 'check-in' ? 'Check-in' : 'Handover'} for ${rentalLabel}
+This email confirms your Move-Out evidence has been sealed and time-stamped.
 
-${introTextPlain}
-
-Evidence Status: 🔒 Permanently Sealed
+Move-Out Sealed
+${formattedDate} (UTC)
+${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Evidence locked
 
 Rental: ${rentalLabel}
-Sealed at (UTC): ${formattedDate}
-Evidence: ${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded
 
 What this means:
 - Photos and timestamps are now immutable
 - Evidence cannot be added, edited, or deleted
-- You can generate a PDF report from your dashboard
+- You can generate a PDF report from Exports
 
-${closingTextPlain}
+Your records are stored securely for 12 months. We'll notify you well in advance before any changes to access or retention.
 
-Keep this email as a backup record. In case of a deposit dispute, this confirms when your evidence was sealed.
+If you rent again in the future, you can use RentVault to keep the same kind of clear records from day one.
 
 Download your evidence pack: ${exportUrl}
 
@@ -869,7 +954,7 @@ RentVault securely stores and organises your rental documents. Not legal advice.
 
     const html = emailTemplate({
         title,
-        previewText: `Your ${lockType} evidence is now permanently sealed`,
+        previewText: `Your Move-Out evidence is now complete and secured`,
         bodyContent,
         ctaText: 'Download Evidence Pack',
         ctaUrl: exportUrl
