@@ -514,7 +514,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             setGeneratingMessage('Loading preview...')
         } else {
             setGenerating(packType)
-            setGeneratingMessage('Preparing photos...')
+            setGeneratingMessage('Preparing your report...')
         }
         setLastGeneratedPdf(null)
 
@@ -523,8 +523,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 ? '/api/pdf/checkin-report'
                 : '/api/pdf/deposit-pack'
 
-            // Update message before API call - more informative
-            setGeneratingMessage('Building PDF (this may take a moment)')
+            // Update message during API call
+            setGeneratingMessage(forPreview ? 'Generating preview...' : 'Compiling photos...')
 
             // Include custom sections if any are filled
             const hasCustomContent = customSections.personalNotes ||
@@ -542,7 +542,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 })
             })
 
-            setGeneratingMessage('Finalizing...')
+            setGeneratingMessage('Almost done...')
 
             const data = await res.json()
             if (!res.ok) {
