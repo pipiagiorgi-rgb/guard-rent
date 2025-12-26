@@ -797,15 +797,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 </div>
             )}
 
-            <WalkthroughVideoUpload
-                caseId={caseId}
-                phase="check-in"
-                isLocked={isLocked}
-                isPaid={hasPack}
-                existingVideo={existingVideo}
-                onVideoUploaded={() => loadData(caseId)}
-                onVideoDeleted={() => loadData(caseId)}
-            />
+
 
             {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 text-red-700">

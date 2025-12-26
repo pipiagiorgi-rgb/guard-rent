@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { useRouter } from 'next/navigation'
+import { EvidenceFilesSection } from '@/components/features/EvidenceFilesSection'
 
 interface DataState {
     rentalLabel: string
@@ -273,6 +274,20 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                         </button>
                     </div>
                 )}
+            </div>
+
+            {/* ═══════════════════════════════════════════════════════════════
+                SECTION: YOUR FILES
+            ═══════════════════════════════════════════════════════════════ */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <FileText className="text-blue-600" size={20} />
+                    </div>
+                    <h2 className="font-semibold text-lg">Your files</h2>
+                </div>
+
+                <EvidenceFilesSection caseId={caseId} />
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
