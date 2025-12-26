@@ -744,7 +744,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                         {/* PDF Viewer */}
                         <div className="flex-1 bg-slate-100 overflow-auto">
                             <iframe
-                                src={previewUrl}
+                                src={`${previewUrl}#toolbar=1&navpanes=0`}
                                 className="w-full h-full"
                                 title="PDF Preview"
                             />
@@ -755,9 +755,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                             const isPaid = previewType === 'checkin_pack' ? hasCheckinPack : hasDepositPack
                             const packPrice = previewType === 'checkin_pack' ? '€19' : '€29'
                             const packName = previewType === 'checkin_pack' ? 'Check-in Pack' : 'Deposit Recovery Pack'
+                            const isSealed = previewType === 'checkin_pack' ? evidence.checkinLocked : evidence.handoverCompleted
 
                             if (isPaid) {
-                                // Paid user - show download button
+                                // Paid user - show download button (but require sealing)
                                 return (
                                     <div className="flex items-center justify-between p-4 border-t border-slate-200 bg-slate-50">
                                         <button
@@ -766,19 +767,35 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         >
                                             ← Back to customize
                                         </button>
-                                        <button
-                                            onClick={() => {
-                                                // Direct download - use window.location for cross-origin URLs
-                                                if (previewUrl) {
-                                                    window.location.href = previewUrl
-                                                    closePreview()
-                                                }
-                                            }}
-                                            className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center gap-2"
-                                        >
-                                            <Download size={18} />
-                                            Download PDF
-                                        </button>
+                                        {isSealed ? (
+                                            <button
+                                                onClick={() => {
+                                                    // Direct download - use window.location for cross-origin URLs
+                                                    if (previewUrl) {
+                                                        window.location.href = previewUrl
+                                                        closePreview()
+                                                    }
+                                                }}
+                                                className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center gap-2"
+                                            >
+                                                <Download size={18} />
+                                                Download PDF
+                                            </button>
+                                        ) : (
+                                            <div className="flex flex-col items-end gap-1">
+                                                <button
+                                                    onClick={() => {
+                                                        closePreview()
+                                                        setLockMessage(`Seal your evidence in ${previewType === 'checkin_pack' ? 'Check-in' : 'Handover'} tab first to download.`)
+                                                    }}
+                                                    className="px-6 py-2.5 bg-amber-500 text-white rounded-xl font-medium hover:bg-amber-600 flex items-center gap-2"
+                                                >
+                                                    <Lock size={18} />
+                                                    Seal to Download
+                                                </button>
+                                                <span className="text-xs text-slate-500">Evidence must be sealed first</span>
+                                            </div>
+                                        )}
                                     </div>
                                 )
                             }
