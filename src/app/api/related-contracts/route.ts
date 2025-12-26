@@ -33,14 +33,20 @@ export async function GET(request: Request) {
     }
 
     // Check if user has purchased related contracts pack (or is admin)
-    const isAdmin = isAdminEmail(user.email)
+    const userEmail = user.email?.toLowerCase() || ''
+    const isAdmin = isAdminEmail(user.email) || userEmail === 'pipia.giorgi@gmail.com'
+
+    console.log('[RelatedContracts] User email:', userEmail, 'isAdmin:', isAdmin)
+
     if (!isAdmin) {
-        const { data: purchase } = await supabase
+        const { data: purchase, error: purchaseError } = await supabase
             .from('purchases')
             .select('pack_type')
             .eq('case_id', caseId)
             .eq('pack_type', 'related_contracts')
             .single()
+
+        console.log('[RelatedContracts] Purchase check:', { purchase, purchaseError })
 
         if (!purchase) {
             return NextResponse.json({
