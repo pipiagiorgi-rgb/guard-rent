@@ -500,14 +500,16 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     }
 
     const handleGenerate = async (packType: string, forPreview = false) => {
-        // Check if the corresponding phase is locked before generating
-        if (packType === 'checkin_pack' && !evidence.checkinLocked) {
-            setLockMessage('Please complete and lock your check-in evidence first. This seals your photos with timestamps before generating the PDF.')
-            return
-        }
-        if (packType === 'deposit_pack' && !evidence.handoverCompleted) {
-            setLockMessage('Please complete and lock your handover evidence first. This seals your move-out documentation before generating the recovery pack.')
-            return
+        // Only block DOWNLOAD if not sealed, allow preview
+        if (!forPreview) {
+            if (packType === 'checkin_pack' && !evidence.checkinLocked) {
+                setLockMessage('Seal your check-in evidence first to download. This locks your photos with timestamps.')
+                return
+            }
+            if (packType === 'deposit_pack' && !evidence.handoverCompleted) {
+                setLockMessage('Seal your handover evidence first to download. This locks your move-out documentation.')
+                return
+            }
         }
 
         if (forPreview) {
@@ -1264,50 +1266,57 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
                             {/* Action Buttons */}
                             {hasCheckinPack ? (
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={() => handlePreview('checkin_pack')}
-                                        disabled={previewing === 'checkin_pack'}
-                                        className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
-                                    >
-                                        {previewing === 'checkin_pack' ? (
-                                            <>
-                                                <Loader2 className="animate-spin" size={18} />
-                                                <span className="text-sm">{generatingMessage || 'Loading...'}</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Eye size={20} />
-                                                Preview
-                                            </>
-                                        )}
-                                    </button>
-                                    <button
-                                        onClick={() => handleGenerate('checkin_pack')}
-                                        disabled={generating === 'checkin_pack'}
-                                        className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${evidence.checkinLocked
-                                            ? 'bg-green-600 text-white hover:bg-green-700'
-                                            : 'bg-amber-500 text-white hover:bg-amber-600'
-                                            }`}
-                                    >
-                                        {generating === 'checkin_pack' ? (
-                                            <>
-                                                <Loader2 className="animate-spin" size={18} />
-                                                <span className="text-sm">{generatingMessage || 'Generating...'}</span>
-                                            </>
-                                        ) : evidence.checkinLocked ? (
-                                            <>
-                                                <Download size={20} />
-                                                Download
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Lock size={18} />
-                                                Seal to Download
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
+                                <>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => handlePreview('checkin_pack')}
+                                            disabled={previewing === 'checkin_pack'}
+                                            className="flex-1 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
+                                        >
+                                            {previewing === 'checkin_pack' ? (
+                                                <>
+                                                    <Loader2 className="animate-spin" size={18} />
+                                                    <span className="text-sm">{generatingMessage || 'Loading...'}</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Eye size={20} />
+                                                    Preview
+                                                </>
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={() => handleGenerate('checkin_pack')}
+                                            disabled={generating === 'checkin_pack'}
+                                            className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${evidence.checkinLocked
+                                                ? 'bg-green-600 text-white hover:bg-green-700'
+                                                : 'bg-amber-500 text-white hover:bg-amber-600'
+                                                }`}
+                                        >
+                                            {generating === 'checkin_pack' ? (
+                                                <>
+                                                    <Loader2 className="animate-spin" size={18} />
+                                                    <span className="text-sm">{generatingMessage || 'Generating...'}</span>
+                                                </>
+                                            ) : evidence.checkinLocked ? (
+                                                <>
+                                                    <Download size={20} />
+                                                    Download
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Lock size={18} />
+                                                    Seal to Download
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                    {!evidence.checkinLocked && (
+                                        <p className="text-xs text-slate-500 text-center mt-2">
+                                            Seal your evidence in <span className="font-medium">Check-in</span> tab to lock timestamps and enable download.
+                                        </p>
+                                    )}
+                                </>
                             ) : canUnlockCheckin ? (
                                 <div className="space-y-3">
                                     <div className="flex gap-3">
@@ -1672,6 +1681,6 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
             {/* Disclaimer */}
 
-        </div>
+        </div >
     )
 }
