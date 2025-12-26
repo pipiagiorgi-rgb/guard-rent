@@ -534,7 +534,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             return {
                 src: data?.signedUrl || '',
                 caption: room.name,
-                subcaption: `Handover • ${new Date(p.created_at).toLocaleString()}`
+                subcaption: `Move Out • ${new Date(p.created_at).toLocaleString()}`
             }
         }))
 
@@ -595,7 +595,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
         return (
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold mb-1">Handover</h1>
+                    <h1 className="text-2xl font-bold mb-1">Move Out</h1>
                     <p className="text-slate-500">
                         Document the move-out condition and confirm key return.
                     </p>
@@ -607,7 +607,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Lock className="text-slate-400" size={40} />
                     </div>
-                    <h3 className="font-semibold text-xl mb-3">Handover requires a pack</h3>
+                    <h3 className="font-semibold text-xl mb-3">Move Out requires a pack</h3>
                     <p className="text-slate-600 mb-6 max-w-md mx-auto">
                         Buy the <strong>Move-Out Pack</strong> or <strong>Full Bundle</strong> to record your handover evidence and protect your deposit.
                     </p>
@@ -659,7 +659,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
         return (
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold mb-1">Handover complete</h1>
+                    <h1 className="text-2xl font-bold mb-1">Move Out complete</h1>
                     <p className="text-slate-500">
                         Completed on {new Date(handover.completedAt).toLocaleDateString('en-GB', {
                             day: 'numeric', month: 'long', year: 'numeric'
@@ -674,7 +674,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     </div>
                     <ul className="space-y-2 text-green-800">
                         <li className="flex items-center gap-2">
-                            <Check size={16} /> {totalHandoverPhotos} handover photos
+                            <Check size={16} /> {totalHandoverPhotos} move out photos
                         </li>
                         {handover.keysReturned && (
                             <li className="flex items-center gap-2">
@@ -729,7 +729,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             />
 
             <div>
-                <h1 className="text-2xl font-bold mb-1">Handover</h1>
+                <h1 className="text-2xl font-bold mb-1">Move Out</h1>
                 <p className="text-slate-500">
                     Document the move-out condition and confirm key return.
                 </p>
@@ -742,7 +742,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                         <div className="flex items-center gap-3">
                             <CheckCircle2 className="text-green-600" size={24} />
                             <div>
-                                <p className="font-semibold text-green-900">Handover completed</p>
+                                <p className="font-semibold text-green-900">Move Out completed</p>
                                 <p className="text-sm text-green-700">
                                     Completed on {new Date(handover.completedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </p>
@@ -1099,7 +1099,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                             <ShieldCheck size={24} className="text-slate-600" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-slate-900 text-lg mb-2">Handover evidence sealed</h3>
+                            <h3 className="font-semibold text-slate-900 text-lg mb-2">Move Out evidence sealed</h3>
                             <div className="space-y-2 text-slate-600">
                                 <p className="flex items-start gap-2">
                                     <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -1163,7 +1163,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                         ) : (
                             <>
                                 <Lock size={20} />
-                                Complete & Lock Handover
+                                Complete & Lock Move Out
                             </>
                         )}
                     </button>

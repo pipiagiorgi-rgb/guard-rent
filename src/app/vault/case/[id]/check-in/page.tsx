@@ -684,7 +684,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             return {
                 src: data?.signedUrl || '',
                 caption: room.name,
-                subcaption: `Check-in • ${new Date(p.created_at).toLocaleString()}`
+                subcaption: `Move In • ${new Date(p.created_at).toLocaleString()}`
             }
         }))
 
@@ -778,7 +778,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             />
 
             <div>
-                <h1 className="text-2xl font-bold mb-1">Check-in photos</h1>
+                <h1 className="text-2xl font-bold mb-1">Move In photos</h1>
                 <p className="text-slate-500">
                     Document the condition of each room when you move in.
                 </p>
@@ -1046,7 +1046,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 {/* Add room card */}
                 <div className="bg-white rounded-xl border-2 border-dashed border-slate-200 p-6">
                     {isLocked ? (
-                        <p className="text-center text-slate-400 text-sm">Check-in is locked</p>
+                        <p className="text-center text-slate-400 text-sm">Move In is locked</p>
                     ) : addingRoom ? (
                         <div className="flex flex-col items-center gap-3">
                             <p className="text-sm text-slate-500">Enter custom room name</p>
@@ -1202,7 +1202,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                             <ShieldCheck size={24} className="text-slate-600" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-slate-900 text-lg mb-2">Check-in evidence sealed</h3>
+                            <h3 className="font-semibold text-slate-900 text-lg mb-2">Move In evidence sealed</h3>
                             <div className="space-y-2 text-slate-600">
                                 <p className="flex items-start gap-2">
                                     <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -1263,7 +1263,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                         ) : (
                             <>
                                 <Lock size={20} />
-                                Complete & Lock Check-in
+                                Complete & Lock Move In
                             </>
                         )}
                     </button>

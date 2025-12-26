@@ -13,27 +13,43 @@ import {
     HardDrive,
     ChevronLeft,
     MessageSquarePlus,
-    AlertTriangle
+    AlertTriangle,
+    Check,
+    Circle
 } from 'lucide-react'
 import { useState } from 'react'
 import { FeedbackDialog } from '@/components/features/FeedbackDialog'
 
+interface CaseState {
+    hasContract: boolean
+    checkinDone: boolean
+    handoverDone: boolean
+}
+
 interface CaseSidebarProps {
     caseId: string
     caseLabel: string
+    caseState?: CaseState
 }
 
-export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
+export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSidebarProps) {
     const pathname = usePathname()
     const [feedbackOpen, setFeedbackOpen] = useState(false)
 
-    const navItems = [
+    // Navigation items grouped by hierarchy
+    const primaryItems = [
         { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
-        { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText },
-        { href: `/vault/case/${caseId}/check-in`, label: 'Check-in', icon: Camera },
-        { href: `/vault/case/${caseId}/issues`, label: 'Issues', icon: AlertTriangle },
+        { href: `/vault/case/${caseId}/check-in`, label: 'Move In', icon: Camera, done: caseState?.checkinDone },
+        { href: `/vault/case/${caseId}/handover`, label: 'Move Out', icon: KeyRound, done: caseState?.handoverDone },
+    ]
+
+    const secondaryItems = [
+        { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText, done: caseState?.hasContract },
         { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
-        { href: `/vault/case/${caseId}/handover`, label: 'Handover', icon: KeyRound },
+        { href: `/vault/case/${caseId}/issues`, label: 'Issues', icon: AlertTriangle },
+    ]
+
+    const tertiaryItems = [
         { href: `/vault/case/${caseId}/exports`, label: 'Exports', icon: Download },
         { href: `/vault/case/${caseId}/storage`, label: 'Storage', icon: HardDrive },
         { href: `/vault/case/${caseId}/settings`, label: 'Data', icon: Database },
@@ -44,6 +60,20 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
             return pathname === href
         }
         return pathname?.startsWith(href)
+    }
+
+    // Progress badge component
+    const Badge = ({ done }: { done?: boolean }) => {
+        if (done === undefined) return null
+        return done ? (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                <Check size={10} className="text-white" strokeWidth={3} />
+            </span>
+        ) : (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
+                <Circle size={6} className="text-white fill-white" />
+            </span>
+        )
     }
 
     return (
@@ -72,56 +102,166 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
                 <h2 className="font-semibold text-slate-900 truncate">{caseLabel}</h2>
             </div>
 
-            {/* Mobile Navigation: Grid that wraps */}
-            <nav className="lg:hidden grid grid-cols-4 gap-2 mb-2">
-                {navItems.map(item => {
-                    const Icon = item.icon
-                    const active = isActive(item.href)
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-medium transition-colors min-h-[64px] justify-center ${active
-                                ? 'bg-slate-900 text-white'
-                                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-                                }`}
-                        >
-                            <Icon size={20} />
-                            <span className="text-center leading-tight">{item.label}</span>
-                        </Link>
-                    )
-                })}
-                {/* Feedback button for mobile */}
-                <button
-                    onClick={() => setFeedbackOpen(true)}
-                    className="flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-medium transition-colors min-h-[64px] justify-center bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-                >
-                    <MessageSquarePlus size={20} />
-                    <span className="text-center leading-tight">Feedback</span>
-                </button>
+            {/* Mobile Navigation: Grid with visual hierarchy */}
+            <nav className="lg:hidden space-y-3 mb-2">
+                {/* Primary row - larger */}
+                <div className="grid grid-cols-3 gap-2">
+                    {primaryItems.map(item => {
+                        const Icon = item.icon
+                        const active = isActive(item.href)
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`relative flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-medium transition-colors min-h-[68px] justify-center ${active
+                                    ? 'bg-slate-900 text-white'
+                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                    }`}
+                            >
+                                <Icon size={22} />
+                                <span className="text-center leading-tight">{item.label}</span>
+                                {!active && <Badge done={item.done} />}
+                            </Link>
+                        )
+                    })}
+                </div>
+
+                {/* Secondary row */}
+                <div className="grid grid-cols-3 gap-2">
+                    {secondaryItems.map(item => {
+                        const Icon = item.icon
+                        const active = isActive(item.href)
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`relative flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl text-xs font-medium transition-colors min-h-[56px] justify-center ${active
+                                    ? 'bg-slate-900 text-white'
+                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                    }`}
+                            >
+                                <Icon size={18} />
+                                <span className="text-center leading-tight">{item.label}</span>
+                                {!active && <Badge done={item.done} />}
+                            </Link>
+                        )
+                    })}
+                </div>
+
+                {/* Tertiary row - smaller, lighter */}
+                <div className="grid grid-cols-4 gap-2">
+                    {tertiaryItems.map(item => {
+                        const Icon = item.icon
+                        const active = isActive(item.href)
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex flex-col items-center gap-0.5 px-1 py-2 rounded-lg text-[10px] font-medium transition-colors ${active
+                                    ? 'bg-slate-900 text-white'
+                                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                                    }`}
+                            >
+                                <Icon size={16} />
+                                <span>{item.label}</span>
+                            </Link>
+                        )
+                    })}
+                    {/* Feedback button fits in tertiary row */}
+                    <button
+                        onClick={() => setFeedbackOpen(true)}
+                        className="flex flex-col items-center gap-0.5 px-1 py-2 rounded-lg text-[10px] font-medium bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors"
+                    >
+                        <MessageSquarePlus size={16} />
+                        <span>Feedback</span>
+                    </button>
+                </div>
             </nav>
 
-            {/* Desktop Navigation: Vertical list */}
+            {/* Desktop Navigation: Vertical list with groups */}
             <nav className="hidden lg:flex lg:flex-col gap-1">
-                {navItems.map(item => {
+                {/* Primary */}
+                {primaryItems.map(item => {
                     const Icon = item.icon
                     const active = isActive(item.href)
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${active
+                            className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${active
                                 ? 'bg-slate-900 text-white'
                                 : 'text-slate-600 hover:bg-slate-100'
                                 }`}
                         >
                             <Icon size={18} />
                             {item.label}
+                            {!active && item.done !== undefined && (
+                                <span className="ml-auto">
+                                    {item.done ? (
+                                        <span className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                                            <Check size={12} className="text-green-600" strokeWidth={3} />
+                                        </span>
+                                    ) : (
+                                        <span className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center">
+                                            <Circle size={6} className="text-amber-500 fill-amber-500" />
+                                        </span>
+                                    )}
+                                </span>
+                            )}
                         </Link>
                     )
                 })}
 
-                <div className="pt-4 mt-2 border-t border-slate-200">
+                {/* Secondary - with divider */}
+                <div className="border-t border-slate-100 my-2 pt-2">
+                    {secondaryItems.map(item => {
+                        const Icon = item.icon
+                        const active = isActive(item.href)
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${active
+                                    ? 'bg-slate-900 text-white'
+                                    : 'text-slate-500 hover:bg-slate-100'
+                                    }`}
+                            >
+                                <Icon size={16} />
+                                {item.label}
+                                {!active && item.done !== undefined && (
+                                    <span className="ml-auto">
+                                        {item.done ? (
+                                            <Check size={14} className="text-green-500" strokeWidth={2.5} />
+                                        ) : null}
+                                    </span>
+                                )}
+                            </Link>
+                        )
+                    })}
+                </div>
+
+                {/* Tertiary - with divider */}
+                <div className="border-t border-slate-100 my-2 pt-2">
+                    {tertiaryItems.map(item => {
+                        const Icon = item.icon
+                        const active = isActive(item.href)
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${active
+                                    ? 'bg-slate-900 text-white'
+                                    : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                                    }`}
+                            >
+                                <Icon size={16} />
+                                {item.label}
+                            </Link>
+                        )
+                    })}
+                </div>
+
+                <div className="pt-2 mt-2 border-t border-slate-200">
                     <button
                         onClick={() => setFeedbackOpen(true)}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
@@ -136,4 +276,3 @@ export default function CaseSidebar({ caseId, caseLabel }: CaseSidebarProps) {
         </aside>
     )
 }
-
