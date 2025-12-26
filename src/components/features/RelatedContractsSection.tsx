@@ -69,6 +69,24 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
 
     useEffect(() => {
         loadContracts()
+
+        // Check for success redirect from Stripe
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search)
+            if (params.get('related_contracts') === 'success') {
+                // Re-fetch after webhook has time to complete (1 second delay)
+                const timer = setTimeout(() => {
+                    loadContracts()
+                }, 1000)
+
+                // Clean up URL (remove query param)
+                params.delete('related_contracts')
+                const newUrl = window.location.pathname + (params.toString() ? `?${params}` : '')
+                window.history.replaceState({}, '', newUrl)
+
+                return () => clearTimeout(timer)
+            }
+        }
     }, [caseId])
 
     const loadContracts = async () => {

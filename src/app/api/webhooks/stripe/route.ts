@@ -105,6 +105,19 @@ export async function POST(req: Request) {
         else if (caseId && packType && userId) {
             // Special handling for related_contracts (reference only, no retention update)
             if (packType === 'related_contracts') {
+                // Idempotency check - prevent duplicate purchases on webhook retry
+                const { data: existing } = await supabaseAdmin
+                    .from('purchases')
+                    .select('id')
+                    .eq('case_id', caseId)
+                    .eq('pack_type', 'related_contracts')
+                    .single()
+
+                if (existing) {
+                    console.log(`Related contracts already purchased for case ${caseId} - skipping duplicate`)
+                    return NextResponse.json({ received: true })
+                }
+
                 const amountCents = session.amount_total || 0
 
                 const { error: purchaseError } = await supabaseAdmin
