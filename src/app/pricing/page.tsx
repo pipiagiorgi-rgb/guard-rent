@@ -424,6 +424,24 @@ export default function PricingPage() {
                     </div>
                 </div>
 
+                {/* PDF Preview Screenshot */}
+                <div className="max-w-md mx-auto mt-8 px-4">
+                    <h3 className="text-center font-medium text-slate-700 mb-4">Official PDF reports</h3>
+                    <div className="relative rounded-xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                        <img
+                            src="/screenshots/pdf-preview.png"
+                            alt="PDF report preview showing property condition record"
+                            className="w-full h-auto"
+                            loading="lazy"
+                            style={{
+                                marginTop: '-35px',
+                                marginBottom: '-55px'
+                            }}
+                        />
+                    </div>
+                    <p className="text-xs text-slate-500 text-center mt-3">Example Check-in Pack preview</p>
+                </div>
+
                 {/* Data retention info */}
                 <div className="max-w-xl mx-auto mt-8 p-6 bg-slate-50 rounded-xl text-center">
                     <h3 className="font-semibold mb-2">Data retention</h3>

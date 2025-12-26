@@ -152,6 +152,23 @@ export default function Home() {
                                 </p>
                             </div>
 
+                            {/* Evidence Sealed Screenshot */}
+                            <div className="mt-8 flex justify-center">
+                                <div className="relative max-w-[280px] rounded-2xl overflow-hidden shadow-lg bg-slate-900">
+                                    {/* Crop top ~40px to hide status bar using object-fit */}
+                                    <img
+                                        src="/screenshots/evidence-sealed-email.png"
+                                        alt="Evidence sealed confirmation email showing permanently sealed status"
+                                        className="w-full h-auto"
+                                        loading="lazy"
+                                        style={{
+                                            marginTop: '-40px',
+                                            marginBottom: '-60px'
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
                             {/* CTA Button */}
                             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                 <Link
