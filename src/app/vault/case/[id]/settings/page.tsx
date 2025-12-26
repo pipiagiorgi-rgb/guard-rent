@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
     Shield, Trash2, AlertTriangle, Lock,
-    Clock, FileText, Loader2, Check
+    Clock, FileText, Loader2, Check, Pencil
 } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { useRouter } from 'next/navigation'
@@ -32,6 +32,10 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
         purchaseType: null,
         storageYears: 0
     })
+    const [editingName, setEditingName] = useState(false)
+    const [newName, setNewName] = useState('')
+    const [savingName, setSavingName] = useState(false)
+    const [nameSaved, setNameSaved] = useState(false)
     const router = useRouter()
 
     useEffect(() => {
@@ -171,6 +175,30 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
         }
     }
 
+    const handleRename = async () => {
+        if (!newName.trim() || newName.trim() === data.rentalLabel) {
+            setEditingName(false)
+            return
+        }
+        setSavingName(true)
+        try {
+            const supabase = createClient()
+            await supabase
+                .from('cases')
+                .update({ label: newName.trim() })
+                .eq('case_id', caseId)
+
+            setData(prev => ({ ...prev, rentalLabel: newName.trim() }))
+            setEditingName(false)
+            setNameSaved(true)
+            setTimeout(() => setNameSaved(false), 2000)
+        } catch (err) {
+            console.error('Rename error:', err)
+        } finally {
+            setSavingName(false)
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex justify-center py-12">
@@ -182,10 +210,69 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
     return (
         <div className="space-y-8">
             <div>
-                <h1 className="text-2xl font-bold mb-1">Data & retention</h1>
+                <h1 className="text-2xl font-bold mb-1">Settings</h1>
                 <p className="text-slate-500">
-                    Understand how your data is stored and manage deletion.
+                    Manage your rental name, data storage, and deletion.
                 </p>
+            </div>
+
+            {/* ═══════════════════════════════════════════════════════════════
+                SECTION: RENAME RENTAL
+            ═══════════════════════════════════════════════════════════════ */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <Pencil className="text-slate-600" size={20} />
+                    </div>
+                    <h2 className="font-semibold text-lg">Rental name</h2>
+                    {nameSaved && (
+                        <span className="text-sm text-green-600 flex items-center gap-1">
+                            <Check size={16} /> Saved
+                        </span>
+                    )}
+                </div>
+
+                {editingName ? (
+                    <div className="flex gap-3">
+                        <input
+                            type="text"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Enter rental name"
+                            autoFocus
+                            onKeyDown={(e) => e.key === 'Enter' && handleRename()}
+                        />
+                        <button
+                            onClick={() => setEditingName(false)}
+                            className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleRename}
+                            disabled={savingName}
+                            className="px-4 py-2 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 disabled:opacity-50 flex items-center gap-2"
+                        >
+                            {savingName ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
+                            Save
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-between">
+                        <span className="text-lg font-medium text-slate-900">{data.rentalLabel}</span>
+                        <button
+                            onClick={() => {
+                                setNewName(data.rentalLabel)
+                                setEditingName(true)
+                            }}
+                            className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg flex items-center gap-2"
+                        >
+                            <Pencil size={16} />
+                            Rename
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
@@ -221,8 +308,8 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
             <div className="bg-white rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center gap-3 mb-4">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${data.purchaseType
-                            ? 'bg-green-50'
-                            : 'bg-slate-100'
+                        ? 'bg-green-50'
+                        : 'bg-slate-100'
                         }`}>
                         <Clock className={data.purchaseType ? 'text-green-600' : 'text-slate-500'} size={20} />
                     </div>
