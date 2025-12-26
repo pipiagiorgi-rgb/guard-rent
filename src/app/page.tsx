@@ -101,6 +101,18 @@ export default function Home() {
                             Free to explore. Pay only when you need official exports or extended retention.
                         </p>
 
+                        {/* Hero Screenshot - Dashboard Overview */}
+                        <div className="mt-10 mx-auto max-w-sm animate-fade-in-up opacity-0 delay-500">
+                            <div className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
+                                <img
+                                    src="/screenshots/dashboard-overview.png"
+                                    alt="RentVault dashboard showing Luxembourg Apartment with full access"
+                                    className="w-full h-auto"
+                                    loading="eager"
+                                />
+                            </div>
+                        </div>
+
                         {/* Trust Strip */}
                         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-10 pt-6 animate-fade-in-up opacity-0 delay-500">
                             <div className="trust-badge">
