@@ -152,15 +152,31 @@ export default function Home() {
                                 </p>
                             </div>
 
-                            {/* Evidence Sealed Screenshot */}
-                            <div className="mt-8 flex justify-center">
-                                <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
-                                    <img
-                                        src="/screenshots/evidence-sealed-email.png"
-                                        alt="Evidence sealed confirmation email showing permanently sealed status"
-                                        className="w-full h-auto"
-                                        loading="lazy"
-                                    />
+                            {/* Screenshots - Evidence Sealed (Primary) + Reminder (Secondary) */}
+                            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                {/* Primary: Evidence Sealed */}
+                                <div className="flex flex-col items-center">
+                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
+                                        <img
+                                            src="/screenshots/evidence-sealed.png"
+                                            alt="Evidence sealed confirmation showing permanently sealed status with timestamp"
+                                            className="w-full h-auto"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-3 text-center">Evidence is sealed with a system timestamp</p>
+                                </div>
+                                {/* Secondary: Reminder Email */}
+                                <div className="flex flex-col items-center">
+                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
+                                        <img
+                                            src="/screenshots/reminder-email.png"
+                                            alt="Deadline reminder email showing upcoming landlord inspection"
+                                            className="w-full h-auto"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-3 text-center">Deadline reminder emails keep you informed</p>
                                 </div>
                             </div>
 

@@ -435,7 +435,7 @@ export default function PricingPage() {
                             loading="lazy"
                         />
                     </div>
-                    <p className="text-xs text-slate-500 text-center mt-3">Example Check-in Pack preview</p>
+                    <p className="text-xs text-slate-500 text-center mt-3">Reports can be exported as formal PDFs</p>
                 </div>
 
                 {/* Data retention info */}
