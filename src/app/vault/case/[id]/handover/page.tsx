@@ -954,94 +954,131 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             {/* ═══════════════════════════════════════════════════════════
                 STEP C: METER READINGS
             ═══════════════════════════════════════════════════════════ */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <button
-                    onClick={() => toggleSection('meters')}
-                    className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${Object.keys(handover.meterReadings).length > 0
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-slate-100 text-slate-400'
-                            }`}>
-                            <Gauge size={16} />
-                        </div>
-                        <div className="text-left">
-                            <h2 className="font-medium">Meter readings (optional)</h2>
-                            <p className="text-sm text-slate-500">Record final utility readings</p>
-                        </div>
-                    </div>
-                    {expandedSections.has('meters') ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                </button>
+            {(() => {
+                const hasMeterData = Object.values(handover.meterReadings).some(r => r?.value || r?.asset_id)
+                const filledMeters = (['electricity', 'gas', 'water'] as const).filter(
+                    m => handover.meterReadings[m]?.value || handover.meterReadings[m]?.asset_id
+                )
 
-                {expandedSections.has('meters') && (
-                    <div className="px-6 pb-6 space-y-6">
-                        {(['electricity', 'gas', 'water'] as const).map(meter => {
-                            const data = handover.meterReadings[meter] || { value: '' }
-                            const isUploadingThis = uploading === `meter-${meter}`
-
-                            return (
-                                <div key={meter} className="grid grid-cols-1 sm:grid-cols-[100px_1fr_auto] gap-4 items-start sm:items-center">
-                                    <label className="text-sm font-medium capitalize pt-2 sm:pt-0">{meter}</label>
-
-                                    <div className="flex-1">
-                                        <input
-                                            type="text"
-                                            value={data.value}
-                                            onChange={(e) => updateMeterValue(meter, e.target.value)}
-                                            onBlur={() => handleSaveMeters()}
-                                            placeholder={`Enter ${meter} reading`}
-                                            className="w-full px-4 py-2 border border-slate-200 rounded-lg"
-                                        />
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                        {data.asset_id ? (
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={async () => {
-                                                        if (!data.photo_url) return
-                                                        setLightboxImages([{
-                                                            src: data.photo_url,
-                                                            caption: `${meter.charAt(0).toUpperCase() + meter.slice(1)} Meter`,
-                                                            subcaption: data.value || ''
-                                                        }])
-                                                        setLightboxOpen(true)
-                                                    }}
-                                                    className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 px-3 py-1 rounded-md"
-                                                >
-                                                    View
-                                                </button>
-                                                <button
-                                                    onClick={() => removeMeterPhoto(meter)}
-                                                    className="text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 px-3 py-1 rounded-md"
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <label className={`w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-colors ${isUploadingThis ? 'opacity-50' : ''}`}>
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    className="hidden"
-                                                    disabled={isUploadingThis}
-                                                    onChange={(e) => handleMeterPhotoUpload(meter, e)}
-                                                />
-                                                {isUploadingThis ? (
-                                                    <Loader2 size={16} className="animate-spin text-slate-400" />
-                                                ) : (
-                                                    <ImageIcon size={18} className="text-slate-400" />
-                                                )}
-                                            </label>
-                                        )}
-                                    </div>
+                return (
+                    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                        <button
+                            onClick={() => toggleSection('meters')}
+                            className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${hasMeterData
+                                    ? 'bg-green-100 text-green-600'
+                                    : 'bg-slate-100 text-slate-400'
+                                    }`}>
+                                    {hasMeterData ? <Check size={16} /> : <Gauge size={16} />}
                                 </div>
-                            )
-                        })}
+                                <div className="text-left">
+                                    <h2 className="font-medium">Meter readings</h2>
+                                    {hasMeterData ? (
+                                        <p className="text-sm text-green-600">
+                                            {filledMeters.map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(' · ')} recorded
+                                        </p>
+                                    ) : (
+                                        <p className="text-sm text-slate-400">Optional</p>
+                                    )}
+                                </div>
+                            </div>
+                            {expandedSections.has('meters') ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </button>
+
+                        {expandedSections.has('meters') && (
+                            <div className="px-4 sm:px-6 pb-5">
+                                {/* Helper text */}
+                                <p className="text-xs text-slate-400 mb-4 pb-3 border-b border-slate-100">
+                                    Optional — useful if you want proof of final utility readings.
+                                </p>
+
+                                {/* Compact utility cards - 2 col on desktop, stacked on mobile */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {(['electricity', 'gas', 'water'] as const).map(meter => {
+                                        const data = handover.meterReadings[meter] || { value: '' }
+                                        const isUploadingThis = uploading === `meter-${meter}`
+                                        const hasPhoto = !!data.asset_id
+                                        const hasValue = !!data.value
+
+                                        return (
+                                            <div
+                                                key={meter}
+                                                className={`p-3 rounded-lg border ${hasValue || hasPhoto
+                                                    ? 'border-green-200 bg-green-50/50'
+                                                    : 'border-slate-200 bg-slate-50'
+                                                    }`}
+                                            >
+                                                {/* Utility name */}
+                                                <label className="text-xs font-medium text-slate-500 uppercase tracking-wide block mb-2">
+                                                    {meter}
+                                                </label>
+
+                                                {/* Input field */}
+                                                <input
+                                                    type="text"
+                                                    value={data.value}
+                                                    onChange={(e) => updateMeterValue(meter, e.target.value)}
+                                                    onBlur={() => handleSaveMeters()}
+                                                    placeholder="Enter reading"
+                                                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+
+                                                {/* Inline photo action */}
+                                                <div className="mt-2">
+                                                    {hasPhoto ? (
+                                                        <div className="flex items-center gap-2 text-xs">
+                                                            <button
+                                                                onClick={async () => {
+                                                                    if (!data.photo_url) return
+                                                                    setLightboxImages([{
+                                                                        src: data.photo_url,
+                                                                        caption: `${meter.charAt(0).toUpperCase() + meter.slice(1)} Meter`,
+                                                                        subcaption: data.value || ''
+                                                                    }])
+                                                                    setLightboxOpen(true)
+                                                                }}
+                                                                className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                                                            >
+                                                                <Camera size={12} /> View photo
+                                                            </button>
+                                                            <span className="text-slate-300">·</span>
+                                                            <button
+                                                                onClick={() => removeMeterPhoto(meter)}
+                                                                className="text-red-500 hover:text-red-600 font-medium"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <label className={`inline-flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 cursor-pointer transition-colors ${isUploadingThis ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                capture="environment"
+                                                                className="hidden"
+                                                                disabled={isUploadingThis}
+                                                                onChange={(e) => handleMeterPhotoUpload(meter, e)}
+                                                            />
+                                                            {isUploadingThis ? (
+                                                                <Loader2 size={12} className="animate-spin" />
+                                                            ) : (
+                                                                <Camera size={12} />
+                                                            )}
+                                                            <span>+ Add photo (optional)</span>
+                                                        </label>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
+                )
+            })()}
 
 
             {/* ═══════════════════════════════════════════════════════════
