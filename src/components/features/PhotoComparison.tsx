@@ -180,7 +180,7 @@ export function PhotoComparison({ caseId }: PhotoComparisonProps) {
 
             {roomsWithComparison.length > 0 && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-                    <strong>{roomsWithComparison.length}</strong> room{roomsWithComparison.length > 1 ? 's have' : ' has'} both check-in and handover photos for comparison.
+                    <strong>{roomsWithComparison.length}</strong> room{roomsWithComparison.length > 1 ? 's have' : ' has'} both Move-In and Move-Out photos for comparison.
                 </div>
             )}
 
@@ -207,7 +207,7 @@ export function PhotoComparison({ caseId }: PhotoComparisonProps) {
                                 <div className="text-left">
                                     <h4 className="font-medium">{room.name}</h4>
                                     <p className="text-xs text-slate-500">
-                                        {room.checkinPhotos.length} check-in · {room.handoverPhotos.length} handover
+                                        {room.checkinPhotos.length} Move-In · {room.handoverPhotos.length} Move-Out
                                     </p>
                                 </div>
                             </div>
@@ -247,9 +247,9 @@ export function PhotoComparison({ caseId }: PhotoComparisonProps) {
                                     // Side-by-side comparison view
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">Check-in</p>
+                                            <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">Move-In</p>
                                             <button
-                                                onClick={() => openPhotoLightbox(room.checkinPhotos, room.name, 'Check-in')}
+                                                onClick={() => openPhotoLightbox(room.checkinPhotos, room.name, 'Move-In')}
                                                 disabled={loadingPhotos}
                                                 className="w-full aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden relative group hover:ring-2 hover:ring-blue-500 transition-all"
                                             >
@@ -272,9 +272,9 @@ export function PhotoComparison({ caseId }: PhotoComparisonProps) {
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">Handover</p>
+                                            <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">Move-Out</p>
                                             <button
-                                                onClick={() => openPhotoLightbox(room.handoverPhotos, room.name, 'Handover')}
+                                                onClick={() => openPhotoLightbox(room.handoverPhotos, room.name, 'Move-Out')}
                                                 disabled={loadingPhotos}
                                                 className="w-full aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden relative group hover:ring-2 hover:ring-blue-500 transition-all"
                                             >
@@ -302,13 +302,13 @@ export function PhotoComparison({ caseId }: PhotoComparisonProps) {
                                     <div className="space-y-3">
                                         {room.checkinPhotos.length > 0 && (
                                             <button
-                                                onClick={() => openPhotoLightbox(room.checkinPhotos, room.name, 'Check-in')}
+                                                onClick={() => openPhotoLightbox(room.checkinPhotos, room.name, 'Move-In')}
                                                 disabled={loadingPhotos}
                                                 className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                                             >
                                                 <div className="flex items-center gap-2">
                                                     <Camera size={16} className="text-slate-500" />
-                                                    <span className="text-sm">Check-in photos</span>
+                                                    <span className="text-sm">Move-In photos</span>
                                                     <span className="text-xs text-slate-400">({room.checkinPhotos.length})</span>
                                                 </div>
                                                 <Eye size={16} className="text-slate-400" />
@@ -316,13 +316,13 @@ export function PhotoComparison({ caseId }: PhotoComparisonProps) {
                                         )}
                                         {room.handoverPhotos.length > 0 && (
                                             <button
-                                                onClick={() => openPhotoLightbox(room.handoverPhotos, room.name, 'Handover')}
+                                                onClick={() => openPhotoLightbox(room.handoverPhotos, room.name, 'Move-Out')}
                                                 disabled={loadingPhotos}
                                                 className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                                             >
                                                 <div className="flex items-center gap-2">
                                                     <Camera size={16} className="text-slate-500" />
-                                                    <span className="text-sm">Handover photos</span>
+                                                    <span className="text-sm">Move-Out photos</span>
                                                     <span className="text-xs text-slate-400">({room.handoverPhotos.length})</span>
                                                 </div>
                                                 <Eye size={16} className="text-slate-400" />

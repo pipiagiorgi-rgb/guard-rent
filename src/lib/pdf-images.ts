@@ -321,14 +321,14 @@ export async function drawComparisonGrid(
     const handoverToShow = handoverPhotos.slice(0, photosPerSide)
 
     // Draw column headers (court-grade clarity)
-    page.drawText('Check-in (Move-in)', {
+    page.drawText('Move-In', {
         x: MARGIN,
         y: yPos,
         size: 9,
         font: fontBold,
         color: rgb(0.3, 0.3, 0.3),
     })
-    page.drawText('Handover (Move-out)', {
+    page.drawText('Move-Out', {
         x: MARGIN + halfWidth + 15,
         y: yPos,
         size: 9,
@@ -398,8 +398,8 @@ export async function drawComparisonGrid(
     const moreHandover = handoverPhotos.length - photosPerSide
     if (moreCheckin > 0 || moreHandover > 0) {
         const moreText = []
-        if (moreCheckin > 0) moreText.push(`+${moreCheckin} check-in`)
-        if (moreHandover > 0) moreText.push(`+${moreHandover} handover`)
+        if (moreCheckin > 0) moreText.push(`+${moreCheckin} Move-In`)
+        if (moreHandover > 0) moreText.push(`+${moreHandover} Move-Out`)
         page.drawText(`${moreText.join(', ')} photos — see full evidence on following pages`, {
             x: MARGIN,
             y: yPos,

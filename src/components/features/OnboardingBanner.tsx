@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 interface OnboardingBannerProps {
     caseId: string
-    currentStep: 'check-in' | 'handover' | 'exports' | 'overview'
+    currentStep: 'move-in' | 'move-out' | 'exports' | 'overview'
     hasCheckinPhotos?: boolean
     hasHandoverPhotos?: boolean
     isCheckinLocked?: boolean
@@ -42,21 +42,21 @@ export function OnboardingBanner({
     // Determine current progress
     const steps = [
         {
-            key: 'check-in',
+            key: 'move-in',
             icon: Camera,
-            label: 'Document move-in',
+            label: 'Document Move-In',
             description: 'Take photos of each room',
             completed: hasCheckinPhotos,
-            current: currentStep === 'check-in',
+            current: currentStep === 'move-in',
             href: `/vault/case/${caseId}/check-in`
         },
         {
-            key: 'handover',
+            key: 'move-out',
             icon: FileCheck,
-            label: 'Record move-out',
+            label: 'Record Move-Out',
             description: 'Final photos & meter readings',
             completed: isHandoverCompleted,
-            current: currentStep === 'handover',
+            current: currentStep === 'move-out',
             href: `/vault/case/${caseId}/handover`
         },
         {
@@ -97,10 +97,10 @@ export function OnboardingBanner({
                         <Link
                             href={step.href}
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${step.current
-                                    ? 'bg-blue-600 text-white'
-                                    : step.completed
-                                        ? 'bg-green-100 text-green-700'
-                                        : 'bg-white/60 text-slate-500 hover:bg-white'
+                                ? 'bg-blue-600 text-white'
+                                : step.completed
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-white/60 text-slate-500 hover:bg-white'
                                 }`}
                         >
                             <step.icon size={16} />

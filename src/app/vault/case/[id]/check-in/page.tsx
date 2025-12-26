@@ -756,14 +756,14 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 onClose={() => setPhotoToDelete(null)}
                 onConfirm={confirmDeletePhoto}
                 itemType="photo"
-                context="check-in"
+                context="move-in"
             />
 
             <LockConfirmationModal
                 isOpen={showLockModal}
                 onClose={() => setShowLockModal(false)}
                 onConfirm={handleLockCheckIn}
-                type="check-in"
+                type="move-in"
             />
 
             {/* Room deletion confirmation */}
@@ -773,7 +773,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                 onConfirm={async () => { if (roomToDelete) await confirmDeleteRoom(roomToDelete) }}
                 itemType="room"
                 itemName={roomToDelete?.name}
-                context="check-in"
+                context="move-in"
                 customMessage={roomToDelete?.photos?.length ? `This room has ${roomToDelete.photos.length} photo${roomToDelete.photos.length > 1 ? 's' : ''}. Deleting it will permanently remove all photos.` : undefined}
             />
 

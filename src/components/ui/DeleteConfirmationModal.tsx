@@ -18,7 +18,7 @@ interface DeleteConfirmationModalProps {
     description?: string
     itemType?: 'photo' | 'video' | 'file' | 'room' | 'issue'
     itemName?: string
-    context?: 'check-in' | 'handover' | 'general' | 'issues'
+    context?: 'move-in' | 'move-out' | 'general' | 'issues'
     customMessage?: string
 }
 
@@ -45,10 +45,10 @@ export function DeleteConfirmationModal({
         if (description) return description
         if (customMessage) return customMessage
 
-        const contextText = context === 'check-in'
-            ? 'check-in evidence record'
-            : context === 'handover'
-                ? 'handover evidence record'
+        const contextText = context === 'move-in'
+            ? 'Move-In evidence record'
+            : context === 'move-out'
+                ? 'Move-Out evidence record'
                 : context === 'issues'
                     ? 'issues log'
                     : 'rental records'

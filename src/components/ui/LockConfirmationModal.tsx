@@ -14,7 +14,7 @@ interface LockConfirmationModalProps {
     isOpen: boolean
     onClose: () => void
     onConfirm: () => Promise<void>
-    type: 'check-in' | 'handover' | 'keys'
+    type: 'move-in' | 'move-out' | 'keys'
 }
 
 export function LockConfirmationModal({
@@ -27,10 +27,10 @@ export function LockConfirmationModal({
 
     const getTitle = () => {
         switch (type) {
-            case 'check-in':
-                return 'Lock check-in evidence?'
-            case 'handover':
-                return 'Complete & lock handover?'
+            case 'move-in':
+                return 'Complete & lock Move-In?'
+            case 'move-out':
+                return 'Complete & lock Move-Out?'
             case 'keys':
                 return 'Confirm keys returned?'
         }
@@ -38,21 +38,21 @@ export function LockConfirmationModal({
 
     const getDescription = () => {
         switch (type) {
-            case 'check-in':
-                return 'This seals your check-in evidence with a system timestamp. After locking, photos and videos cannot be added, edited, or deleted.'
-            case 'handover':
-                return 'This seals your handover evidence and marks your tenancy as complete. After locking, no changes can be made to handover records.'
+            case 'move-in':
+                return 'This seals your Move-In evidence with a system timestamp. After locking, photos and videos cannot be added, edited, or deleted.'
+            case 'move-out':
+                return 'This seals your Move-Out evidence and marks your tenancy as complete. After locking, no changes can be made to Move-Out records.'
             case 'keys':
-                return 'This creates a timestamped record that you returned the keys. The exact date and time will be recorded as proof of key handover.'
+                return 'This creates a timestamped record that you returned the keys. The exact date and time will be recorded as proof of key return.'
         }
     }
 
     const getButtonText = () => {
         switch (type) {
-            case 'check-in':
-                return 'Lock check-in'
-            case 'handover':
-                return 'Complete & lock'
+            case 'move-in':
+                return 'Complete & Lock Move-In'
+            case 'move-out':
+                return 'Complete & Lock Move-Out'
             case 'keys':
                 return 'Confirm keys returned'
         }

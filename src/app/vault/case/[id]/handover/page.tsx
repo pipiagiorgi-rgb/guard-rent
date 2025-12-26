@@ -711,7 +711,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 onClose={() => setPhotoToDelete(null)}
                 onConfirm={confirmDeletePhoto}
                 itemType="photo"
-                context="handover"
+                context="move-out"
             />
 
             <LockConfirmationModal
@@ -725,7 +725,7 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 isOpen={showLockModal}
                 onClose={() => setShowLockModal(false)}
                 onConfirm={handleMarkComplete}
-                type="handover"
+                type="move-out"
             />
 
             <div>
