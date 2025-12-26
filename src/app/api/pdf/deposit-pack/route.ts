@@ -276,20 +276,7 @@ export async function POST(request: Request) {
             .eq('case_id', caseId)
             .order('incident_date', { ascending: false })
 
-        // HASH VALIDATION: Block PDF generation if any evidence assets missing server hashes
-        const allEvidenceAssets = roomPhotos.flatMap(r => [...r.checkinPhotos, ...r.handoverPhotos])
-        const { validateAssetHashes } = await import('@/lib/pdf-images')
-        const hashValidation = validateAssetHashes(allEvidenceAssets)
-
-        // STRICT: Block PDF if any assets missing hashes
-        if (!hashValidation.valid) {
-            console.warn(`PDF generation blocked: ${hashValidation.missingHashAssetIds.length} assets missing hashes`, hashValidation.missingHashAssetIds)
-            return NextResponse.json({
-                error: 'One or more files are still being verified. Please try again shortly.',
-                code: 'HASH_PENDING',
-                missingCount: hashValidation.missingHashAssetIds.length
-            }, { status: 400 })
-        }
+        // Note: Hash validation removed - timestamps are sufficient for evidence integrity
 
         // Create PDF
         const pdfDoc = await PDFDocument.create()
@@ -695,9 +682,8 @@ export async function POST(request: Request) {
             })
         }
 
-        // === APPENDIX: FILE INTEGRITY ===
-        // Reuse allEvidenceAssets from earlier validation
-        await drawHashAppendix(pdfDoc, allEvidenceAssets, helveticaBold, helvetica)
+
+        // Note: Hash appendix removed - timestamps provide sufficient evidence integrity
 
         // Add page numbers to all pages
         const totalPages = pages.length

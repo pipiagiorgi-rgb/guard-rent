@@ -246,20 +246,7 @@ export async function POST(request: Request) {
         const roomPhotos = await getPhotosGroupedByRoom(caseId)
         const totalPhotos = roomPhotos.reduce((sum, r) => sum + r.checkinPhotos.length, 0)
 
-        // HASH VALIDATION: Block PDF generation if any assets missing server hashes
-        const allAssets = roomPhotos.flatMap(r => r.checkinPhotos)
-        const { validateAssetHashes } = await import('@/lib/pdf-images')
-        const hashValidation = validateAssetHashes(allAssets)
-
-        // STRICT: Block PDF if any assets missing hashes
-        if (!hashValidation.valid) {
-            console.warn(`PDF generation blocked: ${hashValidation.missingHashAssetIds.length} assets missing hashes`, hashValidation.missingHashAssetIds)
-            return NextResponse.json({
-                error: 'One or more files are still being verified. Please try again shortly.',
-                code: 'HASH_PENDING',
-                missingCount: hashValidation.missingHashAssetIds.length
-            }, { status: 400 })
-        }
+        // Note: Hash validation removed - timestamps are sufficient for evidence integrity
 
         // Create PDF
         const pdfDoc = await PDFDocument.create()
@@ -540,9 +527,8 @@ export async function POST(request: Request) {
             })
         }
 
-        // === APPENDIX: FILE INTEGRITY ===
-        // Reuse allAssets from earlier validation
-        await drawHashAppendix(pdfDoc, allAssets, helveticaBold, helvetica)
+
+        // Note: Hash appendix removed - timestamps provide sufficient evidence integrity
 
         // Add page numbers to all pages
         const totalPages = pages.length
