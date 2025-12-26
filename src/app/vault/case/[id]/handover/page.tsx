@@ -1075,16 +1075,6 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 </div>
             </div>
 
-            {/* Walkthrough Video Section */}
-            <WalkthroughVideoUpload
-                caseId={caseId}
-                phase="handover"
-                isLocked={!!handover.completedAt}
-                isPaid={hasPack}
-                existingVideo={existingVideo}
-                onVideoUploaded={() => loadData(caseId)}
-                onVideoDeleted={() => loadData(caseId)}
-            />
 
             {/* ═══════════════════════════════════════════════════════════
                 COMPLETE HANDOVER BUTTON

@@ -1093,6 +1093,19 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             </div>
 
             {/* ═══════════════════════════════════════════════════════════
+                WALKTHROUGH VIDEO SECTION
+            ═══════════════════════════════════════════════════════════ */}
+            <WalkthroughVideoUpload
+                caseId={caseId}
+                phase="check-in"
+                isLocked={isLocked}
+                isPaid={true}
+                existingVideo={existingVideo}
+                onVideoUploaded={() => loadData(caseId)}
+                onVideoDeleted={() => loadData(caseId)}
+            />
+
+            {/* ═══════════════════════════════════════════════════════════
                 METER READINGS SECTION (Initial readings at move-in)
             ═══════════════════════════════════════════════════════════ */}
             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
