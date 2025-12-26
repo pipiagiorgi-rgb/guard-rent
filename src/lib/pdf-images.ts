@@ -469,8 +469,12 @@ export async function drawHashAppendix(
 
         const typeLabel = asset.type.replace('_photo', '').replace('_', ' ')
 
-        // Use hash if available, otherwise show N/A
-        const hash = asset.file_hash_server || asset.file_hash || 'N/A (uploaded before hash verification)'
+        // STRICT: Only include assets with verified hashes
+        const hash = asset.file_hash_server || asset.file_hash
+        if (!hash || hash.trim() === '') {
+            // Skip assets without verified hashes (should not happen if validation passed)
+            continue
+        }
 
         page.drawText(date, { x: MARGIN, y: yPos, size: 8, font: fontRegular })
         page.drawText(typeLabel, { x: MARGIN + 100, y: yPos, size: 8, font: fontRegular })

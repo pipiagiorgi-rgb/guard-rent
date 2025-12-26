@@ -276,15 +276,19 @@ export async function POST(request: Request) {
             .eq('case_id', caseId)
             .order('incident_date', { ascending: false })
 
-        // HASH VALIDATION: Collect all evidence assets and validate hashes before PDF generation
+        // HASH VALIDATION: Block PDF generation if any evidence assets missing server hashes
         const allEvidenceAssets = roomPhotos.flatMap(r => [...r.checkinPhotos, ...r.handoverPhotos])
         const { validateAssetHashes } = await import('@/lib/pdf-images')
         const hashValidation = validateAssetHashes(allEvidenceAssets)
 
-        // Log warning if assets missing hashes, but don't block PDF generation
+        // STRICT: Block PDF if any assets missing hashes
         if (!hashValidation.valid) {
-            console.warn(`PDF generation warning: ${hashValidation.missingHashAssetIds.length} assets missing hashes`, hashValidation.missingHashAssetIds)
-            // Continue with PDF generation - don't block for missing hashes
+            console.warn(`PDF generation blocked: ${hashValidation.missingHashAssetIds.length} assets missing hashes`, hashValidation.missingHashAssetIds)
+            return NextResponse.json({
+                error: 'One or more files are still being verified. Please try again shortly.',
+                code: 'HASH_PENDING',
+                missingCount: hashValidation.missingHashAssetIds.length
+            }, { status: 400 })
         }
 
         // Create PDF
