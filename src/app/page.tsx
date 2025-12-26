@@ -154,17 +154,12 @@ export default function Home() {
 
                             {/* Evidence Sealed Screenshot */}
                             <div className="mt-8 flex justify-center">
-                                <div className="relative max-w-[280px] rounded-2xl overflow-hidden shadow-lg bg-slate-900">
-                                    {/* Crop top ~40px to hide status bar using object-fit */}
+                                <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
                                     <img
                                         src="/screenshots/evidence-sealed-email.png"
                                         alt="Evidence sealed confirmation email showing permanently sealed status"
                                         className="w-full h-auto"
                                         loading="lazy"
-                                        style={{
-                                            marginTop: '-40px',
-                                            marginBottom: '-60px'
-                                        }}
                                     />
                                 </div>
                             </div>
