@@ -203,19 +203,6 @@ export default function Home() {
                                 </Link>
                                 <span className="text-sm text-slate-500">No credit card required</span>
                             </div>
-
-                            {/* Source footnote */}
-                            <p className="text-xs text-slate-400 mt-6">
-                                <sup>*</sup> Source:{' '}
-                                <a
-                                    href="https://www.generationrent.org/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="underline hover:text-slate-600"
-                                >
-                                    Generation Rent, 2025
-                                </a>
-                            </p>
                         </div>
                     </div>
                 </section>
