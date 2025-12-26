@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Loader2, Mail, ArrowLeft } from 'lucide-react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Footer } from '@/components/layout/Footer'
 
-export default function LoginPage() {
+function LoginContent() {
     const [loading, setLoading] = useState(false)
     const [step, setStep] = useState<'email' | 'code'>('email')
     const [email, setEmail] = useState('')
@@ -308,5 +308,27 @@ export default function LoginPage() {
             {/* Footer */}
             <Footer />
         </div>
+    )
+}
+
+function LoginFallback() {
+    return (
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+            <main className="flex-1 flex items-center justify-center p-6">
+                <div className="w-full max-w-[400px]">
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
+                        <Loader2 size={32} className="animate-spin text-slate-400 mx-auto" />
+                    </div>
+                </div>
+            </main>
+        </div>
+    )
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<LoginFallback />}>
+            <LoginContent />
+        </Suspense>
     )
 }

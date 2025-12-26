@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
-export default function AuthConfirmPage() {
+function AuthConfirmContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -115,5 +115,32 @@ export default function AuthConfirmPage() {
                 </div>
             </main>
         </div>
+    )
+}
+
+function LoadingFallback() {
+    return (
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+            <main className="flex-1 flex items-center justify-center p-6">
+                <div className="w-full max-w-[400px]">
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
+                        <div className="mb-6">
+                            <Loader2 size={48} className="animate-spin text-slate-400 mx-auto" />
+                        </div>
+                        <h1 className="text-xl font-semibold text-slate-900 mb-2">
+                            Loading…
+                        </h1>
+                    </div>
+                </div>
+            </main>
+        </div>
+    )
+}
+
+export default function AuthConfirmPage() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <AuthConfirmContent />
+        </Suspense>
     )
 }
