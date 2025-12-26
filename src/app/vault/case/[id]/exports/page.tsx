@@ -64,6 +64,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const [purchasing, setPurchasing] = useState<string | null>(null)
     const [generating, setGenerating] = useState<string | null>(null)
     const [generatingMessage, setGeneratingMessage] = useState<string>('')
+    const [generatingStep, setGeneratingStep] = useState<number>(0) // 0=none, 1=preparing, 2=building, 3=finishing
     const [evidence, setEvidence] = useState<EvidenceState>({
         checkinPhotos: 0,
         handoverPhotos: 0,
@@ -511,10 +512,12 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
         if (forPreview) {
             setPreviewing(packType)
-            setGeneratingMessage('Loading preview...')
+            setGeneratingStep(1)
+            setGeneratingMessage('Preparing preview...')
         } else {
             setGenerating(packType)
-            setGeneratingMessage('Preparing your report...')
+            setGeneratingStep(1)
+            setGeneratingMessage('Gathering photos...')
         }
         setLastGeneratedPdf(null)
 
@@ -523,8 +526,9 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 ? '/api/pdf/checkin-report'
                 : '/api/pdf/deposit-pack'
 
-            // Update message during API call
-            setGeneratingMessage(forPreview ? 'Generating preview...' : 'Compiling photos...')
+            // Step 2: Building
+            setGeneratingStep(2)
+            setGeneratingMessage(forPreview ? 'Building preview...' : 'Creating your PDF...')
 
             // Include custom sections if any are filled
             const hasCustomContent = customSections.personalNotes ||
@@ -542,7 +546,9 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 })
             })
 
-            setGeneratingMessage('Almost done...')
+            // Step 3: Finalizing
+            setGeneratingStep(3)
+            setGeneratingMessage('Finalizing...')
 
             const data = await res.json()
             if (!res.ok) {
@@ -581,6 +587,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             setGenerating(null)
             setPreviewing(null)
             setGeneratingMessage('')
+            setGeneratingStep(0)
         }
     }
 
@@ -645,6 +652,60 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                     <div className="flex items-center gap-3 px-5 py-3 bg-green-50 border border-green-200 rounded-xl shadow-lg">
                         <CheckCircle2 size={18} className="text-green-600" />
                         <span className="text-sm text-green-800 font-medium">{toastMessage}</span>
+                    </div>
+                </div>
+            )}
+
+            {/* PDF Generation Progress Modal */}
+            {generatingStep > 0 && (
+                <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full">
+                        <h3 className="text-lg font-semibold text-center mb-6">
+                            {previewing ? 'Loading Preview' : 'Generating PDF'}
+                        </h3>
+
+                        {/* Progress Steps */}
+                        <div className="space-y-4">
+                            {/* Step 1 */}
+                            <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${generatingStep >= 1 ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-400'
+                                    }`}>
+                                    {generatingStep > 1 ? '✓' : '1'}
+                                </div>
+                                <span className={`text-sm ${generatingStep >= 1 ? 'text-slate-900' : 'text-slate-400'}`}>
+                                    Gathering photos
+                                </span>
+                                {generatingStep === 1 && <Loader2 className="animate-spin text-green-500 ml-auto" size={18} />}
+                            </div>
+
+                            {/* Step 2 */}
+                            <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${generatingStep >= 2 ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-400'
+                                    }`}>
+                                    {generatingStep > 2 ? '✓' : '2'}
+                                </div>
+                                <span className={`text-sm ${generatingStep >= 2 ? 'text-slate-900' : 'text-slate-400'}`}>
+                                    Creating document
+                                </span>
+                                {generatingStep === 2 && <Loader2 className="animate-spin text-green-500 ml-auto" size={18} />}
+                            </div>
+
+                            {/* Step 3 */}
+                            <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${generatingStep >= 3 ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-400'
+                                    }`}>
+                                    {generatingStep > 3 ? '✓' : '3'}
+                                </div>
+                                <span className={`text-sm ${generatingStep >= 3 ? 'text-slate-900' : 'text-slate-400'}`}>
+                                    Finalizing
+                                </span>
+                                {generatingStep === 3 && <Loader2 className="animate-spin text-green-500 ml-auto" size={18} />}
+                            </div>
+                        </div>
+
+                        <p className="text-xs text-slate-500 text-center mt-6">
+                            This may take up to 30 seconds
+                        </p>
                     </div>
                 </div>
             )}
