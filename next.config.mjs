@@ -44,3 +44,4 @@ export default process.env.NEXT_PUBLIC_SENTRY_DSN
     ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
     : nextConfig;
 
+// Trigger rebuild for Vercel CVE bypass
