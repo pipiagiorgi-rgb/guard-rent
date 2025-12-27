@@ -859,7 +859,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             <div>
                 <h1 className="text-2xl font-bold mb-1">Exports</h1>
                 <p className="text-slate-500">
-                    Official, downloadable records generated from your stored evidence.
+                    Official, downloadable records generated from your sealed rental evidence.
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                    This is the safest place to retrieve your files at any time.
                 </p>
             </div>
 
@@ -913,8 +916,14 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             )}
 
             {/* ═══════════════════════════════════════════════════════════════
-                SECTION A: EVIDENCE (FREE)
+                SECTION A: EVIDENCE FILES (FREE DOWNLOADS)
             ═══════════════════════════════════════════════════════════════ */}
+            <div className="space-y-3">
+                <div>
+                    <h2 className="text-lg font-semibold text-slate-900">Evidence files</h2>
+                    <p className="text-sm text-slate-500">Original files you uploaded or recorded. Download here at any time.</p>
+                </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {/* Check-in Video */}
@@ -1092,10 +1101,13 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
 
             {/* ═══════════════════════════════════════════════════════════════
-                SECTION B: GENERATE OFFICIAL REPORTS (PAID)
+                SECTION B: OFFICIAL PDF REPORTS (PAID)
             ═══════════════════════════════════════════════════════════════ */}
             <div className="pt-8 border-t border-slate-200">
-                <h2 className="text-lg font-semibold mb-4">Official PDF reports</h2>
+                <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-slate-900">Official PDF reports</h2>
+                    <p className="text-sm text-slate-500 mt-1">These documents reflect the state of your rental at the time they were sealed.</p>
+                </div>
                 <div className="space-y-4">
 
                     {/* Check-in Pack */}
@@ -1107,29 +1119,30 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         <FileText className="text-blue-600" size={24} />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-lg">Check-in Pack</h3>
-                                        <p className="text-slate-500">Timestamped move-in documentation</p>
+                                        <h3 className="font-semibold text-lg">Check-in Report</h3>
+                                        <p className="text-slate-500">Timestamped Move-In record showing the property's initial condition</p>
                                     </div>
                                 </div>
                                 <span className="text-xl font-bold">€19</span>
                             </div>
 
+                            <p className="text-sm text-slate-600 mb-4">Includes:</p>
                             <div className="space-y-2 mb-6 text-sm text-slate-600">
                                 <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
-                                    <span>All check-in photos with timestamps</span>
+                                    <Check size={16} className="text-green-600 flex-shrink-0" />
+                                    <span>Move-In photos with timestamps</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
-                                    <span>Walkthrough video upload</span>
+                                    <Check size={16} className="text-green-600 flex-shrink-0" />
+                                    <span>Walkthrough video (if recorded)</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
+                                    <Check size={16} className="text-green-600 flex-shrink-0" />
+                                    <span>Meter readings at Move-In</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check size={16} className="text-green-600 flex-shrink-0" />
                                     <span>Contract summary</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
-                                    <span>12 months secure storage</span>
                                 </div>
                             </div>
 
@@ -1384,32 +1397,29 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-lg">Deposit Recovery Pack</h3>
-                                        <p className="text-slate-500">Complete before/after evidence</p>
+                                        <p className="text-slate-500">Complete Move-In / Move-Out comparison prepared for deposit disputes</p>
                                     </div>
                                 </div>
                                 <span className="text-xl font-bold">€29</span>
                             </div>
 
+                            <p className="text-sm text-slate-600 mb-4">Includes:</p>
                             <div className="space-y-2 mb-6 text-sm text-slate-600">
                                 <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
-                                    <span>Move-in and move-out photos included</span>
+                                    <Check size={16} className="text-green-600 flex-shrink-0" />
+                                    <span>Move-In and Move-Out photos</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
-                                    <span>Walkthrough video uploads</span>
+                                    <Check size={16} className="text-green-600 flex-shrink-0" />
+                                    <span>Walkthrough videos (if recorded)</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
-                                    <span>Meter readings & key return confirmation</span>
+                                    <Check size={16} className="text-green-600 flex-shrink-0" />
+                                    <span>Meter readings from both Move-In and Move-Out</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
-                                    <span>Ready for deposit disputes</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Check size={16} className="text-green-600" />
-                                    <span>12 months secure storage</span>
+                                    <Check size={16} className="text-green-600 flex-shrink-0" />
+                                    <span>Key return confirmation</span>
                                 </div>
                             </div>
 
