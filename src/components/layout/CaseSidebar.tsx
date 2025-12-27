@@ -47,7 +47,7 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
     const secondaryItems = [
         { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText },
         { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
-        { href: `/vault/case/${caseId}/issues`, label: 'Issues', icon: AlertTriangle },
+        { href: `/vault/case/${caseId}/issues`, label: 'Condition', icon: FileText },
         { href: `/vault/case/${caseId}/documents`, label: 'Documents', icon: FolderOpen },
     ]
 

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
     Plus,
-    AlertTriangle,
+    FileText,
     Calendar,
     Camera,
     Video,
@@ -14,7 +14,10 @@ import {
     X,
     Trash2,
     Play,
-    Image as ImageIcon
+    Image as ImageIcon,
+    Wrench,
+    AlertCircle,
+    StickyNote
 } from 'lucide-react'
 import Link from 'next/link'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
@@ -50,13 +53,14 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
     const [issues, setIssues] = useState<Issue[]>([])
     const [isPaid, setIsPaid] = useState(false)
 
-    // Add issue modal state
+    // Add entry modal state
     const [showAddModal, setShowAddModal] = useState(false)
     const [selectedRoom, setSelectedRoom] = useState<string | null>(null)
     const [customRoomName, setCustomRoomName] = useState('')
     const [showCustomRoom, setShowCustomRoom] = useState(false)
     const [issueDescription, setIssueDescription] = useState('')
     const [issueDate, setIssueDate] = useState(new Date().toISOString().split('T')[0])
+    const [entryType, setEntryType] = useState<'note' | 'maintenance' | 'damage' | 'other'>('note')
     const [uploading, setUploading] = useState(false)
     const [saving, setSaving] = useState(false)
     const [pendingPhotos, setPendingPhotos] = useState<File[]>([])
@@ -164,6 +168,7 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
         setShowCustomRoom(!roomName)
         setIssueDescription('')
         setIssueDate(new Date().toISOString().split('T')[0])
+        setEntryType('note')
         setPendingPhotos([])
         setPendingVideo(null)
         setVideoError(null)
@@ -345,31 +350,57 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
         )
     }
 
+    // Entry type configuration
+    const entryTypes = [
+        { id: 'note' as const, label: 'General note', icon: StickyNote, color: 'bg-slate-100 text-slate-600' },
+        { id: 'maintenance' as const, label: 'Maintenance', icon: Wrench, color: 'bg-blue-100 text-blue-600' },
+        { id: 'damage' as const, label: 'Damage', icon: AlertCircle, color: 'bg-amber-100 text-amber-700' },
+        { id: 'other' as const, label: 'Other', icon: FileText, color: 'bg-slate-100 text-slate-600' }
+    ]
+
+    const getEntryTypeStyle = (type: string) => {
+        const found = entryTypes.find(t => t.id === type)
+        return found?.color || 'bg-slate-100 text-slate-600'
+    }
+
+    const getEntryTypeLabel = (type: string) => {
+        const found = entryTypes.find(t => t.id === type)
+        return found?.label || 'Note'
+    }
+
     return (
         <div className="space-y-6">
             {/* Page Header */}
             <div>
-                <h1 className="text-2xl font-bold text-slate-900">Issues Log</h1>
+                <h1 className="text-2xl font-bold text-slate-900">Condition & Notes</h1>
                 <p className="text-slate-500 mt-1">
-                    Document incidents that happen during your tenancy
+                    Record observations, maintenance, or incidents during your tenancy
+                </p>
+            </div>
+
+            {/* Trust line */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <p className="text-sm text-slate-600">
+                    <span className="font-medium">Private records.</span>{' '}
+                    These entries are for your own reference. Photos and video are optional and help provide context.
                 </p>
             </div>
 
             {/* Rooms Grid */}
             <div>
-                <h2 className="text-lg font-semibold text-slate-900 mb-4">Log an issue by room</h2>
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">Add a note by room</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {rooms.map(room => (
                         <button
                             key={room.room_id}
                             onClick={() => openAddIssue(room.name)}
-                            className="bg-white border border-slate-200 rounded-xl p-4 text-left hover:border-orange-300 hover:bg-orange-50 transition-colors group"
+                            className="bg-white border border-slate-200 rounded-xl p-4 text-left hover:border-blue-300 hover:bg-blue-50 transition-colors group"
                         >
                             <div className="flex items-center justify-between">
                                 <span className="font-medium text-slate-900">{room.name}</span>
-                                <Plus size={18} className="text-slate-400 group-hover:text-orange-500" />
+                                <Plus size={18} className="text-slate-400 group-hover:text-blue-500" />
                             </div>
-                            <p className="text-sm text-slate-500 mt-1">Add issue</p>
+                            <p className="text-sm text-slate-500 mt-1">Add entry</p>
                         </button>
                     ))}
 
@@ -387,18 +418,18 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                 </div>
             </div>
 
-            {/* Issues Timeline */}
+            {/* Entries Timeline */}
             <div>
                 <h2 className="text-lg font-semibold text-slate-900 mb-4">
-                    Logged issues {issues.length > 0 && <span className="text-slate-400 font-normal">({issues.length})</span>}
+                    Recorded entries {issues.length > 0 && <span className="text-slate-400 font-normal">({issues.length})</span>}
                 </h2>
 
                 {issues.length === 0 ? (
                     <div className="bg-white border border-slate-200 rounded-xl p-8 text-center">
-                        <AlertTriangle className="mx-auto text-slate-300 mb-3" size={40} />
-                        <p className="text-slate-500">No issues logged yet</p>
+                        <FileText className="mx-auto text-slate-300 mb-3" size={40} />
+                        <p className="text-slate-500">No entries recorded yet</p>
                         <p className="text-sm text-slate-400 mt-1">
-                            Use the room buttons above to log an issue
+                            Use the room buttons above to add a note or incident
                         </p>
                     </div>
                 ) : (
@@ -417,7 +448,7 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                     >
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                                                     {issue.room_name}
                                                 </span>
                                                 <span className="text-sm text-slate-500 flex items-center gap-1">
@@ -523,10 +554,10 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                                         e.stopPropagation()
                                                         setDeleteIssue(issue)
                                                     }}
-                                                    className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="flex items-center gap-2 px-4 py-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
                                                 >
                                                     <Trash2 size={16} />
-                                                    Delete issue
+                                                    Remove entry
                                                 </button>
                                             </div>
                                         </div>
@@ -544,7 +575,7 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                     <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-auto">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold">Log an issue</h3>
+                                <h3 className="text-lg font-semibold">Add a note or incident</h3>
                                 <button
                                     onClick={() => setShowAddModal(false)}
                                     className="p-2 text-slate-400 hover:text-slate-600 rounded-lg"
@@ -593,15 +624,42 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                 />
                             </div>
 
+                            {/* Entry Type */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Type of entry
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {entryTypes.map((type) => {
+                                        const Icon = type.icon
+                                        const isSelected = entryType === type.id
+                                        return (
+                                            <button
+                                                key={type.id}
+                                                type="button"
+                                                onClick={() => setEntryType(type.id)}
+                                                className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-colors text-left ${isSelected
+                                                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                                                    }`}
+                                            >
+                                                <Icon size={16} />
+                                                <span className="text-sm font-medium">{type.label}</span>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+
                             {/* Description */}
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    What happened?
+                                    What would you like to record?
                                 </label>
                                 <textarea
                                     value={issueDescription}
                                     onChange={e => setIssueDescription(e.target.value)}
-                                    placeholder="Describe the issue, damage, or incident..."
+                                    placeholder="Describe what you noticed or what happened..."
                                     rows={4}
                                     className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                                 />
@@ -708,7 +766,7 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                     className="flex-1 px-4 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {saving ? <Loader2 size={18} className="animate-spin" /> : null}
-                                    Save issue
+                                    Save entry
                                 </button>
                             </div>
                         </div>
