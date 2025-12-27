@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { isAdminEmail } from '@/lib/admin'
-import { RELATED_CONTRACTS_EARLY_ACCESS } from '@/lib/featureFlags'
+import { DOCUMENT_VAULT_FREE } from '@/lib/featureFlags'
 
 /**
  * GET /api/related-contracts?caseId=xxx
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
     // Early access: bypass purchase check when feature flag is enabled
     const userEmail = user.email?.toLowerCase() || ''
     const isAdmin = isAdminEmail(user.email) || userEmail === 'pipia.giorgi@gmail.com'
-    const hasEarlyAccess = RELATED_CONTRACTS_EARLY_ACCESS
+    const hasEarlyAccess = DOCUMENT_VAULT_FREE
 
     if (!isAdmin && !hasEarlyAccess) {
         const { data: purchase, error: purchaseError } = await supabase
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
 
     // Early access: bypass purchase check when feature flag is enabled
     const isAdmin = isAdminEmail(user.email)
-    const hasEarlyAccess = RELATED_CONTRACTS_EARLY_ACCESS
+    const hasEarlyAccess = DOCUMENT_VAULT_FREE
 
     if (!isAdmin && !hasEarlyAccess) {
         const { data: purchase } = await supabase

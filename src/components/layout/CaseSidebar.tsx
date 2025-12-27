@@ -15,7 +15,8 @@ import {
     MessageSquarePlus,
     AlertTriangle,
     Check,
-    Circle
+    Circle,
+    FolderOpen
 } from 'lucide-react'
 import { useState } from 'react'
 import { FeedbackDialog } from '@/components/features/FeedbackDialog'
@@ -47,6 +48,7 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
         { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText, done: caseState?.hasContract },
         { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
         { href: `/vault/case/${caseId}/issues`, label: 'Issues', icon: AlertTriangle },
+        { href: `/vault/case/${caseId}/documents`, label: 'Documents', icon: FolderOpen },
     ]
 
     const tertiaryItems = [
@@ -126,8 +128,8 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                     })}
                 </div>
 
-                {/* Secondary row */}
-                <div className="grid grid-cols-3 gap-2">
+                {/* Secondary row - now 4 items */}
+                <div className="grid grid-cols-4 gap-2">
                     {secondaryItems.map(item => {
                         const Icon = item.icon
                         const active = isActive(item.href)

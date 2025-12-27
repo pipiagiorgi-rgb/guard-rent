@@ -27,7 +27,7 @@ import {
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 import { DocumentAIPanel } from '@/components/features/DocumentAIPanel'
 import { ReminderOptIn } from '@/components/features/ReminderOptIn'
-import { RELATED_CONTRACTS_EARLY_ACCESS } from '@/lib/featureFlags'
+import { DOCUMENT_VAULT_FREE } from '@/lib/featureFlags'
 
 interface RelatedContract {
     contract_id: string
@@ -113,7 +113,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
     const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null)
 
     // Early access = always unlocked (feature flag)
-    const isEarlyAccess = RELATED_CONTRACTS_EARLY_ACCESS
+    const isEarlyAccess = DOCUMENT_VAULT_FREE
     const hasAccess = isEarlyAccess || purchased
 
     useEffect(() => {

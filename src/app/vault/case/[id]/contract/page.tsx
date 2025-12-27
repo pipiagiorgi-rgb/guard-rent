@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { Lock, Info } from 'lucide-react'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { isAdminEmail } from '@/lib/admin'
-import { RelatedContractsSection } from '@/components/features/RelatedContractsSection'
 
 export default async function ContractPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
@@ -50,9 +49,7 @@ export default async function ContractPage({ params }: { params: { id: string } 
 
             <ContractScanClient caseId={params.id} hasPurchasedPack={hasPurchasedPack} />
 
-            {/* Related Contracts - Optional €9 Add-on (reference only, not sealed evidence) */}
-            <RelatedContractsSection caseId={params.id} />
-
         </div>
     )
 }
+
