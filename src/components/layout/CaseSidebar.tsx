@@ -45,7 +45,7 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
     ]
 
     const secondaryItems = [
-        { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText, done: caseState?.hasContract },
+        { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText },
         { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
         { href: `/vault/case/${caseId}/issues`, label: 'Issues', icon: AlertTriangle },
         { href: `/vault/case/${caseId}/documents`, label: 'Documents', icon: FolderOpen },
@@ -144,7 +144,7 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                             >
                                 <Icon size={18} />
                                 <span className="text-center leading-tight">{item.label}</span>
-                                {!active && <Badge done={item.done} />}
+                                {!active && 'done' in item && <Badge done={(item as any).done} />}
                             </Link>
                         )
                     })}
@@ -230,9 +230,9 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                             >
                                 <Icon size={16} />
                                 {item.label}
-                                {!active && item.done !== undefined && (
+                                {'done' in item && (item as any).done !== undefined && (
                                     <span className="ml-auto">
-                                        {item.done ? (
+                                        {(item as any).done ? (
                                             <Check size={14} className="text-green-500" strokeWidth={2.5} />
                                         ) : null}
                                     </span>

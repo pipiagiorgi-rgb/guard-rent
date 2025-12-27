@@ -714,12 +714,84 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
 
     // CASE A: Contract already saved to database
     if (savedContract) {
+        // Helper to get field value safely
+        const getFieldValue = (fieldKey: keyof ContractAnalysis): string | null => {
+            const field = result?.[fieldKey] as ExtractedField | undefined
+            if (!field?.value || field.value.toLowerCase() === 'not found' || field.value === '...') {
+                return null
+            }
+            return field.value
+        }
+
+        // Helper to format date nicely
+        const formatDate = (dateStr: string | null): string => {
+            if (!dateStr) return '—'
+            try {
+                const date = new Date(dateStr)
+                if (isNaN(date.getTime())) return dateStr
+                return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+            } catch {
+                return dateStr
+            }
+        }
+
+        const address = getFieldValue('property_address')
+        const leaseStart = getFieldValue('lease_start_date')
+        const leaseEnd = getFieldValue('lease_end_date')
+        const noticePeriod = getFieldValue('notice_period')
+        const jurisdiction = getFieldValue('jurisdiction_or_country')
+
         return (
             <>
                 {Toast}
                 <div className="space-y-6">
-                    {/* Header - changes based on editing state */}
-                    {isEditing ? (
+
+                    {/* ═══ LAYER 1: CONTRACT SUMMARY (Always visible, compact) ═══ */}
+                    {!isEditing && (
+                        <div className="bg-white border border-slate-200 rounded-xl p-5">
+                            <div className="space-y-3">
+                                {/* Property */}
+                                {address && (
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-slate-500 text-sm w-24 flex-shrink-0">Property</span>
+                                        <span className="font-medium text-slate-900">{address}</span>
+                                    </div>
+                                )}
+
+                                {/* Lease period */}
+                                <div className="flex items-start gap-3">
+                                    <span className="text-slate-500 text-sm w-24 flex-shrink-0">Lease</span>
+                                    <span className="font-medium text-slate-900">
+                                        {formatDate(leaseStart)} → {formatDate(leaseEnd)}
+                                    </span>
+                                </div>
+
+                                {/* Notice period */}
+                                {noticePeriod && (
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-slate-500 text-sm w-24 flex-shrink-0">Notice</span>
+                                        <span className="font-medium text-slate-900">{noticePeriod}</span>
+                                    </div>
+                                )}
+
+                                {/* Jurisdiction */}
+                                {jurisdiction && (
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-slate-500 text-sm w-24 flex-shrink-0">Jurisdiction</span>
+                                        <span className="font-medium text-slate-900">{jurisdiction}</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Trust line */}
+                            <p className="text-xs text-slate-400 mt-4 pt-3 border-t border-slate-100">
+                                Dates extracted automatically — can be edited anytime.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* ═══ EDITING MODE HEADER ═══ */}
+                    {isEditing && (
                         <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-4">
                             <Info className="text-blue-600" size={24} />
                             <div>
@@ -727,42 +799,53 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                                 <p className="text-sm text-blue-700">Make your changes and click Save to update.</p>
                             </div>
                         </div>
-                    ) : (
-                        <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-4">
-                            <CheckCircle className="text-green-600" size={24} />
-                            <div>
-                                <h3 className="font-semibold text-green-900">Contract details applied</h3>
-                                <p className="text-sm text-green-700">These details are saved and used for deadlines and exports.</p>
+                    )}
+
+                    {/* ═══ LAYER 2: KEY ACTIONS (Horizontal) ═══ */}
+                    {!isEditing && (
+                        <div className="flex flex-wrap gap-3">
+                            <button
+                                onClick={() => { setEditableAnalysis(JSON.parse(JSON.stringify(savedContract.analysis))); setIsEditing(true); }}
+                                className="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors"
+                            >
+                                Edit details
+                            </button>
+                            <button
+                                onClick={handleSyncDates}
+                                disabled={applying}
+                                className="px-5 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
+                            >
+                                {applying ? 'Syncing...' : 'Sync dates'}
+                            </button>
+                            <button
+                                onClick={handleReplaceContract}
+                                className="px-5 py-2.5 border border-red-200 text-red-600 rounded-xl font-medium hover:bg-red-50 transition-colors"
+                            >
+                                Replace contract
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ═══ LAYER 3: DETAILS (Collapsible when viewing, full when editing) ═══ */}
+                    {isEditing ? (
+                        // Full edit mode - show all fields as editable
+                        <>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="sm:col-span-2">
+                                    {renderField('Property address', 'property_address')}
+                                </div>
+                                {renderField('Lease start', 'lease_start_date')}
+                                {renderField('Lease end', 'lease_end_date')}
+                                {renderField('Earliest termination', 'earliest_termination_date')}
+                                {renderField('Notice period', 'notice_period')}
+                                {renderField('Notice condition', 'notice_condition')}
+                                {renderField('Notice method', 'notice_method')}
+                                {renderField('Rent amount', 'rent_amount')}
+                                {renderField('Jurisdiction', 'jurisdiction_or_country')}
                             </div>
-                        </div>
-                    )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="sm:col-span-2">
-                            {renderField('Property address', 'property_address')}
-                        </div>
-                        {renderField('Lease start', 'lease_start_date')}
-                        {renderField('Initial lease end', 'lease_end_date')}
-                        {renderField('Earliest termination possible', 'earliest_termination_date')}
-                        {renderField('Notice period', 'notice_period')}
-                        {renderField('Notice condition', 'notice_condition')}
-                        {renderField('Notice method', 'notice_method')}
-                        {renderField('Rent amount', 'rent_amount')}
-                        {renderField('Country / Jurisdiction', 'jurisdiction_or_country')}
-                    </div>
-
-                    {/* Error message */}
-                    {error && (
-                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center gap-3">
-                            <AlertCircle size={18} />
-                            <span>{error}</span>
-                        </div>
-                    )}
-
-                    {/* Buttons - change based on editing state */}
-                    <div className="flex gap-3 pt-4 border-t border-slate-100">
-                        {isEditing ? (
-                            <>
+                            {/* Edit mode buttons */}
+                            <div className="flex gap-3 pt-4 border-t border-slate-100">
                                 <button
                                     onClick={handleApplyToRental}
                                     disabled={applying}
@@ -776,260 +859,230 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                                 >
                                     Cancel
                                 </button>
-                            </>
-                        ) : (
-                            <>
-                                <button
-                                    onClick={() => { setEditableAnalysis(JSON.parse(JSON.stringify(savedContract.analysis))); setIsEditing(true); }}
-                                    className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors"
-                                >
-                                    Edit details manually
-                                </button>
-                                <button
-                                    onClick={handleSyncDates}
-                                    disabled={applying}
-                                    className="px-6 py-2.5 border border-blue-200 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition-colors disabled:opacity-50"
-                                >
-                                    {applying ? 'Syncing...' : 'Sync dates to overview'}
-                                </button>
-                                <button
-                                    onClick={handleReplaceContract}
-                                    className="px-6 py-2.5 border border-red-200 text-red-600 rounded-xl font-medium hover:bg-red-50 transition-colors"
-                                >
-                                    Replace contract
-                                </button>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Ask about this contract - Q&A Section */}
-                    {!isEditing && (
-                        <div className="mt-8 pt-6 border-t border-slate-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <MessageCircle size={20} className="text-slate-600" />
-                                    <h3 className="font-semibold text-slate-900">Ask about this contract</h3>
-                                </div>
-                                {/* Preview counter */}
-                                {!hasPurchasedPack && questionsRemaining > 0 && (
-                                    <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
-                                        {questionsRemaining} free {questionsRemaining === 1 ? 'question' : 'questions'} available
-                                    </span>
-                                )}
                             </div>
-
-                            <p className="text-sm text-slate-500 mb-4">
-                                Ask factual questions about your contract. Find information, summarize clauses, or draft notices.
-                            </p>
-
-                            {/* Limit reached state */}
-                            {!hasPurchasedPack && questionsRemaining === 0 ? (
-                                <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
-                                    <Lock size={24} className="text-slate-400 mx-auto mb-3" />
-                                    <p className="text-slate-700 font-medium mb-1">You've reached the preview limit for this rental.</p>
-                                    <p className="text-sm text-slate-500 mb-4">Unlock a pack to continue and save answers.</p>
-                                    <Link
-                                        href="/pricing"
-                                        className="inline-block px-5 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors"
-                                    >
-                                        See pricing
-                                    </Link>
-                                </div>
-                            ) : (
-                                <>
-                                    {/* Example questions */}
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {[
-                                            "What is the IBAN for rent payments?",
-                                            "When is rent due each month?",
-                                            "Draft a notice email to terminate",
-                                        ].map((example) => (
-                                            <button
-                                                key={example}
-                                                onClick={() => setQaQuestion(example)}
-                                                className="text-xs px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 transition-colors"
-                                            >
-                                                {example}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    {/* Input */}
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={qaQuestion}
-                                            onChange={(e) => setQaQuestion(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleAskQuestion()}
-                                            placeholder="e.g. Draft a notice"
-                                            className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                            maxLength={500}
-                                            disabled={qaLoading}
-                                        />
-                                        <button
-                                            onClick={handleAskQuestion}
-                                            disabled={qaLoading || !qaQuestion.trim()}
-                                            className="px-4 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                                        >
-                                            {qaLoading ? (
-                                                <Loader2 size={18} className="animate-spin" />
-                                            ) : (
-                                                <Send size={18} />
-                                            )}
-                                        </button>
-                                    </div>
-
-                                    {/* Error */}
-                                    {qaError && (
-                                        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                                            {qaError}
+                        </>
+                    ) : (
+                        // Collapsed details section
+                        <details className="border border-slate-200 rounded-xl overflow-hidden group">
+                            <summary className="flex items-center justify-between px-5 py-3.5 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer list-none">
+                                <span className="text-sm font-medium text-slate-700">Show all contract details</span>
+                                <ChevronDown size={18} className="text-slate-500 transition-transform group-open:rotate-180" />
+                            </summary>
+                            <div className="p-5 bg-white border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {[
+                                    { label: 'Earliest termination', key: 'earliest_termination_date' as keyof ContractAnalysis },
+                                    { label: 'Notice condition', key: 'notice_condition' as keyof ContractAnalysis },
+                                    { label: 'Notice method', key: 'notice_method' as keyof ContractAnalysis },
+                                    { label: 'Rent amount', key: 'rent_amount' as keyof ContractAnalysis },
+                                    { label: 'Payment frequency', key: 'payment_frequency' as keyof ContractAnalysis },
+                                    { label: 'Payment due date', key: 'payment_due_date' as keyof ContractAnalysis },
+                                ].map(({ label, key }) => {
+                                    const value = getFieldValue(key)
+                                    return (
+                                        <div key={key} className="flex flex-col">
+                                            <span className="text-xs text-slate-500 mb-1">{label}</span>
+                                            <span className="text-sm font-medium text-slate-900">
+                                                {value || 'Not stated in contract'}
+                                            </span>
                                         </div>
-                                    )}
+                                    )
+                                })}
+                            </div>
+                        </details>
+                    )}
 
-                                    {/* Answer */}
-                                    {qaAnswer && (
-                                        <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                                            <p className="text-slate-800 text-sm whitespace-pre-wrap">{qaAnswer}</p>
-                                            {!hasPurchasedPack && (
-                                                <p className="text-xs text-slate-400 mt-3 flex items-center gap-1">
-                                                    <Info size={12} />
-                                                    Preview answer. Unlock a pack to save answers across sessions.
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
-                                </>
-                            )}
+                    {/* Error message */}
+                    {error && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center gap-3">
+                            <AlertCircle size={18} />
+                            <span>{error}</span>
                         </div>
                     )}
 
-                    {/* Contract Translation Section - always available after contract is applied */}
+                    {/* ═══ LAYER 4: CONTRACT TOOLS (Visually isolated) ═══ */}
                     {!isEditing && (
-                        <div className="mt-8 pt-6 border-t border-slate-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <Languages size={20} className="text-slate-600" />
-                                    <h3 className="font-semibold text-slate-900">Contract translation</h3>
+                        <div className="mt-8 pt-6 border-t-2 border-slate-200">
+                            {/* Section header */}
+                            <div className="mb-6">
+                                <h2 className="text-lg font-semibold text-slate-900">Contract tools</h2>
+                                <p className="text-sm text-slate-500 mt-1">
+                                    Ask questions, translate, or draft notices from your contract.
+                                </p>
+                            </div>
+
+                            {/* Q&A Tool */}
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                        <MessageCircle size={18} className="text-slate-600" />
+                                        <h3 className="font-medium text-slate-900">Ask about this contract</h3>
+                                    </div>
+                                    {!hasPurchasedPack && questionsRemaining > 0 && (
+                                        <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded-full border border-slate-200">
+                                            {questionsRemaining} free
+                                        </span>
+                                    )}
                                 </div>
-                                {/* Preview counter */}
-                                {!hasPurchasedPack && translationsRemaining > 0 && (
-                                    <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
-                                        {translationsRemaining} preview {translationsRemaining === 1 ? 'translation' : 'translations'} left
-                                    </span>
+
+                                {/* Limit reached state */}
+                                {!hasPurchasedPack && questionsRemaining === 0 ? (
+                                    <div className="text-center py-4">
+                                        <Lock size={20} className="text-slate-400 mx-auto mb-2" />
+                                        <p className="text-sm text-slate-600 mb-2">Preview limit reached</p>
+                                        <Link href="/pricing" className="text-sm text-blue-600 hover:underline">
+                                            Unlock to continue
+                                        </Link>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Example questions */}
+                                        <div className="flex flex-wrap gap-2 mb-3">
+                                            {[
+                                                "What is the IBAN for rent payments?",
+                                                "When is rent due each month?",
+                                                "Draft a notice email",
+                                            ].map((example) => (
+                                                <button
+                                                    key={example}
+                                                    onClick={() => setQaQuestion(example)}
+                                                    className="text-xs px-3 py-1.5 bg-white text-slate-600 rounded-full hover:bg-slate-100 transition-colors border border-slate-200"
+                                                >
+                                                    {example}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Input */}
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={qaQuestion}
+                                                onChange={(e) => setQaQuestion(e.target.value)}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleAskQuestion()}
+                                                placeholder="e.g. Draft a notice"
+                                                className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
+                                                maxLength={500}
+                                                disabled={qaLoading}
+                                            />
+                                            <button
+                                                onClick={handleAskQuestion}
+                                                disabled={qaLoading || !qaQuestion.trim()}
+                                                className="px-4 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                                            >
+                                                {qaLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                                            </button>
+                                        </div>
+
+                                        {/* Error */}
+                                        {qaError && (
+                                            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                                                {qaError}
+                                            </div>
+                                        )}
+
+                                        {/* Answer */}
+                                        {qaAnswer && (
+                                            <div className="mt-4 p-4 bg-white border border-slate-200 rounded-xl">
+                                                <p className="text-slate-800 text-sm whitespace-pre-wrap">{qaAnswer}</p>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
 
-                            <p className="text-sm text-slate-500 mb-4">
-                                Translate your contract to another language for convenience. Original contract remains the reference.
-                            </p>
-
-                            {/* Limit reached state */}
-                            {!hasPurchasedPack && translationsRemaining === 0 ? (
-                                <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
-                                    <Lock size={24} className="text-slate-400 mx-auto mb-3" />
-                                    <p className="text-slate-700 font-medium mb-1">Preview limit reached.</p>
-                                    <p className="text-sm text-slate-500 mb-4">Unlock a pack to save and access translations anytime.</p>
-                                    <Link
-                                        href="/pricing"
-                                        className="inline-block px-5 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors"
-                                    >
-                                        See pricing
-                                    </Link>
+                            {/* Translation Tool */}
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                        <Languages size={18} className="text-slate-600" />
+                                        <h3 className="font-medium text-slate-900">Translate contract</h3>
+                                    </div>
+                                    {!hasPurchasedPack && translationsRemaining > 0 && (
+                                        <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded-full border border-slate-200">
+                                            {translationsRemaining} free
+                                        </span>
+                                    )}
                                 </div>
-                            ) : (
-                                <>
-                                    {/* Language selector */}
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {PRESET_LANGUAGES.map((lang) => (
-                                            <button
-                                                key={lang}
-                                                onClick={() => { setTargetLanguage(lang); setCustomLanguage(''); }}
-                                                className={`text-xs px-3 py-1.5 rounded-full transition-colors ${targetLanguage === lang && !customLanguage
-                                                    ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                                    }`}
-                                            >
-                                                {lang}
-                                            </button>
-                                        ))}
+
+                                {/* Limit reached state */}
+                                {!hasPurchasedPack && translationsRemaining === 0 ? (
+                                    <div className="text-center py-4">
+                                        <Lock size={20} className="text-slate-400 mx-auto mb-2" />
+                                        <p className="text-sm text-slate-600 mb-2">Preview limit reached</p>
+                                        <Link href="/pricing" className="text-sm text-blue-600 hover:underline">
+                                            Unlock to continue
+                                        </Link>
                                     </div>
-
-                                    {/* Custom language input */}
-                                    <div className="flex gap-2 mb-4">
-                                        <input
-                                            type="text"
-                                            value={customLanguage}
-                                            onChange={(e) => setCustomLanguage(e.target.value)}
-                                            placeholder="Or type any language..."
-                                            className="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                        />
-                                        <button
-                                            onClick={handleTranslate}
-                                            disabled={translating || (!targetLanguage && !customLanguage.trim())}
-                                            className="px-4 py-2 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                                        >
-                                            {translating ? (
-                                                <Loader2 size={18} className="animate-spin" />
-                                            ) : (
-                                                <Globe size={18} />
-                                            )}
-                                            {translating ? 'Translating...' : 'Translate'}
-                                        </button>
-                                    </div>
-
-                                    {/* Translation error */}
-                                    {translationError && (
-                                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mb-4">
-                                            {translationError}
-                                        </div>
-                                    )}
-
-                                    {/* Translated text */}
-                                    {translatedText && showTranslation && (
-                                        <div className={`p-4 rounded-xl ${hasPurchasedPack ? 'bg-blue-50 border border-blue-200' : 'bg-amber-50 border border-amber-200'}`}>
-                                            {/* Preview warning banner */}
-                                            {!hasPurchasedPack && (
-                                                <div className="flex items-start gap-2 mb-3 pb-3 border-b border-amber-200">
-                                                    <Info size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
-                                                    <div>
-                                                        <p className="text-sm font-medium text-amber-800">Preview translation</p>
-                                                        <p className="text-xs text-amber-700">This translation is not saved unless you unlock a pack.</p>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className={`text-sm font-medium ${hasPurchasedPack ? 'text-blue-800' : 'text-amber-800'}`}>
-                                                    Translated to {customLanguage || targetLanguage}
-                                                </span>
+                                ) : (
+                                    <>
+                                        {/* Language selector */}
+                                        <div className="flex flex-wrap gap-2 mb-3">
+                                            {PRESET_LANGUAGES.slice(0, 6).map((lang) => (
                                                 <button
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(translatedText)
-                                                        setCopiedTranslation(true)
-                                                        setTimeout(() => setCopiedTranslation(false), 2000)
-                                                    }}
-                                                    className={`text-xs flex items-center gap-1 ${hasPurchasedPack ? 'text-blue-600 hover:text-blue-700' : 'text-amber-600 hover:text-amber-700'}`}
+                                                    key={lang}
+                                                    onClick={() => { setTargetLanguage(lang); setCustomLanguage(''); }}
+                                                    className={`text-xs px-3 py-1.5 rounded-full transition-colors ${targetLanguage === lang && !customLanguage
+                                                        ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                                                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                                        }`}
                                                 >
-                                                    {copiedTranslation ? (
-                                                        <><Check size={14} /> Copied</>
-                                                    ) : (
-                                                        <><Copy size={14} /> Copy</>
-                                                    )}
+                                                    {lang}
                                                 </button>
-                                            </div>
-                                            <p className="text-sm text-slate-700 whitespace-pre-wrap max-h-64 overflow-y-auto">
-                                                {translatedText}
-                                            </p>
-                                            <p className={`text-xs mt-3 flex items-center gap-1 ${hasPurchasedPack ? 'text-blue-600' : 'text-amber-600'}`}>
-                                                <Info size={12} />
-                                                {hasPurchasedPack
-                                                    ? 'Translation saved. Original contract is the official reference.'
-                                                    : 'Preview only. This will be cleared on refresh.'}
-                                            </p>
+                                            ))}
                                         </div>
-                                    )}
-                                </>
-                            )}
+
+                                        {/* Custom language input */}
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={customLanguage}
+                                                onChange={(e) => setCustomLanguage(e.target.value)}
+                                                placeholder="Or type any language..."
+                                                className="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
+                                            />
+                                            <button
+                                                onClick={handleTranslate}
+                                                disabled={translating || (!targetLanguage && !customLanguage.trim())}
+                                                className="px-4 py-2 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                                            >
+                                                {translating ? <Loader2 size={18} className="animate-spin" /> : <Globe size={18} />}
+                                                {translating ? 'Translating...' : 'Translate'}
+                                            </button>
+                                        </div>
+
+                                        {/* Translation error */}
+                                        {translationError && (
+                                            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                                                {translationError}
+                                            </div>
+                                        )}
+
+                                        {/* Translated text */}
+                                        {translatedText && showTranslation && (
+                                            <div className="mt-4 p-4 bg-white border border-slate-200 rounded-xl">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-sm font-medium text-slate-700">
+                                                        Translated to {customLanguage || targetLanguage}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(translatedText)
+                                                            setCopiedTranslation(true)
+                                                            setTimeout(() => setCopiedTranslation(false), 2000)
+                                                        }}
+                                                        className="text-xs flex items-center gap-1 text-slate-500 hover:text-slate-700"
+                                                    >
+                                                        {copiedTranslation ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy</>}
+                                                    </button>
+                                                </div>
+                                                <p className="text-sm text-slate-700 whitespace-pre-wrap max-h-64 overflow-y-auto">
+                                                    {translatedText}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
