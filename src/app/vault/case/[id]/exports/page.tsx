@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import Link from 'next/link'
-import { PhotoComparison } from '@/components/features/PhotoComparison'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { Footer } from '@/components/layout/Footer'
 import { isAdminEmail } from '@/lib/admin'
@@ -858,9 +857,9 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             )}
 
             <div>
-                <h1 className="text-2xl font-bold mb-1">Your evidence</h1>
+                <h1 className="text-2xl font-bold mb-1">Exports</h1>
                 <p className="text-slate-500">
-                    Access your photos and documentation anytime.
+                    Official, downloadable records generated from your stored evidence.
                 </p>
             </div>
 
@@ -1091,15 +1090,6 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
             </div>
 
-            {/* ═══════════════════════════════════════════════════════════════
-                SECTION A.5: PHOTO COMPARISON BY ROOM
-            ═══════════════════════════════════════════════════════════════ */}
-            {(evidence.checkinPhotos > 0 || evidence.handoverPhotos > 0) && (
-                <div className="pt-6">
-                    <h2 className="text-lg font-semibold mb-4">Photos by room</h2>
-                    <PhotoComparison caseId={caseId} />
-                </div>
-            )}
 
             {/* ═══════════════════════════════════════════════════════════════
                 SECTION B: GENERATE OFFICIAL REPORTS (PAID)
@@ -1403,7 +1393,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                             <div className="space-y-2 mb-6 text-sm text-slate-600">
                                 <div className="flex items-center gap-2">
                                     <Check size={16} className="text-green-600" />
-                                    <span>Check-in + handover photo comparison</span>
+                                    <span>Move-in and move-out photos included</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Check size={16} className="text-green-600" />
