@@ -374,15 +374,15 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
             <div>
                 <h1 className="text-2xl font-bold text-slate-900">Condition & Notes</h1>
                 <p className="text-slate-500 mt-1">
-                    Record observations, maintenance, or incidents during your tenancy
+                    Private notes for maintenance, observations, or incidents during your tenancy.
                 </p>
             </div>
 
             {/* Trust line */}
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
                 <p className="text-sm text-slate-600">
-                    <span className="font-medium">Private records.</span>{' '}
-                    These entries are for your own reference. Photos and video are optional and help provide context.
+                    These records are for your reference and are not sealed evidence.
+                    Photos and videos help provide context. They remain private and editable.
                 </p>
             </div>
 
@@ -488,46 +488,52 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                             </div>
 
                                             {/* Media gallery */}
-                                            {issue.media.length > 0 && (
-                                                <div className="py-4 border-t border-slate-200">
-                                                    <h4 className="text-sm font-medium text-slate-500 mb-3">
-                                                        Evidence ({photos.length} photo{photos.length !== 1 ? 's' : ''}{videos.length > 0 ? `, ${videos.length} video${videos.length !== 1 ? 's' : ''}` : ''})
-                                                    </h4>
-                                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                                                        {issue.media.map((item) => (
-                                                            item.type === 'issue_photo' ? (
-                                                                <button
-                                                                    key={item.asset_id}
-                                                                    onClick={() => openPhotoLightbox(issue.media)}
-                                                                    className="relative aspect-square rounded-lg overflow-hidden bg-slate-100 group hover:ring-2 hover:ring-blue-500 transition-all"
-                                                                >
-                                                                    {item.signedUrl && (
-                                                                        <img
-                                                                            src={item.signedUrl}
-                                                                            alt=""
-                                                                            className="w-full h-full object-cover"
-                                                                        />
-                                                                    )}
-                                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                                                                </button>
-                                                            ) : (
-                                                                <a
-                                                                    key={item.asset_id}
-                                                                    href={item.signedUrl}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="relative aspect-square rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center group hover:ring-2 hover:ring-blue-500 transition-all"
-                                                                >
-                                                                    <Play size={24} className="text-white" />
-                                                                    <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 text-xs text-white flex items-center gap-1">
-                                                                        <Video size={10} /> Video
-                                                                    </div>
-                                                                </a>
-                                                            )
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <div className="py-4 border-t border-slate-200">
+                                                {issue.media.length > 0 ? (
+                                                    <>
+                                                        <h4 className="text-sm font-medium text-slate-500 mb-3">
+                                                            Media ({photos.length} photo{photos.length !== 1 ? 's' : ''}{videos.length > 0 ? `, ${videos.length} video${videos.length !== 1 ? 's' : ''}` : ''})
+                                                        </h4>
+                                                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                                                            {issue.media.map((item) => (
+                                                                item.type === 'issue_photo' ? (
+                                                                    <button
+                                                                        key={item.asset_id}
+                                                                        onClick={() => openPhotoLightbox(issue.media)}
+                                                                        className="relative aspect-square rounded-lg overflow-hidden bg-slate-100 group hover:ring-2 hover:ring-blue-500 transition-all"
+                                                                    >
+                                                                        {item.signedUrl && (
+                                                                            <img
+                                                                                src={item.signedUrl}
+                                                                                alt=""
+                                                                                className="w-full h-full object-cover"
+                                                                            />
+                                                                        )}
+                                                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                                                    </button>
+                                                                ) : (
+                                                                    <a
+                                                                        key={item.asset_id}
+                                                                        href={item.signedUrl}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="relative aspect-square rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center group hover:ring-2 hover:ring-blue-500 transition-all"
+                                                                    >
+                                                                        <Play size={24} className="text-white" />
+                                                                        <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 text-xs text-white flex items-center gap-1">
+                                                                            <Video size={10} /> Video
+                                                                        </div>
+                                                                    </a>
+                                                                )
+                                                            ))}
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <p className="text-sm text-slate-400">
+                                                        No photos or videos attached to this entry.
+                                                    </p>
+                                                )}
+                                            </div>
 
                                             {/* Metadata */}
                                             <div className="py-4 border-t border-slate-200">
@@ -639,8 +645,8 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                                 type="button"
                                                 onClick={() => setEntryType(type.id)}
                                                 className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-colors text-left ${isSelected
-                                                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                                                     }`}
                                             >
                                                 <Icon size={16} />
