@@ -757,7 +757,8 @@ export async function sendEvidenceLockedEmail({
     lockType,
     lockTimestamp,
     caseId,
-    photoCount
+    photoCount,
+    pdfDownloadUrl
 }: {
     to: string
     rentalLabel: string
@@ -765,6 +766,7 @@ export async function sendEvidenceLockedEmail({
     lockTimestamp: string
     caseId: string
     photoCount: number
+    pdfDownloadUrl?: string // Optional: 7-day signed URL for direct PDF download
 }): Promise<{ success: boolean; error?: string }> {
     const formattedDate = new Date(lockTimestamp).toLocaleDateString('en-GB', {
         day: 'numeric',
@@ -777,21 +779,37 @@ export async function sendEvidenceLockedEmail({
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
     const dashboardUrl = `${siteUrl}/vault/case/${caseId}`
-    const issuesUrl = `${siteUrl}/vault/case/${caseId}/issues`
+    const exportsUrl = `${siteUrl}/vault/case/${caseId}/exports`
 
     // ─────────────────────────────────────────────────────────────
-    // MOVE-IN EMAIL: Warm, welcoming, introduces Issues feature
+    // MOVE-IN EMAIL: Warm, welcoming, with PDF download option
     // ─────────────────────────────────────────────────────────────
     if (lockType === 'check-in') {
-        const subject = `Welcome to your new home — your Move-In is complete`
+        const subject = `Your Move-In is complete`
         const title = `Your Move-In is complete`
+
+        // Generate PDF button HTML if URL provided
+        const pdfButtonHtml = pdfDownloadUrl ? `
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+                <tr>
+                    <td align="center">
+                        <a href="${pdfDownloadUrl}" style="display: inline-block; padding: 14px 32px; background-color: #011246; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 8px;">
+                            Download Move-In PDF
+                        </a>
+                    </td>
+                </tr>
+            </table>
+            <p style="margin: 0 0 24px 0; font-size: 12px; color: #94a3b8; text-align: center;">
+                This link expires in 7 days. You can always re-download from your dashboard.
+            </p>
+        ` : ''
 
         const bodyContent = `
             <p style="margin: 0 0 16px 0; font-size: 16px;">
                 Congratulations on your move-in.
             </p>
             <p style="margin: 0 0 24px 0;">
-                We hope you enjoy settling into your new home. Your move-in record has now been securely completed and time-stamped. We're here to help you keep everything organised and protected throughout your tenancy.
+                Your Move-In record has now been securely completed and time-stamped. This document is sealed and cannot be changed.
             </p>
 
             <!-- Confirmation box -->
@@ -801,63 +819,62 @@ export async function sendEvidenceLockedEmail({
                         <p style="margin: 0 0 8px 0; font-size: 12px; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Move-In Sealed</p>
                         <p style="margin: 0 0 12px 0; font-weight: 600; color: #166534;">${formattedDate} (UTC)</p>
                         <p style="margin: 0; font-size: 14px; color: #166534;">
-                            ${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Immutable · Downloadable anytime
+                            ${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Sealed · Immutable
                         </p>
                     </td>
                 </tr>
             </table>
+
+            ${pdfButtonHtml}
+
+            <p style="margin: 0 0 24px 0; font-size: 14px; color: #475569;">
+                You can download your official Move-In PDF and share it with your landlord if needed.
+            </p>
 
             <!-- Issues feature introduction -->
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 24px;">
                 <tr>
                     <td style="padding: 16px;">
                         <p style="margin: 0 0 12px 0; font-weight: 600; color: #0f172a;">If anything comes up during your tenancy</p>
-                        <p style="margin: 0 0 12px 0; font-size: 14px; color: #475569;">
-                            For example, a small maintenance issue or unexpected damage — you can log it in RentVault at any time.
-                        </p>
                         <p style="margin: 0; font-size: 14px; color: #64748b;">
-                            This is completely optional, but it helps you keep a clear, dated record if you ever need it later.
+                            For example, maintenance or unexpected damage — you can log it in RentVault at any time. This is optional, but helps you keep a clear, dated record if you ever need it later.
                         </p>
                     </td>
                 </tr>
             </table>
 
-            <!-- Storage & exports -->
-            <p style="margin: 0 0 24px 0; font-size: 14px; color: #475569;">
-                Your records are securely stored and accessible from your dashboard. You can generate official PDFs or extend storage later if you choose — nothing is required now.
-            </p>
-
             <!-- Closing -->
             <p style="margin: 0; font-size: 14px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-                We'll be here throughout your tenancy if you need reminders, records, or exports. Enjoy your new place — and welcome.
+                We'll be here throughout your tenancy. Enjoy your new place — and welcome.
             </p>
         `
 
-        const text = `Welcome to your new home — your Move-In is complete
+        const pdfTextLink = pdfDownloadUrl ? `\nDownload your PDF: ${pdfDownloadUrl}\n(This link expires in 7 days)\n` : ''
+
+        const text = `Your Move-In is complete
 
 Congratulations on your move-in.
 
-We hope you enjoy settling into your new home. Your move-in record has now been securely completed and time-stamped. We're here to help you keep everything organised and protected throughout your tenancy.
+Your Move-In record has now been securely completed and time-stamped. This document is sealed and cannot be changed.
 
 Move-In Sealed
 ${formattedDate} (UTC)
-${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Immutable · Downloadable anytime
+${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Sealed · Immutable
+${pdfTextLink}
+You can download your official Move-In PDF and share it with your landlord if needed.
 
-If anything comes up during your tenancy
-For example, a small maintenance issue or unexpected damage — you can log it in RentVault at any time. This is completely optional, but it helps you keep a clear, dated record if you ever need it later.
+If anything comes up during your tenancy — for example, maintenance or unexpected damage — you can log it in RentVault at any time. This is optional, but helps you keep a clear, dated record if you ever need it later.
 
-Your records are securely stored and accessible from your dashboard. You can generate official PDFs or extend storage later if you choose — nothing is required now.
+We'll be here throughout your tenancy. Enjoy your new place — and welcome.
 
-We'll be here throughout your tenancy if you need reminders, records, or exports. Enjoy your new place — and welcome.
-
-View your dashboard: ${dashboardUrl}
+Go to Dashboard: ${dashboardUrl}
 
 ---
 RentVault securely stores and organises your rental documents. Not legal advice.`
 
         const html = emailTemplate({
             title,
-            previewText: `Your move-in evidence is now complete and secured`,
+            previewText: `Your Move-In evidence is sealed and ready to download`,
             bodyContent,
             ctaText: 'Go to Dashboard',
             ctaUrl: dashboardUrl
@@ -873,18 +890,33 @@ RentVault securely stores and organises your rental documents. Not legal advice.
     }
 
     // ─────────────────────────────────────────────────────────────
-    // MOVE-OUT EMAIL: Factual confirmation but still supportive
+    // MOVE-OUT EMAIL: Factual confirmation with PDF download option
     // ─────────────────────────────────────────────────────────────
-    const exportUrl = `${siteUrl}/vault/case/${caseId}/exports`
-    const subject = `Move-Out confirmed for ${rentalLabel}`
+    const subject = `Your Move-Out is complete`
     const title = `Your Move-Out is complete`
+
+    // Generate PDF button HTML if URL provided
+    const pdfButtonHtml = pdfDownloadUrl ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+            <tr>
+                <td align="center">
+                    <a href="${pdfDownloadUrl}" style="display: inline-block; padding: 14px 32px; background-color: #011246; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 8px;">
+                        Download Move-Out PDF
+                    </a>
+                </td>
+            </tr>
+        </table>
+        <p style="margin: 0 0 24px 0; font-size: 12px; color: #94a3b8; text-align: center;">
+            This link expires in 7 days. You can always re-download from your dashboard.
+        </p>
+    ` : ''
 
     const bodyContent = `
         <p style="margin: 0 0 16px 0;">
             We hope RentVault gave you a clear and secure way to record your rental handover.
         </p>
         <p style="margin: 0 0 24px 0;">
-            This email confirms your Move-Out evidence has been sealed and time-stamped.
+            Your Move-Out record has been sealed and time-stamped. This document cannot be changed.
         </p>
 
         <!-- Confirmation box -->
@@ -894,11 +926,17 @@ RentVault securely stores and organises your rental documents. Not legal advice.
                     <p style="margin: 0 0 8px 0; font-size: 12px; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Move-Out Sealed</p>
                     <p style="margin: 0 0 12px 0; font-weight: 600; color: #166534;">${formattedDate} (UTC)</p>
                     <p style="margin: 0; font-size: 14px; color: #166534;">
-                        ${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Evidence locked
+                        ${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Sealed · Immutable
                     </p>
                 </td>
             </tr>
         </table>
+
+        ${pdfButtonHtml}
+
+        <p style="margin: 0 0 24px 0; font-size: 14px; color: #475569;">
+            You can download your official Move-Out PDF and share it with your landlord if needed.
+        </p>
 
         <!-- Details box -->
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 8px; margin-bottom: 24px;">
@@ -910,7 +948,7 @@ RentVault securely stores and organises your rental documents. Not legal advice.
                     <ul style="margin: 0; padding-left: 16px; color: #475569; font-size: 14px;">
                         <li style="margin-bottom: 4px;">Photos and timestamps are now immutable</li>
                         <li style="margin-bottom: 4px;">Evidence cannot be added, edited, or deleted</li>
-                        <li>You can generate a PDF report from Exports</li>
+                        <li>You can generate additional PDF reports from Exports</li>
                     </ul>
                 </td>
             </tr>
@@ -918,46 +956,50 @@ RentVault securely stores and organises your rental documents. Not legal advice.
 
         <!-- Storage notice -->
         <p style="margin: 0 0 16px 0; font-size: 14px; color: #475569;">
-            Your records are stored securely for 12 months. We'll notify you well in advance before any changes to access or retention.
+            Your records are stored securely for 12 months. We'll notify you before any changes.
         </p>
 
         <p style="margin: 0; font-size: 14px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-            If you rent again in the future, you can use RentVault to keep the same kind of clear records from day one.
+            If you rent again in the future, RentVault is here to help from day one.
         </p>
     `
 
-    const text = `Move-Out confirmed for ${rentalLabel}
+    const pdfTextLink = pdfDownloadUrl ? `\nDownload your PDF: ${pdfDownloadUrl}\n(This link expires in 7 days)\n` : ''
+
+    const text = `Your Move-Out is complete
 
 We hope RentVault gave you a clear and secure way to record your rental handover.
 
-This email confirms your Move-Out evidence has been sealed and time-stamped.
+Your Move-Out record has been sealed and time-stamped. This document cannot be changed.
 
 Move-Out Sealed
 ${formattedDate} (UTC)
-${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Evidence locked
+${photoCount} photo${photoCount !== 1 ? 's' : ''} recorded · Sealed · Immutable
+${pdfTextLink}
+You can download your official Move-Out PDF and share it with your landlord if needed.
 
 Rental: ${rentalLabel}
 
 What this means:
 - Photos and timestamps are now immutable
 - Evidence cannot be added, edited, or deleted
-- You can generate a PDF report from Exports
+- You can generate additional PDF reports from Exports
 
-Your records are stored securely for 12 months. We'll notify you well in advance before any changes to access or retention.
+Your records are stored securely for 12 months. We'll notify you before any changes.
 
-If you rent again in the future, you can use RentVault to keep the same kind of clear records from day one.
+If you rent again in the future, RentVault is here to help from day one.
 
-Download your evidence pack: ${exportUrl}
+Go to Dashboard: ${dashboardUrl}
 
 ---
 RentVault securely stores and organises your rental documents. Not legal advice.`
 
     const html = emailTemplate({
         title,
-        previewText: `Your Move-Out evidence is now complete and secured`,
+        previewText: `Your Move-Out evidence is sealed and ready to download`,
         bodyContent,
-        ctaText: 'Download Evidence Pack',
-        ctaUrl: exportUrl
+        ctaText: 'Go to Dashboard',
+        ctaUrl: dashboardUrl
     })
 
     return sendEmail({

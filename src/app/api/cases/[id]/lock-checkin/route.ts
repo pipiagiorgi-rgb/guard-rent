@@ -56,7 +56,59 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             }
         })
 
-        // 4. Send backup confirmation email
+        // 4. Generate PDF and get 7-day signed download URL
+        let pdfDownloadUrl: string | undefined
+        try {
+            console.log('[Lock Check-in] Generating Move-In PDF...')
+
+            // Get the origin for internal API call
+            const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
+
+            // Call PDF API with auth cookie forwarded
+            const pdfResponse = await fetch(`${origin}/api/pdf/checkin-report`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': request.headers.get('cookie') || ''
+                },
+                body: JSON.stringify({ caseId, forPreview: false })
+            })
+
+            if (pdfResponse.ok) {
+                const pdfData = await pdfResponse.json()
+                if (pdfData.url) {
+                    // Create a new 7-day signed URL from the stored PDF
+                    // The PDF API returns a 1-hour URL, we need a 7-day one
+                    // Extract storage path from existing outputs or use the URL directly
+                    const { data: latestOutput } = await supabase
+                        .from('outputs')
+                        .select('storage_path')
+                        .eq('case_id', caseId)
+                        .eq('type', 'checkin_report')
+                        .order('created_at', { ascending: false })
+                        .limit(1)
+                        .single()
+
+                    if (latestOutput?.storage_path) {
+                        const { data: signedData } = await supabase
+                            .storage
+                            .from('guard-rent')
+                            .createSignedUrl(latestOutput.storage_path, 60 * 60 * 24 * 7, {
+                                download: `RentVault_Move-In_${caseId.slice(0, 8)}.pdf`
+                            })
+                        pdfDownloadUrl = signedData?.signedUrl
+                    }
+                }
+                console.log('[Lock Check-in] PDF generated successfully')
+            } else {
+                console.error('[Lock Check-in] PDF generation failed:', await pdfResponse.text())
+            }
+        } catch (pdfErr) {
+            // PDF generation failure should not block the lock flow
+            console.error('[Lock Check-in] PDF generation error (non-blocking):', pdfErr)
+        }
+
+        // 5. Send backup confirmation email (with PDF link if available)
         if (user.email) {
             console.log('[Lock Check-in] Sending confirmation email to:', user.email)
             const emailRes = await sendEvidenceLockedEmail({
@@ -65,7 +117,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 lockType: 'check-in',
                 lockTimestamp: now,
                 caseId,
-                photoCount: photoCount || 0
+                photoCount: photoCount || 0,
+                pdfDownloadUrl
             })
 
             if (emailRes.success) {
@@ -75,7 +128,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                     action: 'checkin_lock_email_sent',
                     details: {
                         timestamp: new Date().toISOString(),
-                        recipient: user.email
+                        recipient: user.email,
+                        hasPdfLink: !!pdfDownloadUrl
                     }
                 })
                 console.log('[Lock Check-in] Confirmation email sent successfully')
