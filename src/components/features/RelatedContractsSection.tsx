@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 import { DocumentAIPanel } from '@/components/features/DocumentAIPanel'
+import { ReminderOptIn } from '@/components/features/ReminderOptIn'
 import { RELATED_CONTRACTS_EARLY_ACCESS } from '@/lib/featureFlags'
 
 interface RelatedContract {
@@ -516,6 +517,16 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                         contractType={contract.contract_type}
                                         providerName={contract.provider_name}
                                         label={contract.label}
+                                    />
+                                    {/* Reminder Opt-In */}
+                                    <ReminderOptIn
+                                        contractId={contract.contract_id}
+                                        caseId={caseId}
+                                        contractType={contract.contract_type}
+                                        providerName={contract.provider_name}
+                                        label={contract.label}
+                                        renewalDate={contract.renewal_date || contract.end_date}
+                                        noticePeriodDays={contract.notice_period_days}
                                     />
                                 </div>
                             )
