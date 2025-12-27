@@ -27,6 +27,7 @@ interface Asset {
     storage_path: string
     created_at: string
     room_name?: string
+    signedUrl?: string
 }
 
 interface MeterReading {
@@ -210,11 +211,16 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                 const roomsWithPhotos = roomsData.map(room => {
                     const roomAssets = assets?.filter(a => a.room_id === room.room_id && a.type === 'handover_photo') || []
                     const checkinCount = checkinAssets?.filter(a => a.room_id === room.room_id).length || 0
+                    // Map signed URLs to photos (like Check-in does)
+                    const assetsWithUrls = roomAssets.map(a => ({
+                        ...a,
+                        signedUrl: signedMap.get(a.storage_path) || ''
+                    }))
                     return {
                         ...room,
                         handover_photos: roomAssets.length,
                         checkin_photos: checkinCount,
-                        photos: roomAssets
+                        photos: assetsWithUrls
                     }
                 })
                 setRooms(roomsWithPhotos)
@@ -903,9 +909,17 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                                             >
                                                 <button
                                                     onClick={() => openRoomGallery(room, i)}
-                                                    className="w-full h-full bg-slate-200 flex items-center justify-center text-xs text-slate-400"
+                                                    className="w-full h-full bg-slate-200 flex items-center justify-center"
                                                 >
-                                                    Photo {i + 1}
+                                                    {photo.signedUrl ? (
+                                                        <img
+                                                            src={photo.signedUrl}
+                                                            alt={`${room.name} photo ${i + 1}`}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <ImageIcon size={20} className="text-slate-400" />
+                                                    )}
                                                 </button>
                                                 {/* Delete button - visible on mobile, more visible on hover */}
                                                 <button
