@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
     Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Loader2, Send, MessageSquarePlus, Bug, Lightbulb, Check } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useParams } from 'next/navigation'
 
 interface FeedbackDialogProps {
     open: boolean
@@ -21,7 +21,26 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [rentalLabel, setRentalLabel] = useState<string | null>(null)
     const pathname = usePathname()
+    const params = useParams()
+
+    // Fetch rental label if we're in a case context
+    useEffect(() => {
+        const caseId = params?.id as string | undefined
+        if (caseId && open) {
+            const fetchRentalLabel = async () => {
+                const supabase = createClient()
+                const { data } = await supabase
+                    .from('cases')
+                    .select('label')
+                    .eq('case_id', caseId)
+                    .single()
+                if (data?.label) setRentalLabel(data.label)
+            }
+            fetchRentalLabel()
+        }
+    }, [params?.id, open])
 
     const handleSubmit = async () => {
         if (!message.trim()) return
@@ -29,6 +48,7 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
         setLoading(true)
         setError(null)
         const supabase = createClient()
+        const caseId = params?.id as string | undefined
 
         try {
             const { data: { user } } = await supabase.auth.getUser()
@@ -44,23 +64,34 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
 
             if (dbError) throw dbError
 
-            // 2. Send email notification to support
-            await fetch('/api/feedback/notify', {
+            // 2. Send email notification to support (CRITICAL: must succeed)
+            const emailRes = await fetch('/api/feedback/notify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     type,
                     message,
                     pageUrl: pathname,
-                    userEmail: user?.email
+                    userEmail: user?.email,
+                    rentalLabel: rentalLabel || undefined,
+                    caseId: caseId || undefined
                 })
             })
 
+            if (!emailRes.ok) {
+                // Email failed - show clear error, don't show success
+                throw new Error('email_failed')
+            }
+
             setSuccess(true)
 
-        } catch (err) {
+        } catch (err: any) {
             console.error('Feedback error:', err)
-            setError('Something went wrong. Please try again.')
+            if (err.message === 'email_failed') {
+                setError("We couldn't send your message right now. Please try again or email support@rentvault.co.")
+            } else {
+                setError('Something went wrong. Please try again.')
+            }
         } finally {
             setLoading(false)
         }
@@ -74,6 +105,7 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
             setMessage('')
             setType('bug')
             setError(null)
+            setRentalLabel(null)
         }, 300)
     }
 
@@ -146,9 +178,14 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
                         <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-4">
                             <Check className="w-5 h-5 text-slate-600" />
                         </div>
-                        <h3 className="text-base font-semibold text-slate-900 mb-2">Thank you for the feedback</h3>
-                        <p className="text-sm text-slate-500 mb-6 max-w-[280px]">
-                            Thanks for taking the time to share this. We review every message and use it to improve RentVault.
+                        <h3 className="text-base font-semibold text-slate-900 mb-2">
+                            Thank you — we've received your message
+                        </h3>
+                        <p className="text-sm text-slate-500 mb-2 max-w-[280px]">
+                            Your feedback has been sent to our support team and will be reviewed by a real person.
+                        </p>
+                        <p className="text-xs text-slate-400 mb-6 max-w-[280px]">
+                            If this is urgent, you can also contact us directly at support@rentvault.co.
                         </p>
                         <Button
                             onClick={handleClose}
