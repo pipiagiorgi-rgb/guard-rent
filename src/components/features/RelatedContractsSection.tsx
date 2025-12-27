@@ -508,17 +508,15 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                 const categoryContracts = grouped[category]
                                 const CategoryIcon = getTypeIcon(category)
                                 const categoryLabel = getTypeLabel(category)
-                                const isCollapsed = collapsedCategories.has(category) || (categoryContracts.length > 1 && !collapsedCategories.has(`${category}_expanded`))
-                                const canCollapse = categoryContracts.length > 1
+                                // ALL folders collapse by default unless explicitly expanded
+                                const isCollapsed = !collapsedCategories.has(`${category}_expanded`)
 
                                 const toggleCollapse = () => {
                                     setCollapsedCategories(prev => {
                                         const next = new Set(prev)
                                         if (isCollapsed) {
-                                            next.delete(category)
                                             next.add(`${category}_expanded`)
                                         } else {
-                                            next.add(category)
                                             next.delete(`${category}_expanded`)
                                         }
                                         return next
@@ -527,18 +525,15 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
 
                                 return (
                                     <div key={category}>
-                                        {/* Folder header - clickable if collapsible */}
+                                        {/* Folder header - always clickable */}
                                         <button
-                                            onClick={canCollapse ? toggleCollapse : undefined}
-                                            className={`flex items-center gap-2 mb-2 px-1 w-full text-left ${canCollapse ? 'cursor-pointer hover:bg-slate-50 rounded-md py-1 -my-1 transition-colors' : ''}`}
-                                            disabled={!canCollapse}
+                                            onClick={toggleCollapse}
+                                            className="flex items-center gap-2 mb-2 px-1 w-full text-left cursor-pointer hover:bg-slate-50 rounded-md py-1 -my-1 transition-colors"
                                         >
-                                            {canCollapse && (
-                                                <ChevronDown
-                                                    size={14}
-                                                    className={`text-slate-400 transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
-                                                />
-                                            )}
+                                            <ChevronDown
+                                                size={14}
+                                                className={`text-slate-400 transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
+                                            />
                                             <CategoryIcon size={16} className="text-slate-400" />
                                             <span className="text-sm font-medium text-slate-600">{categoryLabel}</span>
                                             <span className="text-xs text-slate-400">({categoryContracts.length})</span>

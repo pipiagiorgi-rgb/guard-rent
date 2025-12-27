@@ -89,24 +89,36 @@ function detectCategoryFromFilename(fileName: string): { category: string; confi
 
     const patterns: Record<string, { keywords: string[]; providers: string[] }> = {
         internet: {
-            keywords: ['internet', 'wifi', 'broadband', 'fiber', 'fibre', 'dsl'],
-            providers: ['vodafone', 'orange', 'free', 'bouygues', 'sfr', 'bt', 'virgin', 'sky', 'comcast', 'at&t', 'verizon']
+            keywords: ['internet', 'wifi', 'broadband', 'fiber', 'fibre', 'dsl', 'livebox', 'bbox', 'telecom', 'mobile', 'forfait'],
+            providers: [
+                // Major EU/International telecoms
+                'orange', 'vodafone', 'free', 'bouygues', 'sfr', 'bt', 'virgin', 'sky',
+                'comcast', 'at&t', 'verizon', 't-mobile', 'deutsche telekom',
+                // Belgium/Luxembourg
+                'proximus', 'tango', 'post telecom', 'base', 'telenet', 'voo',
+                // Germany
+                'o2', '1&1', 'congstar',
+                // Netherlands
+                'kpn', 'ziggo', 'tele2',
+                // Other EU
+                'swisscom', 'salt', 'sunrise', 'iliad', 'wind', 'tim', 'fastweb'
+            ]
         },
         electricity: {
-            keywords: ['electricity', 'electric', 'power', 'energy', 'strom', 'électricité'],
-            providers: ['edf', 'engie', 'eon', 'vattenfall', 'octopus', 'bulb', 'british gas']
+            keywords: ['electricity', 'electric', 'power', 'energy', 'strom', 'électricité', 'kwh'],
+            providers: ['edf', 'engie', 'eon', 'e.on', 'vattenfall', 'octopus', 'bulb', 'british gas', 'eni', 'enel', 'enovos', 'creos', 'electrabel']
         },
         gas: {
-            keywords: ['gas', 'gaz', 'heating', 'chauffage'],
-            providers: ['edf', 'engie', 'eon', 'british gas', 'sse']
+            keywords: ['gas', 'gaz', 'heating', 'chauffage', 'natural gas'],
+            providers: ['edf', 'engie', 'eon', 'british gas', 'sse', 'eni', 'enovos']
         },
         water: {
             keywords: ['water', 'eau', 'wasser', 'sewage', 'utility'],
-            providers: ['thames', 'severn', 'united utilities', 'anglian']
+            providers: ['thames', 'severn', 'united utilities', 'anglian', 'sydec', 'sidec']
         },
         insurance: {
-            keywords: ['insurance', 'assurance', 'versicherung', 'policy', 'coverage', 'renters'],
-            providers: ['allianz', 'axa', 'zurich', 'lemonade', 'state farm']
+            keywords: ['insurance', 'assurance', 'versicherung', 'policy', 'coverage', 'renters', 'habitation'],
+            providers: ['allianz', 'axa', 'zurich', 'lemonade', 'state farm', 'foyer', 'lalux', 'bâloise', 'maif', 'maaf', 'matmut', 'gmf']
         },
         cleaning: {
             keywords: ['cleaning', 'cleaner', 'nettoyage', 'housekeeping', 'maid'],
@@ -117,12 +129,13 @@ function detectCategoryFromFilename(fileName: string): { category: string; confi
             providers: []
         },
         employment: {
-            keywords: ['employment', 'contract', 'job', 'work', 'salary', 'arbeitsvertrag', 'contrat de travail'],
+            // Removed 'contract' - too generic, matches everything
+            keywords: ['employment', 'job offer', 'salary', 'arbeitsvertrag', 'contrat de travail', 'cdi', 'cdd', 'work permit'],
             providers: []
         },
         storage: {
-            keywords: ['storage', 'self-storage', 'box', 'lagerung'],
-            providers: ['big yellow', 'safestore', 'public storage']
+            keywords: ['storage', 'self-storage', 'box', 'lagerung', 'garde-meuble'],
+            providers: ['big yellow', 'safestore', 'public storage', 'shurgard']
         }
     }
 
