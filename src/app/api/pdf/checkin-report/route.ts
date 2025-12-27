@@ -262,7 +262,7 @@ export async function POST(request: Request) {
         const { width, height } = coverPage.getSize()
 
         // Formal document title (court-grade, not marketing)
-        coverPage.drawText('Property Condition Record — Check-in', {
+        coverPage.drawText('Move-In Property Record', {
             x: MARGIN,
             y: height - 50,
             size: 18,
@@ -328,7 +328,7 @@ export async function POST(request: Request) {
         ]
 
         if (rentalCase.checkin_completed_at) {
-            details.splice(4, 0, ['Check-in Sealed', new Date(rentalCase.checkin_completed_at).toLocaleDateString('en-GB', {
+            details.splice(4, 0, ['Move-in Sealed', new Date(rentalCase.checkin_completed_at).toLocaleDateString('en-GB', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric'
@@ -364,15 +364,15 @@ export async function POST(request: Request) {
 
         // Build explanation dynamically based on actual sealed state
         const explanationLines: string[] = [
-            'Photos and documents in this record were uploaded to RentVault and timestamped using system time (UTC).',
+            'This record contains photos and documents uploaded to RentVault and timestamped using system time (UTC).',
         ]
 
         // Only mention locked photo set if actually locked
         if (rentalCase.checkin_completed_at) {
-            explanationLines.push('Check-in photo set was locked after completion and cannot be modified.')
+            explanationLines.push('After sealing, records cannot be edited or deleted.')
         }
 
-        explanationLines.push('This report is a snapshot of the stored records at the time of generation.')
+        explanationLines.push('This report is a snapshot of stored records at the time of generation.')
 
         for (const line of explanationLines) {
             coverPage.drawText(line, {
@@ -395,7 +395,7 @@ export async function POST(request: Request) {
         })
         yPos -= 25
 
-        coverPage.drawText('Check-in photos:', {
+        coverPage.drawText('Move-in photos:', {
             x: MARGIN,
             y: yPos,
             size: 11,
@@ -498,7 +498,7 @@ export async function POST(request: Request) {
                 color: rgb(0.5, 0.5, 0.5),
             })
 
-            photoPage.drawText(`Check-in Evidence - ${room.roomName}`, {
+            photoPage.drawText(`Move-In Evidence — ${room.roomName}`, {
                 x: MARGIN,
                 y: pageY,
                 size: 16,
@@ -513,7 +513,7 @@ export async function POST(request: Request) {
                 room.checkinPhotos,
                 pageY,
                 photoPage.getWidth(),
-                `${room.checkinPhotos.length} photos captured`,
+                `${room.checkinPhotos.length} photographs — ${room.roomName}`,
                 helvetica
             )
 

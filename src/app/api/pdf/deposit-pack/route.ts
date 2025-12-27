@@ -293,7 +293,7 @@ export async function POST(request: Request) {
         const { width, height } = coverPage.getSize()
 
         // Formal document title (court-grade, not marketing)
-        coverPage.drawText('Rental Property Evidence Record', {
+        coverPage.drawText('Move-Out Property Record', {
             x: MARGIN,
             y: height - 50,
             size: 18,
@@ -376,14 +376,14 @@ export async function POST(request: Request) {
         yPos -= 25
 
         const evidence = [
-            ['Check-in photos', `${totalCheckin} photos`],
-            ['Check-in sealed', rentalCase.checkin_completed_at
+            ['Move-in photos', `${totalCheckin} photos`],
+            ['Move-in sealed', rentalCase.checkin_completed_at
                 ? new Date(rentalCase.checkin_completed_at).toLocaleDateString('en-GB')
                 : 'Not sealed'],
-            ['Handover photos', `${totalHandover} photos`],
+            ['Move-out photos', `${totalHandover} photos`],
             ['Rooms documented', `${roomPhotos.length} rooms`],
             ['Issues reported', issues && issues.length > 0 ? `${issues.length} incident${issues.length !== 1 ? 's' : ''}` : 'None'],
-            ['Handover completed', rentalCase.handover_completed_at
+            ['Move-out completed', rentalCase.handover_completed_at
                 ? new Date(rentalCase.handover_completed_at).toLocaleDateString('en-GB')
                 : 'Not completed'],
             ['Keys returned', rentalCase.keys_returned_at
@@ -420,7 +420,7 @@ export async function POST(request: Request) {
 
         // Build explanation dynamically based on actual sealed states
         const explanationLines: string[] = [
-            'Photos and documents in this record were uploaded to RentVault and timestamped using system time (UTC).',
+            'This record contains photos and documents uploaded to RentVault and timestamped using system time (UTC).',
         ]
 
         // Only mention locked photo sets if they are actually locked
@@ -428,18 +428,19 @@ export async function POST(request: Request) {
         const handoverSealed = !!rentalCase.handover_completed_at
 
         if (checkinSealed && handoverSealed) {
-            explanationLines.push('Check-in and handover photo sets were locked after completion and cannot be modified.')
+            explanationLines.push('Move-in and move-out photo sets were sealed and cannot be modified.')
         } else if (checkinSealed) {
-            explanationLines.push('Check-in photo set was locked after completion and cannot be modified.')
+            explanationLines.push('Move-in photo set was sealed and cannot be modified.')
         } else if (handoverSealed) {
-            explanationLines.push('Handover photo set was locked after completion and cannot be modified.')
+            explanationLines.push('Move-out photo set was sealed and cannot be modified.')
         }
 
-        explanationLines.push('This report is a snapshot of the stored records at the time of generation.')
+        explanationLines.push('This report is a snapshot of stored records at the time of generation.')
 
         // Asymmetric coverage disclaimer - neutral, factual
         explanationLines.push('')
-        explanationLines.push('The absence of photos for a given phase or room does not imply condition, responsibility, or change.')
+        explanationLines.push('Documentation may differ between move-in and move-out. The absence of photos for a')
+        explanationLines.push('phase or room reflects what was recorded and does not imply condition or change.')
 
         for (const line of explanationLines) {
             coverPage.drawText(line, {
@@ -615,7 +616,7 @@ export async function POST(request: Request) {
 
             if (hasBothPhases) {
                 // Court-grade comparison header
-                photoPage.drawText('Condition Comparison', {
+                photoPage.drawText('Property Condition — Move-In vs Move-Out', {
                     x: MARGIN,
                     y: pageY,
                     size: 14,
@@ -661,7 +662,7 @@ export async function POST(request: Request) {
                     // Neutral note: no handover photos for this room
                     if (room.handoverPhotos.length === 0) {
                         pageY -= 15
-                        photoPage.drawText('Move-out photos were not recorded for this room.', {
+                        photoPage.drawText('Move-out photos were not documented for this room.', {
                             x: MARGIN,
                             y: pageY,
                             size: 9,
@@ -681,7 +682,7 @@ export async function POST(request: Request) {
 
                     // Neutral note: no check-in photos for this room
                     if (room.checkinPhotos.length === 0) {
-                        photoPage.drawText('Move-in photos were not recorded for this room.', {
+                        photoPage.drawText('Move-in photos were not documented for this room.', {
                             x: MARGIN,
                             y: pageY,
                             size: 9,
