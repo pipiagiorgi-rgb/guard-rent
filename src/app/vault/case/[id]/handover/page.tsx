@@ -886,14 +886,14 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                                     </div>
                                 </div>
 
-                                {/* Before/after prompt if check-in has photos but handover doesn't */}
+                                {/* Move-In reference prompt if check-in has photos but handover doesn't */}
                                 {room.photos.length === 0 && room.checkin_photos > 0 && (
                                     <div className="py-4 text-center border-2 border-dashed border-blue-100 rounded-xl bg-blue-50/50 mb-3">
                                         <div className="flex flex-col items-center gap-1">
                                             <Camera size={20} className="text-blue-300" />
                                             <p className="text-blue-600 text-sm font-medium">Add move-out photos</p>
                                             <p className="text-blue-400 text-xs">
-                                                Compare with your {room.checkin_photos} check-in photo{room.checkin_photos > 1 ? 's' : ''}
+                                                You have {room.checkin_photos} move-in photo{room.checkin_photos > 1 ? 's' : ''} for reference
                                             </p>
                                         </div>
                                     </div>

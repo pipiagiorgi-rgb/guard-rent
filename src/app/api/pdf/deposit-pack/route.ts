@@ -437,6 +437,10 @@ export async function POST(request: Request) {
 
         explanationLines.push('This report is a snapshot of the stored records at the time of generation.')
 
+        // Asymmetric coverage disclaimer - neutral, factual
+        explanationLines.push('')
+        explanationLines.push('The absence of photos for a given phase or room does not imply condition, responsibility, or change.')
+
         for (const line of explanationLines) {
             coverPage.drawText(line, {
                 x: MARGIN,
@@ -632,7 +636,7 @@ export async function POST(request: Request) {
                     helvetica
                 )
             } else {
-                // Single phase - show what we have
+                // Single phase - show what we have with neutral note
                 photoPage.drawText(`Photo Evidence - ${room.roomName}`, {
                     x: MARGIN,
                     y: pageY,
@@ -643,15 +647,29 @@ export async function POST(request: Request) {
                 pageY -= 30
 
                 if (room.checkinPhotos.length > 0) {
+                    // Show check-in photos
                     pageY = await drawPhotoGrid(
                         pdfDoc,
                         photoPage,
                         room.checkinPhotos,
                         pageY,
                         photoPage.getWidth(),
-                        'Check-in Photos',
+                        'Move-In Photos',
                         helvetica
                     )
+
+                    // Neutral note: no handover photos for this room
+                    if (room.handoverPhotos.length === 0) {
+                        pageY -= 15
+                        photoPage.drawText('Move-out photos were not recorded for this room.', {
+                            x: MARGIN,
+                            y: pageY,
+                            size: 9,
+                            font: helvetica,
+                            color: rgb(0.5, 0.5, 0.5),
+                        })
+                        pageY -= 15
+                    }
                 }
 
                 if (room.handoverPhotos.length > 0) {
@@ -660,13 +678,26 @@ export async function POST(request: Request) {
                         photoPage = pdfDoc.addPage()
                         pageY = photoPage.getHeight() - 80
                     }
+
+                    // Neutral note: no check-in photos for this room
+                    if (room.checkinPhotos.length === 0) {
+                        photoPage.drawText('Move-in photos were not recorded for this room.', {
+                            x: MARGIN,
+                            y: pageY,
+                            size: 9,
+                            font: helvetica,
+                            color: rgb(0.5, 0.5, 0.5),
+                        })
+                        pageY -= 20
+                    }
+
                     pageY = await drawPhotoGrid(
                         pdfDoc,
                         photoPage,
                         room.handoverPhotos,
                         pageY,
                         photoPage.getWidth(),
-                        'Handover Photos',
+                        'Move-Out Photos',
                         helvetica
                     )
                 }
