@@ -185,7 +185,8 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
                             Your feedback has been sent to our support team and will be reviewed by a real person.
                         </p>
                         <p className="text-xs text-slate-400 mb-6 max-w-[280px]">
-                            If this is urgent, you can also contact us directly at support@rentvault.co.
+                            If this is urgent, contact us directly at{' '}
+                            <span className="font-medium">support@rentvault.co</span>
                         </p>
                         <Button
                             onClick={handleClose}
