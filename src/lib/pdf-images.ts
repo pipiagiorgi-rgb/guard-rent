@@ -1,3 +1,22 @@
+/**
+ * PDF IMAGE GENERATION UTILITIES
+ * ============================================================
+ * 
+ * EVIDENCE INTEGRITY NOTES:
+ * - This module handles SEALED EVIDENCE ONLY (check-in and move-out photos)
+ * - Related contracts are excluded by design (reference-only documents)
+ * - All evidence assets must pass hash validation before PDF generation
+ * - Photo asymmetry (missing check-in or move-out photos) is documented,
+ *   not interpreted — absence of damage does not imply fault
+ * 
+ * LEGAL NEUTRALITY:
+ * - PDFs present factual records without attribution
+ * - Timestamps are UTC-based and immutable
+ * - Missing data is labeled, not hidden
+ * 
+ * ============================================================
+ */
+
 import { PDFDocument, PDFPage, rgb } from 'pdf-lib'
 import { createClient } from '@/lib/supabase/server'
 

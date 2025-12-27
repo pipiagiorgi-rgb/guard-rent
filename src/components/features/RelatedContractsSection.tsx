@@ -549,6 +549,25 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                             </button>
                         </div>
 
+                        {/* Error Banner - Prominent position */}
+                        {uploadError && (
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3 mb-4">
+                                <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-red-800">Failed to save contract</p>
+                                    <p className="text-xs text-red-600 mt-0.5">
+                                        {uploadError}. Your file is still attached — please check your details and try again.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setUploadError(null)}
+                                    className="text-red-400 hover:text-red-600"
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+                        )}
+
                         <div className="space-y-4">
                             {/* File upload */}
                             <div>
@@ -582,12 +601,6 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                         </div>
                                     )}
                                 </div>
-                                {uploadError && (
-                                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                                        <AlertCircle size={12} />
-                                        {uploadError}
-                                    </p>
-                                )}
                             </div>
 
                             {/* Category */}
