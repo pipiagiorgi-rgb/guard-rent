@@ -124,11 +124,15 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                 // Fetch media (photos + videos) for each issue
                 const issuesWithMedia = await Promise.all(
                     issuesData.map(async (issue) => {
-                        const { data: mediaAssets } = await supabase
+                        const { data: mediaAssets, error: mediaError } = await supabase
                             .from('assets')
                             .select('asset_id, storage_path, type, mime_type')
                             .eq('issue_id', issue.issue_id)
                             .in('type', ['issue_photo', 'issue_video'])
+
+                        // Debug logging
+                        console.log('[Issues] Fetching media for issue:', issue.issue_id)
+                        console.log('[Issues] Media query result:', { count: mediaAssets?.length, error: mediaError })
 
                         // Generate signed URLs for all media
                         let signedMedia: IssueMedia[] = []
