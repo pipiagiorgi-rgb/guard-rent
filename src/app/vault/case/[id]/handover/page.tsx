@@ -801,6 +801,27 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
                     {expandedSections.has('photos') ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </button>
 
+                {/* PROGRESSIVE DISCLOSURE: Summary when collapsed */}
+                {!expandedSections.has('photos') && totalHandoverPhotos > 0 && (
+                    <div className="px-6 pb-4 border-t border-slate-100">
+                        <div className="flex items-center justify-between py-3">
+                            <div className="flex items-center gap-2 text-sm text-slate-600">
+                                <Check size={14} className="text-green-500" />
+                                <span>
+                                    {totalHandoverPhotos} photo{totalHandoverPhotos !== 1 ? 's' : ''} across {rooms.filter(r => r.handover_photos > 0).length} room{rooms.filter(r => r.handover_photos > 0).length !== 1 ? 's' : ''}
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => toggleSection('photos')}
+                                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                            >
+                                <Eye size={14} />
+                                Review photos
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {expandedSections.has('photos') && (
                     <div className="px-6 pb-6 space-y-4">
                         {rooms.map(room => (

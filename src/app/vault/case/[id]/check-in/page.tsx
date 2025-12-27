@@ -216,6 +216,10 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
 
             setRooms(roomsWithPhotos)
 
+            // PROGRESSIVE DISCLOSURE: Expand all rooms by default for Move-In
+            // Users should immediately see their photos to reduce anxiety
+            setExpandedRooms(new Set(roomsWithPhotos.map(r => r.room_id)))
+
             // Fetch existing walkthrough video for check-in
             const { data: videoAsset } = await supabase
                 .from('assets')
