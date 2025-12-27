@@ -655,13 +655,55 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
         return colors[confidence as keyof typeof colors] || colors.low
     }
 
+    // Convert technical/legal terms to plain English for better readability
+    const toHumanLanguage = (value: string | undefined, fieldKey: string): string => {
+        if (!value) return value || ''
+        const lower = value.toLowerCase()
+
+        // Notice condition conversions
+        if (fieldKey === 'notice_condition') {
+            if (lower.includes('anniversary')) return 'Ends once per year on the same date'
+            if (lower.includes('anytime') || lower.includes('any time')) return 'Can be ended at any time'
+            if (lower.includes('end of period') || lower.includes('fin de période')) return 'Only at end of rental period'
+        }
+
+        // Notice method conversions
+        if (fieldKey === 'notice_method') {
+            if (lower.includes('registered letter') || lower.includes('lettre recommandée')) return 'Send by registered post'
+            if (lower.includes('registered mail')) return 'Send by registered post'
+            if (lower.includes('email')) return 'Email notification'
+            if (lower.includes('written')) return 'Written notice required'
+        }
+
+        // Earliest termination
+        if (fieldKey === 'earliest_termination_date') {
+            // Keep dates as-is, they're already clear
+            return value
+        }
+
+        return value
+    }
+
+    // Human-friendly label conversion
+    const toHumanLabel = (label: string): string => {
+        const labelMap: Record<string, string> = {
+            'Notice condition': 'How notice works',
+            'Earliest termination': 'Earliest you can end the contract',
+            'Notice method': 'How to send notice',
+            'Payment frequency': 'How often you pay',
+            'Payment due date': 'When rent is due'
+        }
+        return labelMap[label] || label
+    }
+
     const renderField = (label: string, fieldKey: keyof ContractAnalysis) => {
         const field = result ? (result[fieldKey] as ExtractedField) : undefined
+        const humanLabel = toHumanLabel(label)
 
         if (isEditing) {
             return (
                 <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-1.5">{label}</label>
+                    <label className="block text-xs font-medium text-slate-500 mb-1.5">{humanLabel}</label>
                     <input
                         type="text"
                         value={field?.value === 'not found' ? '' : field?.value || ''}
@@ -676,35 +718,33 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
         if (!field || !field.value || field.value.toLowerCase() === 'not found' || field.value === '...') {
             return (
                 <div>
-                    <span className="block text-xs text-slate-400 mb-1">{label}</span>
+                    <span className="block text-xs text-slate-400 mb-1">{humanLabel}</span>
                     <span className="text-sm text-slate-400 italic">Not stated</span>
                 </div>
             )
         }
 
-        // Special handling for "anniversary only" label
-        const displayLabel = fieldKey === 'notice_condition' && field?.value?.toLowerCase().includes('anniversary')
-            ? 'Fixed annual date'
-            : field?.value
+        // Convert technical terms to plain English
+        const displayValue = toHumanLanguage(field.value, fieldKey)
 
-        // Special tooltip for fixed annual date
-        const showTooltip = fieldKey === 'notice_condition' && field?.value?.toLowerCase().includes('anniversary')
+        // Show tooltip for complex conditions
+        const showTooltip = fieldKey === 'notice_condition' && displayValue !== field.value
 
         return (
             <div>
                 <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-xs text-slate-500">{label}</span>
+                    <span className="text-xs text-slate-500">{humanLabel}</span>
                     {showTooltip && (
                         <div className="group relative">
                             <HelpCircle size={12} className="text-slate-400 cursor-help" />
                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                Termination is only possible on this date each year.
+                                Original text: {field.value}
                                 <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
                             </div>
                         </div>
                     )}
                 </div>
-                <span className="text-sm font-medium text-slate-900">{displayLabel || field.value}</span>
+                <span className="text-sm font-medium text-slate-900">{displayValue}</span>
             </div>
         )
     }
@@ -890,11 +930,13 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                                     { label: 'Payment due date', key: 'payment_due_date' as keyof ContractAnalysis },
                                 ].map(({ label, key }) => {
                                     const value = getFieldValue(key)
+                                    const humanLabel = toHumanLabel(label)
+                                    const displayValue = value ? toHumanLanguage(value, key) : null
                                     return (
                                         <div key={key} className="flex flex-col">
-                                            <span className="text-xs text-slate-500 mb-1">{label}</span>
+                                            <span className="text-xs text-slate-500 mb-1">{humanLabel}</span>
                                             <span className="text-sm font-medium text-slate-900">
-                                                {value || 'Not stated in contract'}
+                                                {displayValue || 'Not stated in contract'}
                                             </span>
                                         </div>
                                     )

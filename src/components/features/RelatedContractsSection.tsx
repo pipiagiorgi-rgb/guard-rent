@@ -121,6 +121,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
     })
     const [saving, setSaving] = useState(false)
     const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null)
+    const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set())
 
     // Early access = always unlocked (feature flag)
     const isEarlyAccess = DOCUMENT_VAULT_FREE
@@ -505,108 +506,136 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                 const categoryContracts = grouped[category]
                                 const CategoryIcon = getTypeIcon(category)
                                 const categoryLabel = getTypeLabel(category)
+                                const isCollapsed = collapsedCategories.has(category) || (categoryContracts.length > 1 && !collapsedCategories.has(`${category}_expanded`))
+                                const canCollapse = categoryContracts.length > 1
+
+                                const toggleCollapse = () => {
+                                    setCollapsedCategories(prev => {
+                                        const next = new Set(prev)
+                                        if (isCollapsed) {
+                                            next.delete(category)
+                                            next.add(`${category}_expanded`)
+                                        } else {
+                                            next.add(category)
+                                            next.delete(`${category}_expanded`)
+                                        }
+                                        return next
+                                    })
+                                }
 
                                 return (
                                     <div key={category}>
-                                        {/* Folder header */}
-                                        <div className="flex items-center gap-2 mb-2 px-1">
+                                        {/* Folder header - clickable if collapsible */}
+                                        <button
+                                            onClick={canCollapse ? toggleCollapse : undefined}
+                                            className={`flex items-center gap-2 mb-2 px-1 w-full text-left ${canCollapse ? 'cursor-pointer hover:bg-slate-50 rounded-md py-1 -my-1 transition-colors' : ''}`}
+                                            disabled={!canCollapse}
+                                        >
+                                            {canCollapse && (
+                                                <ChevronDown
+                                                    size={14}
+                                                    className={`text-slate-400 transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
+                                                />
+                                            )}
                                             <CategoryIcon size={16} className="text-slate-400" />
                                             <span className="text-sm font-medium text-slate-600">{categoryLabel}</span>
                                             <span className="text-xs text-slate-400">({categoryContracts.length})</span>
-                                        </div>
+                                        </button>
 
-                                        {/* Documents in this folder */}
-                                        <div className="space-y-2 pl-0">
-                                            {categoryContracts.map((contract) => {
-                                                const Icon = getTypeIcon(contract.contract_type)
-                                                return (
-                                                    <div
-                                                        key={contract.contract_id}
-                                                        className="bg-slate-50 rounded-lg overflow-hidden"
-                                                    >
-                                                        <div className="flex items-center justify-between p-3 sm:p-4">
-                                                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                                                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200 flex-shrink-0">
-                                                                    <Icon size={20} className="text-slate-600" />
-                                                                </div>
-                                                                <div className="min-w-0">
-                                                                    <p className="font-medium text-slate-900 truncate">
-                                                                        {contract.label || getTypeLabel(contract.contract_type, contract.custom_type)}
-                                                                        {contract.provider_name && (
-                                                                            <span className="text-slate-500 font-normal"> — {contract.provider_name}</span>
-                                                                        )}
-                                                                    </p>
-                                                                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 mt-0.5">
-                                                                        {contract.file_name && (
-                                                                            <span className="truncate max-w-[120px]">{contract.file_name}</span>
-                                                                        )}
-                                                                        {contract.size_bytes && (
-                                                                            <span>{formatFileSize(contract.size_bytes)}</span>
-                                                                        )}
-                                                                        {contract.end_date && (
-                                                                            <span className="flex items-center gap-1">
-                                                                                <Calendar size={12} />
-                                                                                Ends {new Date(contract.end_date).toLocaleDateString('en-GB')}
-                                                                            </span>
-                                                                        )}
-                                                                        {contract.notice_period_days && (
-                                                                            <span className="flex items-center gap-1">
-                                                                                <Bell size={12} />
-                                                                                {contract.notice_period_days}d notice
-                                                                            </span>
-                                                                        )}
+                                        {/* Documents in this folder - collapse if multiple */}
+                                        {!isCollapsed && (
+                                            <div className="space-y-2 pl-0">
+                                                {categoryContracts.map((contract) => {
+                                                    const Icon = getTypeIcon(contract.contract_type)
+                                                    return (
+                                                        <div
+                                                            key={contract.contract_id}
+                                                            className="bg-slate-50 rounded-lg overflow-hidden"
+                                                        >
+                                                            <div className="flex items-center justify-between p-3 sm:p-4">
+                                                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                                                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200 flex-shrink-0">
+                                                                        <Icon size={20} className="text-slate-600" />
+                                                                    </div>
+                                                                    <div className="min-w-0">
+                                                                        <p className="font-medium text-slate-900 truncate">
+                                                                            {contract.label || getTypeLabel(contract.contract_type, contract.custom_type)}
+                                                                            {contract.provider_name && (
+                                                                                <span className="text-slate-500 font-normal"> — {contract.provider_name}</span>
+                                                                            )}
+                                                                        </p>
+                                                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 mt-0.5">
+                                                                            {contract.file_name && (
+                                                                                <span className="truncate max-w-[120px]">{contract.file_name}</span>
+                                                                            )}
+                                                                            {contract.size_bytes && (
+                                                                                <span>{formatFileSize(contract.size_bytes)}</span>
+                                                                            )}
+                                                                            {contract.end_date && (
+                                                                                <span className="flex items-center gap-1">
+                                                                                    <Calendar size={12} />
+                                                                                    Ends {new Date(contract.end_date).toLocaleDateString('en-GB')}
+                                                                                </span>
+                                                                            )}
+                                                                            {contract.notice_period_days && (
+                                                                                <span className="flex items-center gap-1">
+                                                                                    <Bell size={12} />
+                                                                                    {contract.notice_period_days}d notice
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
+                                                                <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-2">
+                                                                    {contract.storage_path && (
+                                                                        <>
+                                                                            <button
+                                                                                onClick={() => handleView(contract)}
+                                                                                className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                                                                                title="View"
+                                                                            >
+                                                                                <Eye size={16} />
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => handleDownload(contract)}
+                                                                                className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                                                                                title="Download"
+                                                                            >
+                                                                                <Download size={16} />
+                                                                            </button>
+                                                                        </>
+                                                                    )}
+                                                                    <button
+                                                                        onClick={() => setDeleteId(contract.contract_id)}
+                                                                        className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                                                        title="Delete"
+                                                                    >
+                                                                        <Trash2 size={16} />
+                                                                    </button>
+                                                                </div>
                                                             </div>
-                                                            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-2">
-                                                                {contract.storage_path && (
-                                                                    <>
-                                                                        <button
-                                                                            onClick={() => handleView(contract)}
-                                                                            className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
-                                                                            title="View"
-                                                                        >
-                                                                            <Eye size={16} />
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => handleDownload(contract)}
-                                                                            className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
-                                                                            title="Download"
-                                                                        >
-                                                                            <Download size={16} />
-                                                                        </button>
-                                                                    </>
-                                                                )}
-                                                                <button
-                                                                    onClick={() => setDeleteId(contract.contract_id)}
-                                                                    className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                                                                    title="Delete"
-                                                                >
-                                                                    <Trash2 size={16} />
-                                                                </button>
-                                                            </div>
+                                                            {/* Contextual AI Panel */}
+                                                            <DocumentAIPanel
+                                                                contractId={contract.contract_id}
+                                                                contractType={contract.contract_type}
+                                                                providerName={contract.provider_name}
+                                                                label={contract.label}
+                                                            />
+                                                            {/* Reminder Opt-In */}
+                                                            <ReminderOptIn
+                                                                contractId={contract.contract_id}
+                                                                caseId={caseId}
+                                                                contractType={contract.contract_type}
+                                                                providerName={contract.provider_name}
+                                                                label={contract.label}
+                                                                renewalDate={contract.renewal_date || contract.end_date}
+                                                                noticePeriodDays={contract.notice_period_days}
+                                                            />
                                                         </div>
-                                                        {/* Contextual AI Panel */}
-                                                        <DocumentAIPanel
-                                                            contractId={contract.contract_id}
-                                                            contractType={contract.contract_type}
-                                                            providerName={contract.provider_name}
-                                                            label={contract.label}
-                                                        />
-                                                        {/* Reminder Opt-In */}
-                                                        <ReminderOptIn
-                                                            contractId={contract.contract_id}
-                                                            caseId={caseId}
-                                                            contractType={contract.contract_type}
-                                                            providerName={contract.provider_name}
-                                                            label={contract.label}
-                                                            renewalDate={contract.renewal_date || contract.end_date}
-                                                            noticePeriodDays={contract.notice_period_days}
-                                                        />
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
                                 )
                             })
