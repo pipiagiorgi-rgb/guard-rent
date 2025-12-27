@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
     FileText,
@@ -15,21 +15,34 @@ import {
     Bell,
     Trash2,
     Loader2,
-    Lock,
-    ExternalLink
+    Upload,
+    Eye,
+    Download,
+    Droplets,
+    Sparkles,
+    X,
+    Check,
+    AlertCircle
 } from 'lucide-react'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
+import { RELATED_CONTRACTS_EARLY_ACCESS } from '@/lib/featureFlags'
 
 interface RelatedContract {
     contract_id: string
     contract_type: string
     custom_type?: string
     provider_name?: string
+    label?: string
     start_date?: string
     end_date?: string
     notice_period_days?: number
     notice_period_source?: string
     file_name?: string
+    storage_path?: string
+    mime_type?: string
+    size_bytes?: number
+    renewal_date?: string
+    min_term_end?: string
     created_at: string
 }
 
@@ -41,11 +54,35 @@ const CONTRACT_TYPES = [
     { value: 'internet', label: 'Internet', icon: Wifi },
     { value: 'electricity', label: 'Electricity', icon: Zap },
     { value: 'gas', label: 'Gas', icon: Flame },
-    { value: 'parking', label: 'Parking', icon: Car },
+    { value: 'water', label: 'Water', icon: Droplets },
     { value: 'insurance', label: 'Insurance', icon: Shield },
-    { value: 'storage', label: 'Storage unit', icon: Package },
+    { value: 'cleaning', label: 'Cleaning', icon: Sparkles },
+    { value: 'parking', label: 'Parking', icon: Car },
+    { value: 'storage', label: 'Storage', icon: Package },
     { value: 'other', label: 'Other', icon: FileText },
 ]
+
+// Keyword-based classification for auto-categorization
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+    internet: ['vodafone', 'orange', 'post', 'tango', 'proximus', 'telenet', 'scarlet', 'internet', 'wifi', 'broadband', 'fiber', 'fibre'],
+    electricity: ['edf', 'engie', 'enovos', 'electrabel', 'luminus', 'electricity', 'électricité', 'strom', 'power'],
+    gas: ['gas', 'gaz', 'engie', 'enovos', 'heating'],
+    water: ['water', 'eau', 'wasser', 'sidero', 'sebes'],
+    insurance: ['insurance', 'assurance', 'versicherung', 'axa', 'allianz', 'foyer', 'bâloise', 'baloise', 'lalux'],
+    cleaning: ['cleaning', 'nettoyage', 'reinigung', 'housekeeping', 'maid', 'cleaner'],
+    parking: ['parking', 'garage', 'stationnement', 'car park'],
+    storage: ['storage', 'lagerung', 'stockage', 'self-storage', 'box'],
+}
+
+function suggestCategory(fileName: string, text?: string): string {
+    const searchText = (fileName + ' ' + (text || '')).toLowerCase()
+    for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        if (keywords.some(kw => searchText.includes(kw))) {
+            return category
+        }
+    }
+    return 'other'
+}
 
 export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps) {
     const [contracts, setContracts] = useState<RelatedContract[]>([])
@@ -55,17 +92,27 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
     const [showAddModal, setShowAddModal] = useState(false)
     const [deleteId, setDeleteId] = useState<string | null>(null)
     const [deleting, setDeleting] = useState(false)
+    const [uploading, setUploading] = useState(false)
+    const [uploadError, setUploadError] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     // Form state
     const [newContract, setNewContract] = useState({
         contractType: 'internet',
         customType: '',
         providerName: '',
+        label: '',
         startDate: '',
         endDate: '',
         noticePeriodDays: '',
+        file: null as File | null,
     })
     const [saving, setSaving] = useState(false)
+    const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null)
+
+    // Early access = always unlocked (feature flag)
+    const isEarlyAccess = RELATED_CONTRACTS_EARLY_ACCESS
+    const hasAccess = isEarlyAccess || purchased
 
     useEffect(() => {
         loadContracts()
@@ -74,16 +121,12 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search)
             if (params.get('related_contracts') === 'success') {
-                // Re-fetch after webhook has time to complete (1 second delay)
                 const timer = setTimeout(() => {
                     loadContracts()
                 }, 1000)
-
-                // Clean up URL (remove query param)
                 params.delete('related_contracts')
                 const newUrl = window.location.pathname + (params.toString() ? `?${params}` : '')
                 window.history.replaceState({}, '', newUrl)
-
                 return () => clearTimeout(timer)
             }
         }
@@ -121,11 +164,70 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
         }
     }
 
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        // Validate file type
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/heic', 'image/heif']
+        if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.heic')) {
+            setUploadError('Please upload a PDF or image file')
+            return
+        }
+
+        // Validate size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            setUploadError('File size must be under 10MB')
+            return
+        }
+
+        setUploadError(null)
+        setNewContract({ ...newContract, file })
+
+        // Suggest category based on filename
+        const suggested = suggestCategory(file.name)
+        setSuggestedCategory(suggested)
+        setNewContract(prev => ({ ...prev, contractType: suggested, file }))
+    }
+
     const handleAddContract = async () => {
         if (!newContract.contractType) return
 
         setSaving(true)
+        setUploadError(null)
+
         try {
+            let storagePath = null
+            let fileName = null
+            let mimeType = null
+            let sizeBytes = null
+
+            // Upload file if present
+            if (newContract.file) {
+                const supabase = createClient()
+                const fileExt = newContract.file.name.split('.').pop()?.toLowerCase() || 'pdf'
+                const filePath = `cases/${caseId}/related/${crypto.randomUUID()}.${fileExt}`
+
+                const { error: uploadError } = await supabase.storage
+                    .from('guard-rent')
+                    .upload(filePath, newContract.file, {
+                        contentType: newContract.file.type,
+                        upsert: false
+                    })
+
+                if (uploadError) {
+                    console.error('Upload error:', uploadError)
+                    setUploadError('Failed to upload file. Please try again.')
+                    setSaving(false)
+                    return
+                }
+
+                storagePath = filePath
+                fileName = newContract.file.name
+                mimeType = newContract.file.type
+                sizeBytes = newContract.file.size
+            }
+
             const res = await fetch('/api/related-contracts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -134,10 +236,15 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                     contractType: newContract.contractType,
                     customType: newContract.customType || null,
                     providerName: newContract.providerName || null,
+                    label: newContract.label || null,
                     startDate: newContract.startDate || null,
                     endDate: newContract.endDate || null,
                     noticePeriodDays: newContract.noticePeriodDays ? parseInt(newContract.noticePeriodDays) : null,
-                    noticePeriodSource: newContract.noticePeriodDays ? 'manual' : null
+                    noticePeriodSource: newContract.noticePeriodDays ? 'manual' : null,
+                    storagePath,
+                    fileName,
+                    mimeType,
+                    sizeBytes
                 })
             })
 
@@ -148,13 +255,20 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                     contractType: 'internet',
                     customType: '',
                     providerName: '',
+                    label: '',
                     startDate: '',
                     endDate: '',
                     noticePeriodDays: '',
+                    file: null,
                 })
+                setSuggestedCategory(null)
+            } else {
+                const error = await res.json()
+                setUploadError(error.error || 'Failed to save contract')
             }
         } catch (err) {
             console.error('Failed to add contract:', err)
+            setUploadError('Failed to save contract. Please try again.')
         } finally {
             setSaving(false)
         }
@@ -175,6 +289,40 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
         }
     }
 
+    const handleView = async (contract: RelatedContract) => {
+        if (!contract.storage_path) return
+
+        const supabase = createClient()
+        const { data } = await supabase.storage
+            .from('guard-rent')
+            .createSignedUrl(contract.storage_path, 3600)
+
+        if (data?.signedUrl) {
+            window.open(data.signedUrl, '_blank')
+        }
+    }
+
+    const handleDownload = async (contract: RelatedContract) => {
+        if (!contract.storage_path) return
+
+        const supabase = createClient()
+        const { data } = await supabase.storage
+            .from('guard-rent')
+            .createSignedUrl(contract.storage_path, 3600, {
+                download: contract.file_name || 'document'
+            })
+
+        if (data?.signedUrl) {
+            // Use programmatic download for consistent behavior
+            const link = document.createElement('a')
+            link.href = data.signedUrl
+            link.download = contract.file_name || 'document'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+        }
+    }
+
     const getTypeIcon = (type: string) => {
         const found = CONTRACT_TYPES.find(t => t.value === type)
         return found ? found.icon : FileText
@@ -184,6 +332,13 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
         if (type === 'other' && customType) return customType
         const found = CONTRACT_TYPES.find(t => t.value === type)
         return found ? found.label : type
+    }
+
+    const formatFileSize = (bytes?: number) => {
+        if (!bytes) return ''
+        if (bytes < 1024) return `${bytes} B`
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
     }
 
     if (loading) {
@@ -200,7 +355,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
     return (
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
             {/* Header */}
-            <div className="p-6 border-b border-slate-100">
+            <div className="p-4 sm:p-6 border-b border-slate-100">
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
@@ -209,34 +364,36 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                             <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded">optional</span>
                         </h2>
                         <p className="text-sm text-slate-500 mt-1">
-                            Track contracts like internet or utilities.
+                            Stored privately. Download or delete anytime. Not sealed evidence.
                         </p>
                     </div>
-                    {purchased && (
+                    {hasAccess && (
                         <button
                             onClick={() => setShowAddModal(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                         >
-                            <Plus size={16} />
-                            Add contract
+                            <Upload size={16} />
+                            <span className="hidden sm:inline">Upload</span>
                         </button>
                     )}
                 </div>
 
-                {/* REQUIRED DISCLAIMER */}
-                <p className="text-xs text-slate-400 mt-3 flex items-center gap-1">
-                    <Bell size={12} />
-                    Stored for reference and reminders only. Not sealed evidence.
-                </p>
+                {/* Early access banner */}
+                {isEarlyAccess && !purchased && (
+                    <div className="mt-3 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg">
+                        <Sparkles size={14} />
+                        <span>Free during early access — pricing may apply later</span>
+                    </div>
+                )}
             </div>
 
             {/* Content */}
-            <div className="p-6">
-                {!purchased ? (
-                    // Upsell state
+            <div className="p-4 sm:p-6">
+                {!hasAccess ? (
+                    // Upsell state (only shown if early access is disabled)
                     <div className="text-center py-8">
                         <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Lock size={24} className="text-slate-400" />
+                            <FileText size={24} className="text-slate-400" />
                         </div>
                         <h3 className="font-medium text-slate-900 mb-2">Track your utility contracts</h3>
                         <p className="text-sm text-slate-500 mb-4 max-w-md mx-auto">
@@ -263,18 +420,21 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                     // Empty state
                     <div className="text-center py-8">
                         <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FileText size={24} className="text-blue-500" />
+                            <Upload size={24} className="text-blue-500" />
                         </div>
-                        <h3 className="font-medium text-slate-900 mb-2">No contracts added yet</h3>
-                        <p className="text-sm text-slate-500 mb-4">
-                            Add your utility and service contracts to track them.
+                        <h3 className="font-medium text-slate-900 mb-2">Upload a service or household contract</h3>
+                        <p className="text-sm text-slate-500 mb-1">
+                            Internet, electricity, cleaning, parking, insurance, etc.
+                        </p>
+                        <p className="text-xs text-slate-400 mb-4">
+                            Your documents remain accessible even if you move out. You stay in control.
                         </p>
                         <button
                             onClick={() => setShowAddModal(true)}
                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         >
-                            <Plus size={16} className="inline mr-1" />
-                            Add your first contract
+                            <Upload size={16} className="inline mr-2" />
+                            Upload your first contract
                         </button>
                     </div>
                 ) : (
@@ -285,20 +445,26 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                             return (
                                 <div
                                     key={contract.contract_id}
-                                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg"
+                                    className="flex items-center justify-between p-3 sm:p-4 bg-slate-50 rounded-lg"
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200 flex-shrink-0">
                                             <Icon size={20} className="text-slate-600" />
                                         </div>
-                                        <div>
-                                            <p className="font-medium text-slate-900">
-                                                {getTypeLabel(contract.contract_type, contract.custom_type)}
+                                        <div className="min-w-0">
+                                            <p className="font-medium text-slate-900 truncate">
+                                                {contract.label || getTypeLabel(contract.contract_type, contract.custom_type)}
                                                 {contract.provider_name && (
                                                     <span className="text-slate-500 font-normal"> — {contract.provider_name}</span>
                                                 )}
                                             </p>
-                                            <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 mt-0.5">
+                                                {contract.file_name && (
+                                                    <span className="truncate max-w-[120px]">{contract.file_name}</span>
+                                                )}
+                                                {contract.size_bytes && (
+                                                    <span>{formatFileSize(contract.size_bytes)}</span>
+                                                )}
                                                 {contract.end_date && (
                                                     <span className="flex items-center gap-1">
                                                         <Calendar size={12} />
@@ -308,18 +474,39 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                                 {contract.notice_period_days && (
                                                     <span className="flex items-center gap-1">
                                                         <Bell size={12} />
-                                                        {contract.notice_period_days} days notice
+                                                        {contract.notice_period_days}d notice
                                                     </span>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => setDeleteId(contract.contract_id)}
-                                        className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-2">
+                                        {contract.storage_path && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleView(contract)}
+                                                    className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                                                    title="View"
+                                                >
+                                                    <Eye size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDownload(contract)}
+                                                    className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                                                    title="Download"
+                                                >
+                                                    <Download size={16} />
+                                                </button>
+                                            </>
+                                        )}
+                                        <button
+                                            onClick={() => setDeleteId(contract.contract_id)}
+                                            className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
                                 </div>
                             )
                         })}
@@ -330,12 +517,66 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
             {/* Add Modal */}
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl max-w-md w-full p-6">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-4">Add related contract</h3>
+                    <div className="bg-white rounded-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-slate-900">Add service contract</h3>
+                            <button
+                                onClick={() => setShowAddModal(false)}
+                                className="p-1 text-slate-400 hover:text-slate-600"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
 
                         <div className="space-y-4">
+                            {/* File upload */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Upload document (optional)
+                                </label>
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${newContract.file
+                                            ? 'border-green-300 bg-green-50'
+                                            : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50'
+                                        }`}
+                                >
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept=".pdf,.jpg,.jpeg,.png,.heic,.heif"
+                                        onChange={handleFileSelect}
+                                        className="hidden"
+                                    />
+                                    {newContract.file ? (
+                                        <div className="flex items-center justify-center gap-2 text-green-700">
+                                            <Check size={20} />
+                                            <span className="text-sm truncate max-w-[200px]">{newContract.file.name}</span>
+                                        </div>
+                                    ) : (
+                                        <div className="text-slate-500">
+                                            <Upload size={24} className="mx-auto mb-2 text-slate-400" />
+                                            <p className="text-sm">Click to upload PDF or image</p>
+                                            <p className="text-xs text-slate-400 mt-1">Max 10MB</p>
+                                        </div>
+                                    )}
+                                </div>
+                                {uploadError && (
+                                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                                        <AlertCircle size={12} />
+                                        {uploadError}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Category */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Category
+                                    {suggestedCategory && (
+                                        <span className="text-xs text-blue-500 font-normal ml-2">(suggested)</span>
+                                    )}
+                                </label>
                                 <select
                                     value={newContract.contractType}
                                     onChange={(e) => setNewContract({ ...newContract, contractType: e.target.value })}
@@ -355,13 +596,26 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                         value={newContract.customType}
                                         onChange={(e) => setNewContract({ ...newContract, customType: e.target.value })}
                                         className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="e.g. Water, Gym membership"
+                                        placeholder="e.g. Gym membership"
                                     />
                                 </div>
                             )}
 
+                            {/* Label */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Provider name</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Label (optional)</label>
+                                <input
+                                    type="text"
+                                    value={newContract.label}
+                                    onChange={(e) => setNewContract({ ...newContract, label: e.target.value })}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="e.g. Home Internet"
+                                />
+                            </div>
+
+                            {/* Provider */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Provider name (optional)</label>
                                 <input
                                     type="text"
                                     value={newContract.providerName}
@@ -371,6 +625,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                 />
                             </div>
 
+                            {/* Dates */}
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Start date</label>
@@ -392,6 +647,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                 </div>
                             </div>
 
+                            {/* Notice period */}
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Notice period (days)</label>
                                 <input
@@ -415,9 +671,16 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                             <button
                                 onClick={handleAddContract}
                                 disabled={saving}
-                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                {saving ? 'Saving...' : 'Add contract'}
+                                {saving ? (
+                                    <>
+                                        <Loader2 size={16} className="animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    'Add contract'
+                                )}
                             </button>
                         </div>
                     </div>

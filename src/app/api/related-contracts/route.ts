@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { isAdminEmail } from '@/lib/admin'
+import { RELATED_CONTRACTS_EARLY_ACCESS } from '@/lib/featureFlags'
 
 /**
  * GET /api/related-contracts?caseId=xxx
@@ -32,21 +33,18 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Case not found' }, { status: 404 })
     }
 
-    // Check if user has purchased related contracts pack (or is admin)
+    // Early access: bypass purchase check when feature flag is enabled
     const userEmail = user.email?.toLowerCase() || ''
     const isAdmin = isAdminEmail(user.email) || userEmail === 'pipia.giorgi@gmail.com'
+    const hasEarlyAccess = RELATED_CONTRACTS_EARLY_ACCESS
 
-    console.log('[RelatedContracts] User email:', userEmail, 'isAdmin:', isAdmin)
-
-    if (!isAdmin) {
+    if (!isAdmin && !hasEarlyAccess) {
         const { data: purchase, error: purchaseError } = await supabase
             .from('purchases')
             .select('pack_type')
             .eq('case_id', caseId)
             .eq('pack_type', 'related_contracts')
             .single()
-
-        console.log('[RelatedContracts] Purchase check:', { purchase, purchaseError })
 
         if (!purchase) {
             return NextResponse.json({
@@ -71,7 +69,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
         contracts: contracts || [],
-        purchased: true
+        purchased: true // Always true when early access is enabled
     })
 }
 
@@ -88,7 +86,21 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { caseId, contractType, customType, providerName, startDate, endDate, noticePeriodDays, noticePeriodSource } = body
+    const {
+        caseId,
+        contractType,
+        customType,
+        providerName,
+        label,
+        startDate,
+        endDate,
+        noticePeriodDays,
+        noticePeriodSource,
+        storagePath,
+        fileName,
+        mimeType,
+        sizeBytes
+    } = body
 
     if (!caseId || !contractType) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -105,9 +117,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Case not found' }, { status: 404 })
     }
 
-    // Check purchase (or admin)
+    // Early access: bypass purchase check when feature flag is enabled
     const isAdmin = isAdminEmail(user.email)
-    if (!isAdmin) {
+    const hasEarlyAccess = RELATED_CONTRACTS_EARLY_ACCESS
+
+    if (!isAdmin && !hasEarlyAccess) {
         const { data: purchase } = await supabase
             .from('purchases')
             .select('pack_type')
@@ -120,7 +134,7 @@ export async function POST(request: Request) {
         }
     }
 
-    // Create contract
+    // Create contract with all new fields
     const { data: contract, error } = await supabase
         .from('related_contracts')
         .insert({
@@ -129,10 +143,15 @@ export async function POST(request: Request) {
             contract_type: contractType,
             custom_type: customType || null,
             provider_name: providerName || null,
+            label: label || null,
             start_date: startDate || null,
             end_date: endDate || null,
             notice_period_days: noticePeriodDays || null,
-            notice_period_source: noticePeriodSource || null
+            notice_period_source: noticePeriodSource || null,
+            storage_path: storagePath || null,
+            file_name: fileName || null,
+            mime_type: mimeType || null,
+            size_bytes: sizeBytes || null
         })
         .select()
         .single()
@@ -144,3 +163,4 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ contract })
 }
+
