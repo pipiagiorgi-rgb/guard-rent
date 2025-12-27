@@ -641,29 +641,24 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
 
         if (isEditing) {
             return (
-                <div className="bg-white p-5 rounded-xl border border-blue-200 ring-2 ring-blue-50">
-                    <label className="block text-sm font-medium text-slate-500 mb-2">{label}</label>
+                <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1.5">{label}</label>
                     <input
                         type="text"
                         value={field?.value === 'not found' ? '' : field?.value || ''}
                         onChange={(e) => updateField(fieldKey, e.target.value)}
                         placeholder={`Enter ${label.toLowerCase()}`}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                     />
                 </div>
             )
         }
 
         if (!field || !field.value || field.value.toLowerCase() === 'not found' || field.value === '...') {
-            // Use appropriate fallback text based on field type
-            const fallbackText = fieldKey === 'property_address'
-                ? 'Address not stated in lease'
-                : 'Not extracted from lease'
-
             return (
-                <div className="bg-white p-5 rounded-xl border border-slate-200 text-slate-400 italic">
-                    <p className="text-sm text-slate-500 mb-1">{label}</p>
-                    {fallbackText}
+                <div>
+                    <span className="block text-xs text-slate-400 mb-1">{label}</span>
+                    <span className="text-sm text-slate-400 italic">Not stated</span>
                 </div>
             )
         }
@@ -677,12 +672,12 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
         const showTooltip = fieldKey === 'notice_condition' && field?.value?.toLowerCase().includes('anniversary')
 
         return (
-            <div className="bg-white p-5 rounded-xl border border-slate-200">
+            <div>
                 <div className="flex items-center gap-1.5 mb-1">
-                    <p className="text-sm text-slate-500">{label}</p>
+                    <span className="text-xs text-slate-500">{label}</span>
                     {showTooltip && (
                         <div className="group relative">
-                            <HelpCircle size={14} className="text-slate-400 cursor-help" />
+                            <HelpCircle size={12} className="text-slate-400 cursor-help" />
                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 Termination is only possible on this date each year.
                                 <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
@@ -690,13 +685,11 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                         </div>
                     )}
                 </div>
-                <p className="text-lg font-semibold mb-2">{displayLabel || field.value}</p>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${getConfidenceBadge(field.confidence)}`}>
-                    {field.confidence} confidence
-                </span>
+                <span className="text-sm font-medium text-slate-900">{displayLabel || field.value}</span>
             </div>
         )
     }
+
 
     // Toast component (renders independently of state)
     const Toast = showToast ? (
@@ -828,8 +821,8 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
 
                     {/* ═══ LAYER 3: DETAILS (Collapsible when viewing, full when editing) ═══ */}
                     {isEditing ? (
-                        // Full edit mode - show all fields as editable
-                        <>
+                        // Full edit mode - show all fields as editable in a single card
+                        <div className="bg-white border border-slate-200 rounded-xl p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="sm:col-span-2">
                                     {renderField('Property address', 'property_address')}
@@ -845,11 +838,11 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                             </div>
 
                             {/* Edit mode buttons */}
-                            <div className="flex gap-3 pt-4 border-t border-slate-100">
+                            <div className="flex gap-3 pt-4 mt-4 border-t border-slate-100">
                                 <button
                                     onClick={handleApplyToRental}
                                     disabled={applying}
-                                    className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                    className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 disabled:opacity-50 transition-colors"
                                 >
                                     {applying ? 'Saving...' : 'Save changes'}
                                 </button>
@@ -860,7 +853,7 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                                     Cancel
                                 </button>
                             </div>
-                        </>
+                        </div>
                     ) : (
                         // Collapsed details section
                         <details className="border border-slate-200 rounded-xl overflow-hidden group">
