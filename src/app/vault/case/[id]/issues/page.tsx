@@ -251,20 +251,31 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
                     const storagePath = `${user.id}/${caseId}/issues/${newIssue.issue_id}/${fileName}`
 
-                    await supabase.storage
+                    const { error: uploadError } = await supabase.storage
                         .from('guard-rent')
                         .upload(storagePath, file)
 
-                    await supabase.from('assets').insert({
+                    if (uploadError) {
+                        console.error('[Issues] Photo upload failed:', uploadError)
+                        continue
+                    }
+
+                    const { error: insertError } = await supabase.from('assets').insert({
                         case_id: caseId,
                         user_id: user.id,
                         issue_id: newIssue.issue_id,
                         type: 'issue_photo',
                         original_name: file.name,
                         storage_path: storagePath,
-                        file_size: file.size,
+                        size_bytes: file.size,
                         mime_type: file.type
                     })
+
+                    if (insertError) {
+                        console.error('[Issues] Photo asset insert failed:', insertError)
+                    } else {
+                        console.log('[Issues] Photo saved successfully:', storagePath)
+                    }
                 }
             }
 
@@ -274,20 +285,30 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                 const fileName = `video_${Date.now()}.${ext}`
                 const storagePath = `${user.id}/${caseId}/issues/${newIssue.issue_id}/${fileName}`
 
-                await supabase.storage
+                const { error: videoUploadError } = await supabase.storage
                     .from('guard-rent')
                     .upload(storagePath, pendingVideo)
 
-                await supabase.from('assets').insert({
-                    case_id: caseId,
-                    user_id: user.id,
-                    issue_id: newIssue.issue_id,
-                    type: 'issue_video',
-                    original_name: pendingVideo.name,
-                    storage_path: storagePath,
-                    file_size: pendingVideo.size,
-                    mime_type: pendingVideo.type
-                })
+                if (videoUploadError) {
+                    console.error('[Issues] Video upload failed:', videoUploadError)
+                } else {
+                    const { error: videoInsertError } = await supabase.from('assets').insert({
+                        case_id: caseId,
+                        user_id: user.id,
+                        issue_id: newIssue.issue_id,
+                        type: 'issue_video',
+                        original_name: pendingVideo.name,
+                        storage_path: storagePath,
+                        size_bytes: pendingVideo.size,
+                        mime_type: pendingVideo.type
+                    })
+
+                    if (videoInsertError) {
+                        console.error('[Issues] Video asset insert failed:', videoInsertError)
+                    } else {
+                        console.log('[Issues] Video saved successfully:', storagePath)
+                    }
+                }
             }
 
             setShowAddModal(false)
