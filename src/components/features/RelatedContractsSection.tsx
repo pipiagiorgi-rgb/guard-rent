@@ -25,6 +25,7 @@ import {
     AlertCircle
 } from 'lucide-react'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
+import { DocumentAIPanel } from '@/components/features/DocumentAIPanel'
 import { RELATED_CONTRACTS_EARLY_ACCESS } from '@/lib/featureFlags'
 
 interface RelatedContract {
@@ -445,68 +446,77 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                             return (
                                 <div
                                     key={contract.contract_id}
-                                    className="flex items-center justify-between p-3 sm:p-4 bg-slate-50 rounded-lg"
+                                    className="bg-slate-50 rounded-lg overflow-hidden"
                                 >
-                                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200 flex-shrink-0">
-                                            <Icon size={20} className="text-slate-600" />
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="font-medium text-slate-900 truncate">
-                                                {contract.label || getTypeLabel(contract.contract_type, contract.custom_type)}
-                                                {contract.provider_name && (
-                                                    <span className="text-slate-500 font-normal"> — {contract.provider_name}</span>
-                                                )}
-                                            </p>
-                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 mt-0.5">
-                                                {contract.file_name && (
-                                                    <span className="truncate max-w-[120px]">{contract.file_name}</span>
-                                                )}
-                                                {contract.size_bytes && (
-                                                    <span>{formatFileSize(contract.size_bytes)}</span>
-                                                )}
-                                                {contract.end_date && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Calendar size={12} />
-                                                        Ends {new Date(contract.end_date).toLocaleDateString('en-GB')}
-                                                    </span>
-                                                )}
-                                                {contract.notice_period_days && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Bell size={12} />
-                                                        {contract.notice_period_days}d notice
-                                                    </span>
-                                                )}
+                                    <div className="flex items-center justify-between p-3 sm:p-4">
+                                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200 flex-shrink-0">
+                                                <Icon size={20} className="text-slate-600" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="font-medium text-slate-900 truncate">
+                                                    {contract.label || getTypeLabel(contract.contract_type, contract.custom_type)}
+                                                    {contract.provider_name && (
+                                                        <span className="text-slate-500 font-normal"> — {contract.provider_name}</span>
+                                                    )}
+                                                </p>
+                                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 mt-0.5">
+                                                    {contract.file_name && (
+                                                        <span className="truncate max-w-[120px]">{contract.file_name}</span>
+                                                    )}
+                                                    {contract.size_bytes && (
+                                                        <span>{formatFileSize(contract.size_bytes)}</span>
+                                                    )}
+                                                    {contract.end_date && (
+                                                        <span className="flex items-center gap-1">
+                                                            <Calendar size={12} />
+                                                            Ends {new Date(contract.end_date).toLocaleDateString('en-GB')}
+                                                        </span>
+                                                    )}
+                                                    {contract.notice_period_days && (
+                                                        <span className="flex items-center gap-1">
+                                                            <Bell size={12} />
+                                                            {contract.notice_period_days}d notice
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
+                                        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-2">
+                                            {contract.storage_path && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleView(contract)}
+                                                        className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                                                        title="View"
+                                                    >
+                                                        <Eye size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDownload(contract)}
+                                                        className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                                                        title="Download"
+                                                    >
+                                                        <Download size={16} />
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button
+                                                onClick={() => setDeleteId(contract.contract_id)}
+                                                className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                                title="Delete"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-2">
-                                        {contract.storage_path && (
-                                            <>
-                                                <button
-                                                    onClick={() => handleView(contract)}
-                                                    className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
-                                                    title="View"
-                                                >
-                                                    <Eye size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDownload(contract)}
-                                                    className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
-                                                    title="Download"
-                                                >
-                                                    <Download size={16} />
-                                                </button>
-                                            </>
-                                        )}
-                                        <button
-                                            onClick={() => setDeleteId(contract.contract_id)}
-                                            className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                                            title="Delete"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
+                                    {/* Contextual AI Panel */}
+                                    <DocumentAIPanel
+                                        contractId={contract.contract_id}
+                                        contractType={contract.contract_type}
+                                        providerName={contract.provider_name}
+                                        label={contract.label}
+                                    />
                                 </div>
                             )
                         })}
@@ -537,8 +547,8 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
                                     className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${newContract.file
-                                            ? 'border-green-300 bg-green-50'
-                                            : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50'
+                                        ? 'border-green-300 bg-green-50'
+                                        : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50'
                                         }`}
                                 >
                                     <input
