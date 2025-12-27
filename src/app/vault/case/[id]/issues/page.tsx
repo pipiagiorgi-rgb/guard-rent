@@ -17,7 +17,8 @@ import {
     Image as ImageIcon,
     Wrench,
     AlertCircle,
-    StickyNote
+    StickyNote,
+    Download
 } from 'lucide-react'
 import Link from 'next/link'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
@@ -35,6 +36,7 @@ interface IssueMedia {
     signedUrl?: string
     type: 'issue_photo' | 'issue_video'
     mime_type?: string
+    original_name?: string
 }
 
 interface Issue {
@@ -126,7 +128,7 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                     issuesData.map(async (issue) => {
                         const { data: mediaAssets, error: mediaError } = await supabase
                             .from('assets')
-                            .select('asset_id, storage_path, type, mime_type')
+                            .select('asset_id, storage_path, type, mime_type, original_name')
                             .eq('issue_id', issue.issue_id)
                             .in('type', ['issue_photo', 'issue_video'])
 
@@ -519,39 +521,52 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                                         <h4 className="text-sm font-medium text-slate-500 mb-3">
                                                             Media ({photos.length} photo{photos.length !== 1 ? 's' : ''}{videos.length > 0 ? `, ${videos.length} video${videos.length !== 1 ? 's' : ''}` : ''})
                                                         </h4>
-                                                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                                             {issue.media.map((item) => (
-                                                                item.type === 'issue_photo' ? (
-                                                                    <button
-                                                                        key={item.asset_id}
-                                                                        onClick={() => openPhotoLightbox(issue.media)}
-                                                                        className="relative aspect-square rounded-lg overflow-hidden bg-slate-100 group hover:ring-2 hover:ring-blue-500 transition-all"
-                                                                    >
-                                                                        {item.signedUrl && (
-                                                                            <img
-                                                                                src={item.signedUrl}
-                                                                                alt=""
-                                                                                className="w-full h-full object-cover"
-                                                                            />
-                                                                        )}
-                                                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                                                                    </button>
-                                                                ) : (
+                                                                <div key={item.asset_id} className="relative group">
+                                                                    {item.type === 'issue_photo' ? (
+                                                                        <button
+                                                                            onClick={() => openPhotoLightbox(issue.media)}
+                                                                            className="relative aspect-square w-full rounded-lg overflow-hidden bg-slate-100 hover:ring-2 hover:ring-blue-500 transition-all"
+                                                                        >
+                                                                            {item.signedUrl && (
+                                                                                <img
+                                                                                    src={item.signedUrl}
+                                                                                    alt=""
+                                                                                    className="w-full h-full object-cover"
+                                                                                />
+                                                                            )}
+                                                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                                                        </button>
+                                                                    ) : (
+                                                                        <a
+                                                                            href={item.signedUrl}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="relative aspect-square w-full rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center hover:ring-2 hover:ring-blue-500 transition-all"
+                                                                        >
+                                                                            <Play size={24} className="text-white" />
+                                                                            <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 text-xs text-white flex items-center gap-1">
+                                                                                <Play size={10} /> Play video
+                                                                            </div>
+                                                                        </a>
+                                                                    )}
+                                                                    {/* Download button */}
                                                                     <a
-                                                                        key={item.asset_id}
                                                                         href={item.signedUrl}
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="relative aspect-square rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center group hover:ring-2 hover:ring-blue-500 transition-all"
+                                                                        download={item.original_name || `${item.type}_${item.asset_id}`}
+                                                                        className="absolute top-1 right-1 p-1.5 bg-white/90 hover:bg-white rounded-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                        title="Download"
+                                                                        onClick={(e) => e.stopPropagation()}
                                                                     >
-                                                                        <Play size={24} className="text-white" />
-                                                                        <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 text-xs text-white flex items-center gap-1">
-                                                                            <Play size={10} /> Play video
-                                                                        </div>
+                                                                        <Download size={14} className="text-slate-600" />
                                                                     </a>
-                                                                )
+                                                                </div>
                                                             ))}
                                                         </div>
+                                                        <p className="mt-3 text-xs text-slate-400">
+                                                            These photos and videos are stored separately and won&apos;t appear in reports unless you choose to include them.
+                                                        </p>
                                                     </>
                                                 ) : (
                                                     <p className="text-sm text-slate-400">
