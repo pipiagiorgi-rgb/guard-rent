@@ -181,7 +181,7 @@ export default function StoragePage() {
                                     {storageInfo.status === 'expired' ? (
                                         <>Your storage expired on <strong>{formatDate(storageInfo.expiresAt)}</strong>.</>
                                     ) : (
-                                        <>Expires on <strong>{formatDate(storageInfo.expiresAt)}</strong> ({storageInfo.daysRemaining} days remaining)</>
+                                        <>Stored securely until <strong>{formatDate(storageInfo.expiresAt)}</strong><span className="text-slate-400 ml-1">({storageInfo.daysRemaining} days)</span></>
                                     )}
                                 </p>
                             )}
@@ -212,25 +212,32 @@ export default function StoragePage() {
                     {(storageInfo?.status === 'expired' || storageInfo?.status === 'critical') && (
                         <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl">
                             <p className="text-sm text-red-800">
-                                <strong>Important:</strong> When storage expires, your rental documents, photos, and records
-                                may be permanently deleted. We cannot recover deleted data. Extend your storage to keep your records safe.
+                                <strong>Action required:</strong> You have a 30-day grace period to download your files or extend storage.
+                                After that, data is removed and cannot be recovered.
                             </p>
                         </div>
+                    )}
+
+                    {/* Trust line for active storage */}
+                    {storageInfo?.status === 'active' && (
+                        <p className="mt-4 text-xs text-slate-400">
+                            Your evidence is sealed and unchanged. Storage only affects availability.
+                        </p>
                     )}
                 </div>
 
                 {/* Extend Storage Section */}
                 <div className="bg-white rounded-2xl border border-slate-200 p-6">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Extend Storage</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Add Storage Time</h3>
                     <p className="text-slate-600 mb-6">
-                        Your pack includes 1 year of storage. Add more time to keep your records accessible beyond the initial period.
+                        Your records are stored for 1 year from purchase. Need more time? Add storage below — no subscriptions, just one-time payments.
                     </p>
 
                     <div className="grid gap-3">
                         {[
-                            { years: 1, price: 9, label: 'Add 1 Year', sublabel: null },
-                            { years: 2, price: 16, label: 'Add 2 Years', sublabel: 'Save €2' },
-                            { years: 3, price: 21, label: 'Add 3 Years', sublabel: 'Save €6 · Best value' }
+                            { years: 1, price: 9, label: '+ 1 year', sublabel: null },
+                            { years: 2, price: 16, label: '+ 2 years', sublabel: 'Save €2' },
+                            { years: 3, price: 21, label: '+ 3 years', sublabel: 'Save €6 · Best value' }
                         ].map((option) => (
                             <button
                                 key={option.years}
@@ -271,7 +278,7 @@ export default function StoragePage() {
                             <span className="text-slate-400 group-open:rotate-180 transition-transform">↓</span>
                         </summary>
                         <p className="mt-3 text-sm text-slate-600">
-                            After your storage period ends, your rental documents, photos, and records may be permanently deleted after a 30-day grace period. We send reminder emails at 60, 30, and 7 days before expiry.
+                            After your storage ends, you have a <strong>30-day grace period</strong> to download your files or extend storage. After that, data is removed and cannot be recovered. We send reminders at 60, 30, and 7 days before expiry.
                         </p>
                     </details>
 
