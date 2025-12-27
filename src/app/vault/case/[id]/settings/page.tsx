@@ -8,7 +8,6 @@ import {
 } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { useRouter } from 'next/navigation'
-import { EvidenceFilesSection } from '@/components/features/EvidenceFilesSection'
 
 interface DataState {
     rentalLabel: string
@@ -209,130 +208,91 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold mb-1">Settings</h1>
+                <h1 className="text-2xl font-bold mb-1">Data</h1>
                 <p className="text-slate-500">
-                    Manage your rental name, data storage, and deletion.
+                    Your rental data, retention status, and control options.
                 </p>
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
-                SECTION: RENAME RENTAL
+                SECTION 1: RENTAL METADATA (Context, not action)
             ═══════════════════════════════════════════════════════════════ */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                        <Pencil className="text-slate-600" size={20} />
+            <div className="bg-white rounded-xl border border-slate-200 p-5">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                            <Pencil className="text-slate-600" size={18} />
+                        </div>
+                        <div>
+                            {editingName ? (
+                                <div className="flex gap-2 items-center">
+                                    <input
+                                        type="text"
+                                        value={newName}
+                                        onChange={(e) => setNewName(e.target.value)}
+                                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter rental name"
+                                        autoFocus
+                                        onKeyDown={(e) => e.key === 'Enter' && handleRename()}
+                                    />
+                                    <button
+                                        onClick={handleRename}
+                                        disabled={savingName}
+                                        className="p-1.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50"
+                                    >
+                                        {savingName ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
+                                    </button>
+                                    <button
+                                        onClick={() => setEditingName(false)}
+                                        className="p-1.5 text-slate-400 hover:text-slate-600"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <p className="font-semibold text-slate-900">{data.rentalLabel}</p>
+                                    <p className="text-sm text-slate-500">
+                                        Created {new Date(data.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {data.photoCount} files
+                                    </p>
+                                </>
+                            )}
+                        </div>
                     </div>
-                    <h2 className="font-semibold text-lg">Rental name</h2>
-                    {nameSaved && (
-                        <span className="text-sm text-green-600 flex items-center gap-1">
-                            <Check size={16} /> Saved
-                        </span>
-                    )}
-                </div>
-
-                {editingName ? (
-                    <div className="flex gap-3">
-                        <input
-                            type="text"
-                            value={newName}
-                            onChange={(e) => setNewName(e.target.value)}
-                            className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Enter rental name"
-                            autoFocus
-                            onKeyDown={(e) => e.key === 'Enter' && handleRename()}
-                        />
-                        <button
-                            onClick={() => setEditingName(false)}
-                            className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleRename}
-                            disabled={savingName}
-                            className="px-4 py-2 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 disabled:opacity-50 flex items-center gap-2"
-                        >
-                            {savingName ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
-                            Save
-                        </button>
-                    </div>
-                ) : (
-                    <div className="flex items-center justify-between">
-                        <span className="text-lg font-medium text-slate-900">{data.rentalLabel}</span>
+                    {!editingName && (
                         <button
                             onClick={() => {
                                 setNewName(data.rentalLabel)
                                 setEditingName(true)
                             }}
-                            className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg flex items-center gap-2"
+                            className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1"
                         >
-                            <Pencil size={16} />
+                            <Pencil size={14} />
                             Rename
                         </button>
+                    )}
+                </div>
+                {nameSaved && (
+                    <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                        <Check size={12} /> Name saved
                     </div>
                 )}
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
-                SECTION: YOUR FILES
+                SECTION 2: RETENTION STATUS (Primary focus)
             ═══════════════════════════════════════════════════════════════ */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-5">
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                        <FileText className="text-blue-600" size={20} />
-                    </div>
-                    <h2 className="font-semibold text-lg">Your files</h2>
-                </div>
-
-                <EvidenceFilesSection caseId={caseId} />
-            </div>
-
-            {/* ═══════════════════════════════════════════════════════════════
-                SECTION A: STORAGE OVERVIEW
-            ═══════════════════════════════════════════════════════════════ */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                        <Shield className="text-blue-600" size={20} />
-                    </div>
-                    <h2 className="font-semibold text-lg">How your data is stored</h2>
-                </div>
-
-                <div className="space-y-3 text-sm text-slate-600">
-                    <div className="flex items-center gap-3">
-                        <Lock size={16} className="text-slate-400" />
-                        <span>All files are stored in a private, encrypted bucket</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Shield size={16} className="text-slate-400" />
-                        <span>Data is encrypted in transit (TLS) and at rest</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <FileText size={16} className="text-slate-400" />
-                        <span>Only you can access your files</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* ═══════════════════════════════════════════════════════════════
-                SECTION B: RETENTION STATUS (4-state logic)
-            ═══════════════════════════════════════════════════════════════ */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${data.purchaseType
-                        ? 'bg-green-50'
-                        : 'bg-slate-100'
-                        }`}>
-                        <Clock className={data.purchaseType ? 'text-green-600' : 'text-slate-500'} size={20} />
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${data.purchaseType ? 'bg-blue-50' : 'bg-slate-100'}`}>
+                        <Clock className={data.purchaseType ? 'text-blue-600' : 'text-slate-500'} size={20} />
                     </div>
                     <h2 className="font-semibold text-lg">Retention status</h2>
                 </div>
 
                 {(() => {
-                    // Determine retention state
                     const now = new Date()
                     const retentionExpiry = data.retentionUntil ? new Date(data.retentionUntil) : null
                     const formatDate = (date: Date) => date.toLocaleDateString('en-GB', {
@@ -342,113 +302,123 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                     // STATE A: Preview (no pack purchased)
                     if (!data.purchaseType) {
                         return (
-                            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                                <div className="flex items-center gap-2 text-slate-700 mb-1">
-                                    <Clock size={18} />
-                                    <span className="font-medium">Preview mode</span>
-                                </div>
+                            <div className="bg-slate-50 border border-slate-100 rounded-lg p-4">
+                                <p className="font-medium text-slate-700 mb-1">Preview mode</p>
                                 <p className="text-sm text-slate-600">
                                     Your records are stored temporarily while you explore RentVault.
-                                    Purchase a pack in{' '}
-                                    <a href={`/vault/case/${caseId}/exports`} className="underline font-medium text-slate-700">Exports</a>{' '}
-                                    to unlock 12-month secure retention and official PDF exports.
+                                </p>
+                                <p className="text-sm text-slate-500 mt-2">
+                                    Purchase a pack in Exports to unlock 12-month secure retention.
                                 </p>
                             </div>
                         )
                     }
 
-                    // STATE D: Expired (retention passed, no grace)
-                    // Note: In practice, grace period would come from a separate field
-                    // For now, if expiry is in the past with no grace_period_active field, treat as expired
+                    // STATE D: Expired
                     if (retentionExpiry && retentionExpiry < now) {
                         return (
-                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                                <div className="flex items-center gap-2 text-amber-700 mb-1">
-                                    <Clock size={18} />
-                                    <span className="font-medium">Retention expired</span>
-                                </div>
+                            <div className="bg-amber-50 border border-amber-100 rounded-lg p-4">
+                                <p className="font-medium text-amber-800 mb-1">Retention expired</p>
                                 <p className="text-sm text-amber-700">
                                     Your retention period ended on {formatDate(retentionExpiry)}.
-                                    You can download any remaining files or extend storage if available.
+                                    Download any remaining files or extend storage.
                                 </p>
                             </div>
                         )
                     }
 
-                    // STATE B: Paid (retention active)
+                    // STATE B: Active
                     return (
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                            <div className="flex items-center gap-2 text-green-700 mb-1">
-                                <Check size={18} />
-                                <span className="font-medium">Storage active</span>
-                            </div>
-                            <p className="text-sm text-green-600">
-                                {data.storageYears > 1 && (
-                                    <>You have <span className="font-medium">{data.storageYears} years</span> of storage. </>
-                                )}
-                                Your rental records are securely stored until{' '}
+                        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                            <p className="font-medium text-blue-800 mb-1">Storage active</p>
+                            <p className="text-sm text-blue-700">
+                                Stored securely until{' '}
                                 <span className="font-medium">
                                     {retentionExpiry ? formatDate(retentionExpiry) : 'your retention period ends'}
                                 </span>.
-                                You&apos;ll be notified in advance if any action is needed.
+                                {data.storageYears > 1 && ` (${data.storageYears} years total)`}
+                            </p>
+                            <p className="text-xs text-blue-600 mt-2">
+                                You'll be notified in advance if any action is needed.
                             </p>
                         </div>
                     )
                 })()}
-
-                <div className="mt-4 pt-4 border-t border-slate-100 text-sm text-slate-500">
-                    <div className="flex justify-between">
-                        <span>Rental created</span>
-                        <span>{new Date(data.createdAt).toLocaleDateString('en-GB')}</span>
-                    </div>
-                    <div className="flex justify-between mt-1">
-                        <span>Files stored</span>
-                        <span>{data.photoCount} files</span>
-                    </div>
-                </div>
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
-                SECTION C: DELETION CONTROLS
+                SECTION 3: STORAGE & SECURITY (Collapsible, informational)
             ═══════════════════════════════════════════════════════════════ */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
-                        <Trash2 className="text-red-600" size={20} />
+            <details className="bg-white rounded-xl border border-slate-200 overflow-hidden group">
+                <summary className="p-5 cursor-pointer list-none flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                            <Shield className="text-slate-500" size={20} />
+                        </div>
+                        <span className="font-semibold text-lg text-slate-900">How your data is stored</span>
                     </div>
-                    <h2 className="font-semibold text-lg">Delete data</h2>
+                    <span className="text-slate-400 group-open:rotate-180 transition-transform">↓</span>
+                </summary>
+                <div className="px-5 pb-5 pt-2 border-t border-slate-100">
+                    <div className="space-y-3 text-sm text-slate-600">
+                        <div className="flex items-center gap-3">
+                            <Lock size={16} className="text-slate-400 flex-shrink-0" />
+                            <span>All files are stored in a private, encrypted bucket</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Shield size={16} className="text-slate-400 flex-shrink-0" />
+                            <span>Data is encrypted in transit (TLS) and at rest</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <FileText size={16} className="text-slate-400 flex-shrink-0" />
+                            <span>Only you can access your files</span>
+                        </div>
+                    </div>
                 </div>
+            </details>
 
-                <p className="text-sm text-slate-600 mb-6">
-                    You have full control over your data. Deletion is permanent and cannot be undone.
-                </p>
-
-                <div className="space-y-3">
-                    <button
-                        onClick={() => setShowDeleteConfirm('files')}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl text-left hover:bg-slate-50 transition-colors"
-                    >
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <span className="font-medium text-slate-900">Delete all files</span>
-                                <p className="text-sm text-slate-500">Remove all photos and documents</p>
-                            </div>
-                            <Trash2 className="text-slate-400" size={18} />
+            {/* ═══════════════════════════════════════════════════════════════
+                SECTION 4: DATA CONTROL (Destructive actions, isolated)
+            ═══════════════════════════════════════════════════════════════ */}
+            <div className="pt-4 border-t border-slate-200">
+                <div className="bg-white rounded-xl border border-slate-200 p-5">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
+                            <Trash2 className="text-red-600" size={20} />
                         </div>
-                    </button>
-
-                    <button
-                        onClick={() => setShowDeleteConfirm('rental')}
-                        className="w-full px-4 py-3 border border-red-200 bg-red-50 rounded-xl text-left hover:bg-red-100 transition-colors"
-                    >
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <span className="font-medium text-red-900">Delete this rental</span>
-                                <p className="text-sm text-red-700">Permanently remove all data for "{data.rentalLabel}"</p>
-                            </div>
-                            <Trash2 className="text-red-600" size={18} />
+                        <div>
+                            <h2 className="font-semibold text-lg">Data control</h2>
+                            <p className="text-sm text-slate-500">Permanent actions — cannot be undone</p>
                         </div>
-                    </button>
+                    </div>
+
+                    <div className="space-y-3">
+                        <button
+                            onClick={() => setShowDeleteConfirm('files')}
+                            className="w-full px-4 py-3 border border-slate-200 rounded-xl text-left hover:bg-slate-50 transition-colors"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <span className="font-medium text-slate-900">Delete all files</span>
+                                    <p className="text-sm text-slate-500">Remove all photos and documents</p>
+                                </div>
+                                <Trash2 className="text-slate-400" size={18} />
+                            </div>
+                        </button>
+
+                        <button
+                            onClick={() => setShowDeleteConfirm('rental')}
+                            className="w-full px-4 py-3 border border-red-200 bg-red-50 rounded-xl text-left hover:bg-red-100 transition-colors"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <span className="font-medium text-red-900">Delete this rental</span>
+                                    <p className="text-sm text-red-700">Permanently remove all data for "{data.rentalLabel}"</p>
+                                </div>
+                                <Trash2 className="text-red-600" size={18} />
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
 
