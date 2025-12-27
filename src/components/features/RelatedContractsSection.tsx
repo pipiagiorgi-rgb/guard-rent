@@ -122,6 +122,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
     const [saving, setSaving] = useState(false)
     const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null)
     const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set())
+    const [isEditingDetails, setIsEditingDetails] = useState(false)
 
     // Early access = always unlocked (feature flag)
     const isEarlyAccess = DOCUMENT_VAULT_FREE
@@ -660,20 +661,41 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
 
                         {/* Error Banner - Prominent position */}
                         {uploadError && (
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3 mb-4">
-                                <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-red-800">Failed to save contract</p>
-                                    <p className="text-xs text-red-600 mt-0.5">
-                                        {uploadError}. Your file is still attached — please check your details and try again.
-                                    </p>
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                                <div className="flex items-start gap-3">
+                                    <AlertCircle size={20} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-amber-900">We saved your file, but couldn&apos;t finish organising it</p>
+                                        <p className="text-xs text-amber-700 mt-1">
+                                            {uploadError}
+                                        </p>
+                                        <div className="flex gap-3 mt-3">
+                                            <button
+                                                onClick={handleAddContract}
+                                                disabled={saving}
+                                                className="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-md hover:bg-amber-700 font-medium"
+                                            >
+                                                {saving ? 'Retrying...' : 'Retry'}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setNewContract({ ...newContract, file: null })
+                                                    setUploadError(null)
+                                                    setSuggestedCategory(null)
+                                                }}
+                                                className="px-3 py-1.5 text-xs border border-amber-300 text-amber-700 rounded-md hover:bg-amber-100"
+                                            >
+                                                Remove file
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setUploadError(null)}
+                                        className="text-amber-400 hover:text-amber-600"
+                                    >
+                                        <X size={16} />
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={() => setUploadError(null)}
-                                    className="text-red-400 hover:text-red-600"
-                                >
-                                    <X size={16} />
-                                </button>
                             </div>
                         )}
 
@@ -744,104 +766,173 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                             </div>
 
                             {/* Suggested Details Section */}
-                            {newContract.file && (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-                                    <p className="text-sm text-blue-700">
-                                        <span className="font-medium">We found these details</span> — review or edit if needed
+                            {newContract.file && !isEditingDetails && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <p className="text-sm font-medium text-blue-800">
+                                            Detected details
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsEditingDetails(true)}
+                                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                            Edit details
+                                        </button>
+                                    </div>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-slate-500">Category:</span>
+                                            <span className="font-medium text-slate-900">
+                                                {CONTRACT_TYPES.find(t => t.value === newContract.contractType)?.label || newContract.contractType}
+                                            </span>
+                                            {suggestedCategory && (
+                                                <span className="text-xs text-blue-500">(auto-detected)</span>
+                                            )}
+                                        </div>
+                                        {newContract.providerName && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-slate-500">Provider:</span>
+                                                <span className="font-medium text-slate-900">{newContract.providerName}</span>
+                                            </div>
+                                        )}
+                                        {newContract.startDate && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-slate-500">Starts:</span>
+                                                <span className="font-medium text-slate-900">
+                                                    {new Date(newContract.startDate).toLocaleDateString('en-GB')}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {newContract.endDate && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-slate-500">Ends:</span>
+                                                <span className="font-medium text-slate-900">
+                                                    {new Date(newContract.endDate).toLocaleDateString('en-GB')}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {newContract.noticePeriodDays && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-slate-500">Notice:</span>
+                                                <span className="font-medium text-slate-900">{newContract.noticePeriodDays} days</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-blue-600 mt-3">
+                                        These are optional — you can add or correct details anytime.
                                     </p>
                                 </div>
                             )}
 
-                            {/* Category */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Category
-                                    {suggestedCategory && (
-                                        <span className="text-xs text-blue-500 font-normal ml-2">(suggested)</span>
+                            {/* Editable form - shown when no file or when editing details */}
+                            {(!newContract.file || isEditingDetails) && (
+                                <>
+                                    {isEditingDetails && (
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-sm font-medium text-slate-700">Edit details</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsEditingDetails(false)}
+                                                className="text-xs text-slate-500 hover:text-slate-700"
+                                            >
+                                                Done editing
+                                            </button>
+                                        </div>
                                     )}
-                                </label>
-                                <select
-                                    value={newContract.contractType}
-                                    onChange={(e) => setNewContract({ ...newContract, contractType: e.target.value })}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                    {CONTRACT_TYPES.map(t => (
-                                        <option key={t.value} value={t.value}>{t.label}</option>
-                                    ))}
-                                </select>
-                            </div>
 
-                            {newContract.contractType === 'other' && (
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Custom type</label>
-                                    <input
-                                        type="text"
-                                        value={newContract.customType}
-                                        onChange={(e) => setNewContract({ ...newContract, customType: e.target.value })}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="e.g. Gym membership"
-                                    />
-                                </div>
+                                    {/* Category */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                            Category
+                                            {suggestedCategory && (
+                                                <span className="text-xs text-blue-500 font-normal ml-2">(suggested)</span>
+                                            )}
+                                        </label>
+                                        <select
+                                            value={newContract.contractType}
+                                            onChange={(e) => setNewContract({ ...newContract, contractType: e.target.value })}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        >
+                                            {CONTRACT_TYPES.map(t => (
+                                                <option key={t.value} value={t.value}>{t.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {newContract.contractType === 'other' && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Custom type</label>
+                                            <input
+                                                type="text"
+                                                value={newContract.customType}
+                                                onChange={(e) => setNewContract({ ...newContract, customType: e.target.value })}
+                                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                placeholder="e.g. Gym membership"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Label */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Label (optional)</label>
+                                        <input
+                                            type="text"
+                                            value={newContract.label}
+                                            onChange={(e) => setNewContract({ ...newContract, label: e.target.value })}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g. Home Internet"
+                                        />
+                                    </div>
+
+                                    {/* Provider */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Provider name (optional)</label>
+                                        <input
+                                            type="text"
+                                            value={newContract.providerName}
+                                            onChange={(e) => setNewContract({ ...newContract, providerName: e.target.value })}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g. Vodafone, EDF"
+                                        />
+                                    </div>
+
+                                    {/* Dates */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Start date</label>
+                                            <input
+                                                type="date"
+                                                value={newContract.startDate}
+                                                onChange={(e) => setNewContract({ ...newContract, startDate: e.target.value })}
+                                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">End date</label>
+                                            <input
+                                                type="date"
+                                                value={newContract.endDate}
+                                                onChange={(e) => setNewContract({ ...newContract, endDate: e.target.value })}
+                                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Notice period */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Notice period (days)</label>
+                                        <input
+                                            type="number"
+                                            value={newContract.noticePeriodDays}
+                                            onChange={(e) => setNewContract({ ...newContract, noticePeriodDays: e.target.value })}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g. 30"
+                                        />
+                                        <p className="text-xs text-slate-500 mt-1">Only enter if explicitly stated in your contract</p>
+                                    </div>
+                                </>
                             )}
-
-                            {/* Label */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Label (optional)</label>
-                                <input
-                                    type="text"
-                                    value={newContract.label}
-                                    onChange={(e) => setNewContract({ ...newContract, label: e.target.value })}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="e.g. Home Internet"
-                                />
-                            </div>
-
-                            {/* Provider */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Provider name (optional)</label>
-                                <input
-                                    type="text"
-                                    value={newContract.providerName}
-                                    onChange={(e) => setNewContract({ ...newContract, providerName: e.target.value })}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="e.g. Vodafone, EDF"
-                                />
-                            </div>
-
-                            {/* Dates */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Start date</label>
-                                    <input
-                                        type="date"
-                                        value={newContract.startDate}
-                                        onChange={(e) => setNewContract({ ...newContract, startDate: e.target.value })}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">End date</label>
-                                    <input
-                                        type="date"
-                                        value={newContract.endDate}
-                                        onChange={(e) => setNewContract({ ...newContract, endDate: e.target.value })}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Notice period */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Notice period (days)</label>
-                                <input
-                                    type="number"
-                                    value={newContract.noticePeriodDays}
-                                    onChange={(e) => setNewContract({ ...newContract, noticePeriodDays: e.target.value })}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="e.g. 30"
-                                />
-                                <p className="text-xs text-slate-500 mt-1">Only enter if explicitly stated in your contract</p>
-                            </div>
                         </div>
 
                         <div className="flex gap-3 mt-6">
