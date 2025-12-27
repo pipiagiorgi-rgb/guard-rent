@@ -70,12 +70,22 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
     const [applying, setApplying] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    // Translation state
+    // Translation state - persist language preference in localStorage
     const [translatedText, setTranslatedText] = useState<string>('')
     const [translating, setTranslating] = useState(false)
     const [showTranslationBanner, setShowTranslationBanner] = useState(true)
-    const [targetLanguage, setTargetLanguage] = useState('English')
-    const [customLanguage, setCustomLanguage] = useState('')
+    const [targetLanguage, setTargetLanguage] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('rentvault_translation_language') || 'English'
+        }
+        return 'English'
+    })
+    const [customLanguage, setCustomLanguage] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('rentvault_translation_custom') || ''
+        }
+        return ''
+    })
     const [showTranslation, setShowTranslation] = useState(false)
     const [translationError, setTranslationError] = useState<string | null>(null)
     const [copiedTranslation, setCopiedTranslation] = useState(false)
@@ -477,6 +487,15 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
 
             setTranslatedText(data.translatedText)
             setShowTranslation(true)
+
+            // Save language preference for future translations
+            if (customLanguage.trim()) {
+                localStorage.setItem('rentvault_translation_custom', customLanguage.trim())
+                localStorage.removeItem('rentvault_translation_language')
+            } else {
+                localStorage.setItem('rentvault_translation_language', targetLanguage)
+                localStorage.removeItem('rentvault_translation_custom')
+            }
 
             // Record usage if in preview mode
             if (!hasPurchasedPack) {
@@ -1013,7 +1032,12 @@ export default function ContractScanClient({ caseId, hasPurchasedPack = false }:
                                             {PRESET_LANGUAGES.slice(0, 6).map((lang) => (
                                                 <button
                                                     key={lang}
-                                                    onClick={() => { setTargetLanguage(lang); setCustomLanguage(''); }}
+                                                    onClick={() => {
+                                                        setTargetLanguage(lang);
+                                                        setCustomLanguage('');
+                                                        localStorage.setItem('rentvault_translation_language', lang);
+                                                        localStorage.removeItem('rentvault_translation_custom');
+                                                    }}
                                                     className={`text-xs px-3 py-1.5 rounded-full transition-colors ${targetLanguage === lang && !customLanguage
                                                         ? 'bg-blue-100 text-blue-700 border border-blue-300'
                                                         : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
