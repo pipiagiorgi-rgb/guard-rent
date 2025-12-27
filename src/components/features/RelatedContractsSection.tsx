@@ -86,6 +86,16 @@ function suggestCategory(fileName: string, text?: string): string {
     return 'other'
 }
 
+/**
+ * RelatedContractsSection - Document Vault Component
+ * 
+ * LEGAL SAFETY NOTES:
+ * - Document Vault files are reference-only
+ * - They are EXCLUDED from all evidence PDFs by design
+ * - No impact on Move-In / Move-Out sealing or court-ready reports
+ * - Users can view, download, or delete files at any time
+ * - These are NOT sealed evidence
+ */
 export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps) {
     const [contracts, setContracts] = useState<RelatedContract[]>([])
     const [purchased, setPurchased] = useState(false)
@@ -424,19 +434,19 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                         <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Upload size={24} className="text-blue-500" />
                         </div>
-                        <h3 className="font-medium text-slate-900 mb-2">Upload a service or household contract</h3>
+                        <h3 className="font-medium text-slate-900 mb-2">Upload a document — we'll help you keep it organised</h3>
                         <p className="text-sm text-slate-500 mb-1">
-                            Internet, electricity, cleaning, parking, insurance, etc.
+                            Internet, electricity, insurance, cleaning, parking, gym, employment, or any rental-related document.
                         </p>
                         <p className="text-xs text-slate-400 mb-4">
-                            Your documents remain accessible even if you move out. You stay in control.
+                            You can view, download, or delete files anytime. You stay in control.
                         </p>
                         <button
                             onClick={() => setShowAddModal(true)}
                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         >
                             <Upload size={16} className="inline mr-2" />
-                            Upload your first contract
+                            Upload your first document
                         </button>
                     </div>
                 ) : (
@@ -540,7 +550,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-slate-900">Add service contract</h3>
+                            <h3 className="text-lg font-semibold text-slate-900">Add a document</h3>
                             <button
                                 onClick={() => setShowAddModal(false)}
                                 className="p-1 text-slate-400 hover:text-slate-600"
@@ -569,16 +579,15 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                         )}
 
                         <div className="space-y-4">
-                            {/* File upload */}
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">
                                     Upload document (optional)
                                 </label>
                                 <div
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${newContract.file
+                                    onClick={() => !newContract.file && fileInputRef.current?.click()}
+                                    className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${newContract.file
                                         ? 'border-green-300 bg-green-50'
-                                        : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50'
+                                        : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
                                         }`}
                                 >
                                     <input
@@ -589,15 +598,47 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                         className="hidden"
                                     />
                                     {newContract.file ? (
-                                        <div className="flex items-center justify-center gap-2 text-green-700">
-                                            <Check size={20} />
-                                            <span className="text-sm truncate max-w-[200px]">{newContract.file.name}</span>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-center gap-2 text-green-700">
+                                                <Check size={20} />
+                                                <span className="text-sm font-medium truncate max-w-[200px]">{newContract.file.name}</span>
+                                            </div>
+                                            <div className="flex items-center justify-center gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        // Preview - create blob URL
+                                                        if (newContract.file) {
+                                                            const url = URL.createObjectURL(newContract.file)
+                                                            window.open(url, '_blank')
+                                                        }
+                                                    }}
+                                                    className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                                                >
+                                                    <Eye size={14} />
+                                                    View
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        setNewContract({ ...newContract, file: null })
+                                                        setSuggestedCategory(null)
+                                                    }}
+                                                    className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+                                                >
+                                                    <Trash2 size={14} />
+                                                    Remove file
+                                                </button>
+                                            </div>
+                                            <p className="text-xs text-slate-400">You can delete or replace this later.</p>
                                         </div>
                                     ) : (
                                         <div className="text-slate-500">
                                             <Upload size={24} className="mx-auto mb-2 text-slate-400" />
                                             <p className="text-sm">Click to upload PDF or image</p>
-                                            <p className="text-xs text-slate-400 mt-1">Max 10MB</p>
+                                            <p className="text-xs text-slate-400 mt-1">Max 10MB · You can delete or replace this later</p>
                                         </div>
                                     )}
                                 </div>
@@ -713,7 +754,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                         Saving...
                                     </>
                                 ) : (
-                                    'Add contract'
+                                    'Add document'
                                 )}
                             </button>
                         </div>
@@ -726,8 +767,8 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                 isOpen={!!deleteId}
                 onClose={() => setDeleteId(null)}
                 onConfirm={handleDelete}
-                title="Delete contract"
-                description="Are you sure you want to delete this contract? This is a reference document only (not evidence)."
+                title="Delete document"
+                description="Are you sure you want to delete this document? This is a reference document only (not sealed evidence)."
             />
         </div>
     )
