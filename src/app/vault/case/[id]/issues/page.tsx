@@ -666,7 +666,7 @@ export default function IssuesPage({ params }: { params: Promise<{ id: string }>
                                             <Play size={20} className="text-white" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium text-slate-900 truncate">{pendingVideo.name}</p>
+                                            <p className="text-sm font-medium text-slate-900 truncate">{decodeURIComponent(pendingVideo.name)}</p>
                                             <p className="text-xs text-slate-500">{(pendingVideo.size / 1024 / 1024).toFixed(1)} MB</p>
                                         </div>
                                         <button
