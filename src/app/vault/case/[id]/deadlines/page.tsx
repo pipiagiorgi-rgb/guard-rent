@@ -318,8 +318,8 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
             if (!res.ok) throw new Error('Failed to save')
             setTermination(prev => ({ ...prev, saved: true }))
-            setSuccessMessage('Reminder saved')
-            setTimeout(() => setSuccessMessage(null), 3000)
+            setSuccessMessage(`✔ Reminder saved — you'll be notified ${termination.offsets[0]} days before`)
+            setTimeout(() => setSuccessMessage(null), 4000)
         } catch (err) {
             setError('Could not save reminder. Please try again.')
         } finally {
@@ -346,8 +346,8 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
             if (!res.ok) throw new Error('Failed to save')
             setRent(prev => ({ ...prev, saved: true }))
-            setSuccessMessage('Reminder saved')
-            setTimeout(() => setSuccessMessage(null), 3000)
+            setSuccessMessage(`✔ Reminder saved — you'll be notified ${rent.offsets[0]} days before`)
+            setTimeout(() => setSuccessMessage(null), 4000)
         } catch (err) {
             setError('Could not save reminder. Please try again.')
         } finally {
@@ -386,8 +386,8 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
             }])
             setNewCustomReminder({ label: '', date: '', offsets: [7], saved: false })
             setShowAddCustom(false)
-            setSuccessMessage('Custom reminder added')
-            setTimeout(() => setSuccessMessage(null), 3000)
+            setSuccessMessage(`✔ Reminder saved — you'll be notified ${newCustomReminder.offsets[0]} days before`)
+            setTimeout(() => setSuccessMessage(null), 4000)
         } catch (err) {
             setError('Could not save reminder. Please try again.')
         } finally {
@@ -645,7 +645,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                                 {termination.saved ? (
                                     <div className="flex items-center gap-2 text-green-600 text-sm font-medium">
                                         <Check size={16} />
-                                        Reminder set relative to the notice deadline
+                                        Reminder saved — you'll be notified {termination.offsets[0]} days before
                                     </div>
                                 ) : (
                                     <div className="text-sm text-slate-400 italic">Unsaved changes</div>
@@ -743,7 +743,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                                 {rent.saved ? (
                                     <div className="flex items-center gap-2 text-green-600 text-sm font-medium">
                                         <Check size={16} />
-                                        Reminder active
+                                        Reminder saved — you'll be notified {rent.offsets[0]} days before
                                     </div>
                                 ) : (
                                     <div className="text-sm text-slate-400 italic">Unsaved changes</div>

@@ -235,10 +235,10 @@ export function generateReminderConfirmationHtml({
             <p style="margin: 0; font-size: 13px; color: #64748b;">You can change or disable this reminder anytime in RentVault.</p>
         `
     } else {
-        title = 'Reminder active'
+        title = 'Reminder confirmed'
         const dueDateText = dueDay ? `${dueDay}${getOrdinalSuffix(parseInt(dueDay))} of each month` : formattedDate
         bodyContent = `
-            <p style="margin: 0 0 16px 0;">Your rent payment reminder is now active.</p>
+            <p style="margin: 0 0 16px 0;">This confirms a reminder you chose to set in RentVault.</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; margin-bottom: 16px;">
                 <tr>
                     <td style="padding: 16px;">

@@ -344,11 +344,11 @@ export async function sendReminderConfirmationEmail({
         `
         text = `You're all set.\n\nWe'll remind you before the deadline to avoid auto-renewal.\n\nContract: ${rentalLabel}${leaseEndFormatted ? `\nLease ends: ${leaseEndFormatted}` : ''}\nSend notice by: ${formattedDate}\nYou'll be notified: ${offsetText}${noticeMethod && noticeMethod !== 'not found' ? `\nNotice method: ${noticeMethod}` : ''}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else if (type === 'rent_payment') {
-        subject = '[Reminder] Rent payment reminder scheduled'
-        title = 'Reminder active'
+        subject = '[RentVault] Rent reminder confirmed'
+        title = 'Reminder confirmed'
         const dueDateText = dueDay ? `${dueDay}${getOrdinalSuffix(parseInt(dueDay))} of each month` : formattedDate
         bodyContent = `
-            <p style="margin: 0 0 16px 0;">Your rent payment reminder is now active.</p>
+            <p style="margin: 0 0 16px 0;">This confirms a reminder you chose to set in RentVault.</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; margin-bottom: 16px;">
                 <tr>
                     <td style="padding: 16px;">
@@ -367,14 +367,14 @@ export async function sendReminderConfirmationEmail({
             </table>
             <p style="margin: 0; font-size: 13px; color: #64748b;">You can change or disable this reminder anytime in RentVault.</p>
         `
-        text = `Reminder active.\n\nYour rent payment reminder is now active.\n\nContract: ${rentalLabel}${rentAmount ? `\nMonthly rent: ${rentAmount}` : ''}\nRent due: ${dueDateText}\nYou'll be notified: ${offsetText}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
+        text = `Reminder confirmed.\n\nThis confirms a reminder you chose to set in RentVault.\n\nContract: ${rentalLabel}${rentAmount ? `\nMonthly rent: ${rentAmount}` : ''}\nRent due: ${dueDateText}\nYou'll be notified: ${offsetText}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     } else {
         // Custom reminder
         const reminderName = customLabel || 'Custom reminder'
-        subject = `[Reminder] ${reminderName} scheduled`
-        title = 'Reminder active'
+        subject = `[RentVault] ${reminderName} confirmed`
+        title = 'Reminder confirmed'
         bodyContent = `
-            <p style="margin: 0 0 16px 0;">Your custom reminder is now active.</p>
+            <p style="margin: 0 0 16px 0;">This confirms a reminder you chose to set in RentVault.</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; margin-bottom: 16px;">
                 <tr>
                     <td style="padding: 16px;">
@@ -391,7 +391,7 @@ export async function sendReminderConfirmationEmail({
             </table>
             <p style="margin: 0; font-size: 13px; color: #64748b;">You can change or disable this reminder anytime in RentVault.</p>
         `
-        text = `Reminder active.\n\nYour custom reminder is now active.\n\nReminder: ${reminderName}\nFor rental: ${rentalLabel}\nDate: ${formattedDate}\nYou'll be notified: ${offsetText}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
+        text = `Reminder confirmed.\n\nThis confirms a reminder you chose to set in RentVault.\n\nReminder: ${reminderName}\nFor rental: ${rentalLabel}\nDate: ${formattedDate}\nYou'll be notified: ${offsetText}\n\nYou can change or disable this reminder anytime in RentVault.\n\n---\nRentVault securely stores and organises your rental documents. Not legal advice.`
     }
 
     const html = emailTemplate({
