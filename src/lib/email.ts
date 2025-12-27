@@ -217,6 +217,121 @@ export async function sendEmail({ to, subject, text, html, tags }: SendEmailOpti
 }
 
 // ============================================================
+// PACK PURCHASE CONFIRMATION EMAIL
+// ============================================================
+interface PackPurchaseEmailProps {
+    to: string
+    packType: 'checkin' | 'moveout' | 'bundle'
+    rentalLabel: string
+    retentionUntil: string
+    caseId: string
+}
+
+export async function sendPackPurchaseEmail({
+    to,
+    packType,
+    rentalLabel,
+    retentionUntil,
+    caseId
+}: PackPurchaseEmailProps): Promise<{ success: boolean; error?: string }> {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
+    const exportsUrl = `${siteUrl}/vault/case/${caseId}/exports`
+    const dashboardUrl = `${siteUrl}/vault/case/${caseId}`
+
+    const formattedExpiry = new Date(retentionUntil).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    })
+
+    const packNames: Record<string, { name: string; unlocks: string[] }> = {
+        checkin: {
+            name: 'Check-In Pack',
+            unlocks: [
+                'Move-in evidence sealed and timestamped',
+                'PDF report generation',
+                'Unlimited contract questions and translations',
+                '12 months secure storage'
+            ]
+        },
+        moveout: {
+            name: 'Move-Out Pack',
+            unlocks: [
+                'Move-out evidence sealed and timestamped',
+                'Deposit recovery report generation',
+                'Unlimited contract questions and translations',
+                '12 months secure storage'
+            ]
+        },
+        bundle: {
+            name: 'Full Bundle',
+            unlocks: [
+                'Move-in and move-out evidence',
+                'All PDF reports',
+                'Unlimited contract questions and translations',
+                '12 months secure storage',
+                'Full access to all features'
+            ]
+        }
+    }
+
+    const pack = packNames[packType] || packNames.checkin
+    const subject = `Your ${pack.name} is now active`
+
+    const unlocksHtml = pack.unlocks.map(item => `<li style="margin-bottom: 8px;">${item}</li>`).join('')
+    const unlocksText = pack.unlocks.map(item => `• ${item}`).join('\n')
+
+    const text = `
+Your ${pack.name} is now active
+
+Thank you for your purchase. Your rental "${rentalLabel}" now has full access to:
+
+${unlocksText}
+
+Your data is securely stored until ${formattedExpiry}.
+
+Access your exports: ${exportsUrl}
+
+© RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.
+`.trim()
+
+    const html = emailTemplate({
+        title: `Your ${pack.name} is now active`,
+        previewText: `${pack.name} activated for "${rentalLabel}"`,
+        bodyContent: `
+            <p style="color: #1e293b; font-size: 15px; line-height: 24px; margin-bottom: 16px;">
+                Thank you for your purchase. Your rental <strong>"${rentalLabel}"</strong> now has full access to:
+            </p>
+
+            <ul style="color: #1e293b; font-size: 15px; line-height: 24px; margin-bottom: 24px; padding-left: 20px;">
+                ${unlocksHtml}
+            </ul>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <p style="color: #166534; font-size: 14px; line-height: 22px; margin: 0;">
+                    <strong>✓ Secure storage active until ${formattedExpiry}</strong><br>
+                    Your evidence and documents are protected.
+                </p>
+            </div>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 22px;">
+                You can now seal your evidence and generate reports from your rental dashboard.
+            </p>
+        `,
+        ctaText: 'Go to Your Rental',
+        ctaUrl: dashboardUrl
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'pack_purchase' }]
+    })
+}
+
+// ============================================================
 // PDF EMAIL
 // ============================================================
 export async function sendPdfEmail({

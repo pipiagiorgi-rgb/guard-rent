@@ -3,11 +3,12 @@ import { stripe } from '@/lib/stripe'
 import { headers } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
-import { sendRelatedContractsPurchaseEmail } from '@/lib/email'
+import { sendRelatedContractsPurchaseEmail, sendPackPurchaseEmail } from '@/lib/email'
 
 export async function POST(req: Request) {
     const body = await req.text()
-    const signature = headers().get('Stripe-Signature') as string
+    const headersList = await headers()
+    const signature = headersList.get('Stripe-Signature') as string
 
     let event: Stripe.Event
 
@@ -61,7 +62,10 @@ export async function POST(req: Request) {
                         storage_years_purchased: newYearsTotal,
                         storage_extended_at: new Date().toISOString(),
                         retention_until: newExpiry.toISOString(), // Keep in sync
-                        last_activity_at: new Date().toISOString()
+                        last_activity_at: new Date().toISOString(),
+                        // CRITICAL: Clear retention warning flags so new warnings are sent
+                        expiry_notified_at: null,
+                        final_expiry_notified_at: null
                     })
                     .eq('case_id', caseId)
 
@@ -169,7 +173,21 @@ export async function POST(req: Request) {
 
                 console.log(`Added related_contracts pack to case ${caseId}`)
             } else {
-                // Standard evidence pack handling
+                // Standard evidence pack handling (checkin, moveout, bundle)
+
+                // Idempotency check - prevent duplicate purchases on webhook retry
+                const { data: existingPack } = await supabaseAdmin
+                    .from('purchases')
+                    .select('purchase_id')
+                    .eq('case_id', caseId)
+                    .eq('pack_type', packType)
+                    .single()
+
+                if (existingPack) {
+                    console.log(`Pack ${packType} already purchased for case ${caseId} - skipping duplicate`)
+                    return NextResponse.json({ received: true })
+                }
+
                 // Calculate Retention: Now + 12 months
                 const purchaseDate = new Date()
                 const retentionDate = new Date(purchaseDate)
@@ -195,7 +213,14 @@ export async function POST(req: Request) {
                     // Continue anyway - case update is more critical
                 }
 
-                // 2. Update Case in DB
+                // 2. Get rental info for email
+                const { data: rentalCase } = await supabaseAdmin
+                    .from('cases')
+                    .select('label, address')
+                    .eq('case_id', caseId)
+                    .single()
+
+                // 3. Update Case in DB
                 const { error } = await supabaseAdmin
                     .from('cases')
                     .update({
@@ -212,6 +237,31 @@ export async function POST(req: Request) {
                 }
 
                 console.log(`Updated case ${caseId} with pack ${packType}, retention until ${retentionDate.toISOString()}`)
+
+                // 4. Send pack purchase confirmation email
+                try {
+                    const { data: userData } = await supabaseAdmin
+                        .from('profiles')
+                        .select('email')
+                        .eq('user_id', userId)
+                        .single()
+
+                    if (userData?.email && (packType === 'checkin' || packType === 'moveout' || packType === 'bundle')) {
+                        const rentalLabel = rentalCase?.label || rentalCase?.address || 'Your rental'
+
+                        await sendPackPurchaseEmail({
+                            to: userData.email,
+                            packType: packType as 'checkin' | 'moveout' | 'bundle',
+                            rentalLabel,
+                            retentionUntil: retentionDate.toISOString(),
+                            caseId
+                        })
+                        console.log(`Sent pack purchase confirmation email to ${userData.email}`)
+                    }
+                } catch (emailError) {
+                    console.error('Failed to send pack purchase email (non-critical):', emailError)
+                    // Don't fail the webhook for email errors
+                }
             }
         }
     }
