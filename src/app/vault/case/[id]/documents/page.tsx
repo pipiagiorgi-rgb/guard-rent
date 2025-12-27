@@ -14,14 +14,14 @@ function DocumentsContent({ caseId }: { caseId: string }) {
             <div>
                 <h1 className="text-2xl font-bold mb-1">Document Vault</h1>
                 <p className="text-slate-500">
-                    Private storage for rental-related documents. You can download or delete files anytime.
+                    Upload documents related to your rental life — we'll help keep them organised.
                 </p>
             </div>
 
             {/* Trust microcopy */}
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
                 <p className="text-sm text-slate-600">
-                    These documents are not sealed evidence. They are stored privately and remain under your control.
+                    These documents are not sealed evidence. They are stored privately and remain fully under your control.
                 </p>
             </div>
 
