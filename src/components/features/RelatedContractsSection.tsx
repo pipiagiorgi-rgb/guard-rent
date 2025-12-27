@@ -22,7 +22,8 @@ import {
     Sparkles,
     X,
     Check,
-    AlertCircle
+    AlertCircle,
+    ChevronDown
 } from 'lucide-react'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 import { DocumentAIPanel } from '@/components/features/DocumentAIPanel'
