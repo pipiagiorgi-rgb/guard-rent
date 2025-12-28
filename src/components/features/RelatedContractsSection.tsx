@@ -24,7 +24,8 @@ import {
     Check,
     AlertCircle,
     ChevronDown,
-    ChevronUp
+    ChevronUp,
+    Lock
 } from 'lucide-react'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 import { DocumentAIPanel } from '@/components/features/DocumentAIPanel'
@@ -169,6 +170,26 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ caseId })
+            })
+            const data = await res.json()
+            if (data.url) {
+                window.location.href = data.url
+            }
+        } catch (err) {
+            console.error('Failed to start checkout:', err)
+        } finally {
+            setPurchasing(false)
+        }
+    }
+
+    // Purchase any pack type (checkin, moveout, bundle)
+    const handlePackPurchase = async (packType: string, amount: number) => {
+        setPurchasing(true)
+        try {
+            const res = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ caseId, packType, amount })
             })
             const data = await res.json()
             if (data.url) {
@@ -530,31 +551,55 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
             {/* Content */}
             <div className="p-4 sm:p-6">
                 {!hasAccess ? (
-                    // Upsell state (only shown if early access is disabled)
+                    // Locked state - show all 3 pack options
                     <div className="text-center py-8">
-                        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FileText size={24} className="text-slate-400" />
+                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Lock size={28} className="text-slate-400" />
                         </div>
-                        <h3 className="font-medium text-slate-900 mb-2">Track your utility contracts</h3>
-                        <p className="text-sm text-slate-500 mb-4 max-w-md mx-auto">
-                            Store internet, electricity, and other service contracts.
-                            Get reminders for notice periods before they auto-renew.
+                        <h3 className="font-semibold text-lg text-slate-900 mb-2">Document Vault requires a pack</h3>
+                        <p className="text-sm text-slate-600 mb-6 max-w-md mx-auto">
+                            Buy any pack to store and analyse your rental documents.
                         </p>
-                        <button
-                            onClick={handlePurchase}
-                            disabled={purchasing}
-                            className="px-6 py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50"
-                        >
-                            {purchasing ? (
-                                <span className="flex items-center gap-2">
-                                    <Loader2 size={16} className="animate-spin" />
-                                    Processing...
-                                </span>
-                            ) : (
-                                'Unlock for €9'
-                            )}
-                        </button>
-                        <p className="text-xs text-slate-400 mt-2">One-time payment</p>
+
+                        {/* Features list */}
+                        <div className="text-sm text-slate-500 space-y-1 mb-6">
+                            <p>✓ Upload contracts, insurance, utility docs</p>
+                            <p>✓ AI extraction of key details</p>
+                            <p>✓ Auto-detect deadlines and reminders</p>
+                            <p>✓ Download anytime</p>
+                        </div>
+
+                        {/* Pack buttons */}
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                            <button
+                                onClick={() => handlePackPurchase('checkin', 1900)}
+                                disabled={purchasing}
+                                className="px-4 py-2.5 border-2 border-slate-200 text-slate-700 rounded-lg hover:border-slate-300 hover:bg-slate-50 transition-colors disabled:opacity-50 font-medium"
+                            >
+                                Check-In Pack €19
+                            </button>
+                            <button
+                                onClick={() => handlePackPurchase('bundle', 3900)}
+                                disabled={purchasing}
+                                className="px-4 py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 font-medium"
+                            >
+                                Full Pack €39
+                            </button>
+                            <button
+                                onClick={() => handlePackPurchase('moveout', 2900)}
+                                disabled={purchasing}
+                                className="px-4 py-2.5 border-2 border-slate-200 text-slate-700 rounded-lg hover:border-slate-300 hover:bg-slate-50 transition-colors disabled:opacity-50 font-medium"
+                            >
+                                Move-Out Pack €29
+                            </button>
+                        </div>
+
+                        {purchasing && (
+                            <p className="text-sm text-slate-400 mt-4 flex items-center justify-center gap-2">
+                                <Loader2 size={14} className="animate-spin" />
+                                Redirecting to checkout...
+                            </p>
+                        )}
                     </div>
                 ) : contracts.length === 0 ? (
                     // Empty state with drag-drop

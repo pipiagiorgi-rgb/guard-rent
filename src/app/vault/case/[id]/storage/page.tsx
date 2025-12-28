@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 
 interface StorageInfo {
     yearsTotal: number
+    hasExplicitPurchase: boolean  // True if user explicitly bought storage extension
     expiresAt: Date | null
     daysRemaining: number
     status: 'active' | 'warning' | 'critical' | 'expired'
@@ -67,7 +68,8 @@ export default function StoragePage() {
         else if (daysRemaining <= 60) status = 'warning'
 
         setStorageInfo({
-            yearsTotal: data.storage_years_purchased || 1,
+            yearsTotal: data.storage_years_purchased || 0,
+            hasExplicitPurchase: (data.storage_years_purchased || 0) > 0,
             expiresAt,
             daysRemaining,
             status
@@ -199,12 +201,14 @@ export default function StoragePage() {
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
-                                <span className="flex items-center gap-1">
-                                    <Calendar size={14} />
-                                    {storageInfo?.yearsTotal} year{storageInfo?.yearsTotal !== 1 ? 's' : ''} purchased
-                                </span>
-                            </div>
+                            {storageInfo?.hasExplicitPurchase && (
+                                <div className="flex items-center gap-4 text-sm text-slate-500">
+                                    <span className="flex items-center gap-1">
+                                        <Calendar size={14} />
+                                        {storageInfo.yearsTotal} year{storageInfo.yearsTotal !== 1 ? 's' : ''} extended
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
 

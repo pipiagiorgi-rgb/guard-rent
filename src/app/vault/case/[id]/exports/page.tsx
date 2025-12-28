@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { Footer } from '@/components/layout/Footer'
 import { isAdminEmail } from '@/lib/admin'
@@ -128,6 +129,11 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     // Admin state
     const [isAdmin, setIsAdmin] = useState(false)
 
+    // Purchase success state
+    const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null)
+    const router = useRouter()
+    const searchParams = useSearchParams()
+
     useEffect(() => {
         async function load() {
             const { id } = await params
@@ -137,6 +143,29 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         }
         load()
     }, [params])
+
+    // Detect purchase success redirect from Stripe
+    useEffect(() => {
+        if (!caseId) return
+        const purchaseParam = searchParams.get('purchase')
+        const packParam = searchParams.get('pack')
+
+        if (purchaseParam === 'success' && packParam) {
+            // Show success banner
+            setPurchaseSuccess(packParam)
+
+            // Re-fetch entitlement state to reflect the new purchase
+            loadEvidence(caseId)
+
+            // Clear URL params without page reload
+            const newUrl = window.location.pathname
+            router.replace(newUrl, { scroll: false })
+
+            // Auto-hide success banner after 8 seconds
+            const timer = setTimeout(() => setPurchaseSuccess(null), 8000)
+            return () => clearTimeout(timer)
+        }
+    }, [caseId, searchParams, router])
 
     // Autosave effect
     useEffect(() => {
@@ -872,6 +901,31 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 currentPack={evidence.purchasedPacks.length > 0 ? evidence.purchasedPacks[0] : null}
                 isAdmin={isAdmin}
             />
+
+            {/* Purchase Success Banner */}
+            {purchaseSuccess && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <CheckCircle2 className="text-green-600" size={20} />
+                    </div>
+                    <div className="flex-1">
+                        <p className="font-medium text-green-900">
+                            {purchaseSuccess === 'checkin' && 'Check-In Pack activated!'}
+                            {purchaseSuccess === 'moveout' && 'Move-Out Pack activated!'}
+                            {purchaseSuccess === 'bundle' && 'Full Pack activated!'}
+                        </p>
+                        <p className="text-sm text-green-700">
+                            Your download is now unlocked. Click "Download" below to get your watermark-free PDF.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setPurchaseSuccess(null)}
+                        className="text-green-600 hover:text-green-800 p-1"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+            )}
 
             {/* Lock Required Message */}
             {lockMessage && (
@@ -1648,13 +1702,20 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                 </div>
                             ) : (
                                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                                    <div className="flex items-center gap-2 text-amber-700">
-                                        <Lock size={18} />
-                                        <span className="font-medium">
-                                            {!evidence.handoverCompleted
-                                                ? 'Complete handover to unlock'
-                                                : 'Add check-in and handover photos to unlock'}
-                                        </span>
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2 text-amber-700">
+                                            <Lock size={18} />
+                                            <span className="font-medium">
+                                                {!evidence.checkinLocked
+                                                    ? 'Complete move-in first'
+                                                    : !evidence.handoverCompleted
+                                                        ? 'Complete move-out to unlock'
+                                                        : 'Add check-in and move-out photos'}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-amber-600 ml-6">
+                                            This pack compares before & after — requires both phases.
+                                        </p>
                                     </div>
                                 </div>
                             )}

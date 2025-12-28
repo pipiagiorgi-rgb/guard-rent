@@ -39,18 +39,20 @@ export async function GET(request: Request) {
     const hasEarlyAccess = DOCUMENT_VAULT_FREE
 
     if (!isAdmin && !hasEarlyAccess) {
-        const { data: purchase, error: purchaseError } = await supabase
+        // Check if user has purchased ANY pack (checkin, moveout, bundle)
+        const { data: purchases } = await supabase
             .from('purchases')
             .select('pack_type')
             .eq('case_id', caseId)
-            .eq('pack_type', 'related_contracts')
-            .single()
+            .in('pack_type', ['checkin', 'moveout', 'bundle', 'related_contracts'])
 
-        if (!purchase) {
+        const hasPack = purchases && purchases.length > 0
+
+        if (!hasPack) {
             return NextResponse.json({
                 contracts: [],
                 purchased: false,
-                message: 'Related contracts tracking not purchased for this rental'
+                message: 'Purchase a pack to unlock Document Vault'
             })
         }
     }
@@ -122,15 +124,17 @@ export async function POST(request: Request) {
     const hasEarlyAccess = DOCUMENT_VAULT_FREE
 
     if (!isAdmin && !hasEarlyAccess) {
-        const { data: purchase } = await supabase
+        // Check if user has purchased ANY pack (checkin, moveout, bundle)
+        const { data: purchases } = await supabase
             .from('purchases')
             .select('pack_type')
             .eq('case_id', caseId)
-            .eq('pack_type', 'related_contracts')
-            .single()
+            .in('pack_type', ['checkin', 'moveout', 'bundle', 'related_contracts'])
 
-        if (!purchase) {
-            return NextResponse.json({ error: 'Related contracts not purchased' }, { status: 403 })
+        const hasPack = purchases && purchases.length > 0
+
+        if (!hasPack) {
+            return NextResponse.json({ error: 'Purchase a pack to use Document Vault' }, { status: 403 })
         }
     }
 

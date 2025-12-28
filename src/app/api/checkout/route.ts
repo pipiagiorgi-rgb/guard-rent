@@ -34,9 +34,9 @@ export async function POST(request: Request) {
         let cancelUrl: string
 
         if (caseId) {
-            // User is buying for an existing case - redirect through payment-success for Google Ads tracking
-            successUrl = `${origin}/payment-success?case=${caseId}&pack=${encodeURIComponent(pack.name)}`
-            cancelUrl = `${origin}/vault/case/${caseId}?canceled=true`
+            // User is buying for an existing case - redirect to exports page for immediate access
+            successUrl = `${origin}/vault/case/${caseId}/exports?purchase=success&pack=${encodeURIComponent(pack.type)}`
+            cancelUrl = `${origin}/vault/case/${caseId}/exports?canceled=true`
         } else {
             // User is buying from pricing page (no account yet)
             successUrl = `${origin}/payment-success?pack=${encodeURIComponent(pack.name)}`
