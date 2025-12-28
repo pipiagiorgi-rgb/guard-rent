@@ -49,6 +49,7 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
     const [isLocked, setIsLocked] = useState(false)
     const [locking, setLocking] = useState(false)
     const [showLockModal, setShowLockModal] = useState(false)
+    const [purchasing, setPurchasing] = useState(false)
 
     // Meter readings state
     const [meterReadings, setMeterReadings] = useState<MeterReadings>({})
@@ -465,6 +466,31 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
         } finally {
             setLocking(false)
             setShowLockModal(false)
+        }
+    }
+
+    // Redirect to Stripe checkout to purchase pack before sealing
+    const handlePurchaseForLock = async () => {
+        setPurchasing(true)
+        try {
+            const res = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    caseId,
+                    packType: 'checkin',
+                    amount: 1900
+                })
+            })
+            const data = await res.json()
+            if (data.url) {
+                window.location.href = data.url
+            }
+        } catch (err) {
+            console.error('Purchase error:', err)
+            setError('Failed to start checkout')
+        } finally {
+            setPurchasing(false)
         }
     }
 
@@ -1263,6 +1289,36 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
                             </a>
                         </div>
                     </div>
+                </div>
+            ) : !hasPack ? (
+                // No pack - show purchase button instead of lock
+                <div className="pt-4">
+                    <button
+                        onClick={handlePurchaseForLock}
+                        disabled={!isComplete || purchasing}
+                        className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${isComplete
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            }`}
+                    >
+                        {purchasing ? (
+                            <Loader2 className="animate-spin" size={24} />
+                        ) : (
+                            <>
+                                <Lock size={20} />
+                                Buy Pack & Complete Move In
+                            </>
+                        )}
+                    </button>
+                    {!isComplete ? (
+                        <p className="text-sm text-slate-500 text-center mt-2">
+                            Add at least one photo to complete check-in
+                        </p>
+                    ) : (
+                        <p className="text-xs text-slate-500 text-center mt-2">
+                            Check-In Pack €19 · Seals evidence with immutable timestamps
+                        </p>
+                    )}
                 </div>
             ) : (
                 <div className="pt-4">
