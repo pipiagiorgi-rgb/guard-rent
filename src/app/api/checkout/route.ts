@@ -17,8 +17,8 @@ export async function POST(request: Request) {
         // Price mapping (pack_type format for database)
         const packPricing: Record<string, { price: number, type: string, name: string, description: string }> = {
             'checkin': { price: 1900, type: 'checkin', name: 'Check-In Pack', description: 'Check-in documentation · Includes 1 year secure storage' },
-            'moveout': { price: 2900, type: 'moveout', name: 'Move-Out Pack', description: 'Move-out & deposit recovery · Includes 1 year secure storage' },
-            'bundle': { price: 3900, type: 'bundle', name: 'Full Bundle', description: 'Complete rental protection · Includes 1 year secure storage' }
+            'moveout': { price: 2900, type: 'moveout', name: 'Handover Pack', description: 'Handover & deposit recovery · Includes 1 year secure storage' },
+            'bundle': { price: 3900, type: 'bundle', name: 'Full Pack', description: 'Complete rental protection · Includes 1 year secure storage' }
         }
 
         const pack = packPricing[packType]
@@ -34,12 +34,12 @@ export async function POST(request: Request) {
         let cancelUrl: string
 
         if (caseId) {
-            // User is buying for an existing case
-            successUrl = `${origin}/vault/case/${caseId}?success=true`
+            // User is buying for an existing case - redirect through payment-success for Google Ads tracking
+            successUrl = `${origin}/payment-success?case=${caseId}&pack=${encodeURIComponent(pack.name)}`
             cancelUrl = `${origin}/vault/case/${caseId}?canceled=true`
         } else {
             // User is buying from pricing page (no account yet)
-            successUrl = `${origin}/login?purchased=${packType}`
+            successUrl = `${origin}/payment-success?pack=${encodeURIComponent(pack.name)}`
             cancelUrl = `${origin}/pricing`
         }
 

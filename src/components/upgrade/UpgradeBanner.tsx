@@ -147,7 +147,7 @@ export function UpgradeBanner({ caseId, currentPack, isAdmin = false }: UpgradeB
                             disabled={loading === 'bundle'}
                             className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
-                            {loading === 'bundle' ? 'Loading...' : 'Full Bundle €39'}
+                            {loading === 'bundle' ? 'Loading...' : 'Full Pack €39'}
                         </button>
                         <button
                             onClick={() => handlePurchase('moveout')}
