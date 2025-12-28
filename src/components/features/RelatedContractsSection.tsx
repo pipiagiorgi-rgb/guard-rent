@@ -23,7 +23,8 @@ import {
     X,
     Check,
     AlertCircle,
-    ChevronDown
+    ChevronDown,
+    ChevronUp
 } from 'lucide-react'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 import { DocumentAIPanel } from '@/components/features/DocumentAIPanel'
@@ -124,6 +125,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
     const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null)
     const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set())
     const [isEditingDetails, setIsEditingDetails] = useState(false)
+    const [expandedDetails, setExpandedDetails] = useState<Set<string>>(new Set())
 
     // Early access = always unlocked (feature flag)
     const isEarlyAccess = DOCUMENT_VAULT_FREE
@@ -722,6 +724,81 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                                                     </button>
                                                                 </div>
                                                             </div>
+
+                                                            {/* Show all details - like Contract page */}
+                                                            {(contract.start_date || contract.end_date || contract.notice_period_days || contract.provider_name) && (
+                                                                <div className="border-t border-slate-100">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const next = new Set(expandedDetails)
+                                                                            if (next.has(contract.contract_id)) {
+                                                                                next.delete(contract.contract_id)
+                                                                            } else {
+                                                                                next.add(contract.contract_id)
+                                                                            }
+                                                                            setExpandedDetails(next)
+                                                                        }}
+                                                                        className="w-full px-4 py-3 flex items-center justify-between text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                                                                    >
+                                                                        <span className="font-medium">Show all document details</span>
+                                                                        {expandedDetails.has(contract.contract_id) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                                                    </button>
+
+                                                                    {expandedDetails.has(contract.contract_id) && (
+                                                                        <div className="px-4 pb-4 bg-slate-50 grid grid-cols-2 gap-4">
+                                                                            {contract.start_date && (
+                                                                                <div>
+                                                                                    <p className="text-xs text-slate-400 mb-1">Start date</p>
+                                                                                    <p className="text-sm font-medium text-slate-800">
+                                                                                        {new Date(contract.start_date).toLocaleDateString('en-GB')}
+                                                                                    </p>
+                                                                                </div>
+                                                                            )}
+                                                                            {contract.end_date && (
+                                                                                <div>
+                                                                                    <p className="text-xs text-slate-400 mb-1">End date</p>
+                                                                                    <p className="text-sm font-medium text-slate-800">
+                                                                                        {new Date(contract.end_date).toLocaleDateString('en-GB')}
+                                                                                    </p>
+                                                                                </div>
+                                                                            )}
+                                                                            {contract.notice_period_days && (
+                                                                                <div>
+                                                                                    <p className="text-xs text-slate-400 mb-1">Notice period</p>
+                                                                                    <p className="text-sm font-medium text-slate-800">
+                                                                                        {contract.notice_period_days} days
+                                                                                    </p>
+                                                                                </div>
+                                                                            )}
+                                                                            {contract.provider_name && (
+                                                                                <div>
+                                                                                    <p className="text-xs text-slate-400 mb-1">Provider</p>
+                                                                                    <p className="text-sm font-medium text-slate-800">
+                                                                                        {contract.provider_name}
+                                                                                    </p>
+                                                                                </div>
+                                                                            )}
+                                                                            {contract.renewal_date && (
+                                                                                <div>
+                                                                                    <p className="text-xs text-slate-400 mb-1">Renewal date</p>
+                                                                                    <p className="text-sm font-medium text-slate-800">
+                                                                                        {new Date(contract.renewal_date).toLocaleDateString('en-GB')}
+                                                                                    </p>
+                                                                                </div>
+                                                                            )}
+                                                                            {contract.min_term_end && (
+                                                                                <div>
+                                                                                    <p className="text-xs text-slate-400 mb-1">Minimum term ends</p>
+                                                                                    <p className="text-sm font-medium text-slate-800">
+                                                                                        {new Date(contract.min_term_end).toLocaleDateString('en-GB')}
+                                                                                    </p>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+
                                                             {/* Contextual AI Panel */}
                                                             <DocumentAIPanel
                                                                 contractId={contract.contract_id}
