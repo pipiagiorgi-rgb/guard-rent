@@ -170,8 +170,8 @@ export default function Home() {
                                 <div className="flex flex-col items-center">
                                     <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                         <img
-                                            src="/screenshots/rentvault-related-documents-internet-contract.png"
-                                            alt="RentVault related documents showing internet contract with renewal date detection and reminder option"
+                                            src="/screenshots/rentvault-app-mobile-related-documents.png"
+                                            alt="RentVault mobile app interface showing related documents organizer for internet contracts"
                                             className="w-full h-auto"
                                             loading="lazy"
                                         />
@@ -181,8 +181,8 @@ export default function Home() {
                                 <div className="flex flex-col items-center">
                                     <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                         <img
-                                            src="/screenshots/rentvault-contract-termination-notice-reminder.jpg"
-                                            alt="RentVault contract termination reminder showing lease end date, notice period, and deadline notification settings"
+                                            src="/screenshots/rentvault-app-mobile-contract-reminders.png"
+                                            alt="RentVault mobile app interface showing contract termination notice reminders"
                                             className="w-full h-auto"
                                             loading="lazy"
                                         />
@@ -559,7 +559,7 @@ export default function Home() {
                                 },
                                 {
                                     question: "What happens to my data?",
-                                    answer: "Your data is stored securely and encrypted. You control it completely — you can download or delete your records at any time. We don't share your data with landlords, agencies, or third parties. Evidence is retained for 12 months by default, with options to extend."
+                                    answer: "Your data is stored securely and encrypted. You control it completely. You can download or delete your records at any time. We don't share your data with landlords, agencies, or third parties. Evidence is retained for 12 months by default, with options to extend."
                                 },
                                 {
                                     question: "Can I use this for my current tenancy?",
@@ -567,11 +567,11 @@ export default function Home() {
                                 },
                                 {
                                     question: "How is this different from photos on my phone?",
-                                    answer: "Phone photos can be edited, backdated, or dismissed in disputes. RentVault creates system-generated timestamps that cannot be altered. Once you seal your evidence, it becomes tamper-proof — the record shows exactly when photos were taken and uploaded."
+                                    answer: "Phone photos can be edited, backdated, or dismissed in disputes. RentVault creates system-generated timestamps that cannot be altered. Once you seal your evidence, it becomes tamper-proof. The record shows exactly when photos were taken and uploaded."
                                 },
                                 {
                                     question: "Do I need to pay upfront?",
-                                    answer: "No. You can document everything for free — upload photos, scan contracts, set reminders. You only pay when you need to export official PDF reports or extend storage beyond 12 months. There are no subscriptions."
+                                    answer: "No. You can document everything for free. Upload photos, scan contracts, set reminders. You only pay when you need to export official PDF reports or extend storage beyond 12 months. There are no subscriptions."
                                 },
                                 {
                                     question: "Does my landlord see my documents?",
