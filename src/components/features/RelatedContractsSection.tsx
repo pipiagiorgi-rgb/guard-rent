@@ -740,7 +740,7 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                                                         }}
                                                                         className="w-full px-4 py-3 flex items-center justify-between text-sm text-slate-600 hover:bg-slate-50 transition-colors"
                                                                     >
-                                                                        <span className="font-medium">Show all document details</span>
+                                                                        <span className="font-medium">Details</span>
                                                                         {expandedDetails.has(contract.contract_id) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                                                     </button>
 
