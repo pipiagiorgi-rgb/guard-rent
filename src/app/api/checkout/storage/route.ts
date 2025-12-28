@@ -62,7 +62,7 @@ export async function POST(request: Request) {
                 }
             ],
             mode: 'payment',
-            success_url: `${siteUrl}/vault/case/${caseId}/storage?success=true`,
+            success_url: `${siteUrl}/payment-success?case=${caseId}&pack=Storage%20Extension`,
             cancel_url: `${siteUrl}/vault/case/${caseId}/storage?cancelled=true`,
             customer_email: user.email,
             metadata: {

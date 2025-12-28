@@ -46,7 +46,7 @@ export async function POST(request: Request) {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/vault/case/${caseId}/settings?extended=true`,
+            success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/payment-success?case=${caseId}&pack=Storage%20Extension`,
             cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/vault/case/${caseId}/settings`,
             customer_email: user.email,
             metadata: {

@@ -64,7 +64,7 @@ export async function POST(request: Request) {
                 }
             ],
             mode: 'payment',
-            success_url: `${siteUrl}/vault/case/${caseId}?related_contracts=success`,
+            success_url: `${siteUrl}/payment-success?case=${caseId}&pack=Related%20Documents`,
             cancel_url: `${siteUrl}/vault/case/${caseId}?related_contracts=cancelled`,
             customer_email: user.email,
             metadata: {
