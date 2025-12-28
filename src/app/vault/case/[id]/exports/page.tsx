@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { Footer } from '@/components/layout/Footer'
 import { isAdminEmail } from '@/lib/admin'
+import { CheckInUpsellModal } from '@/components/ui/CheckInUpsellModal'
 
 interface Issue {
     issue_id: string
@@ -133,6 +134,17 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null)
     const router = useRouter()
     const searchParams = useSearchParams()
+
+    // Upsell modal state
+    const [showUpsellModal, setShowUpsellModal] = useState(false)
+
+    // Handler for upsell modal selection
+    const handleUpsellSelection = async (packType: 'checkin' | 'bundle', amount: number) => {
+        // Map pack type to the correct pack name for checkout
+        const checkoutPackType = packType === 'checkin' ? 'checkin_pack' : 'bundle'
+        setShowUpsellModal(false)
+        await handlePurchase(checkoutPackType, amount)
+    }
 
     useEffect(() => {
         async function load() {
@@ -747,6 +759,14 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 isOpen={lightboxOpen}
                 onClose={() => setLightboxOpen(false)}
                 images={lightboxImages}
+            />
+
+            {/* Check-In Upsell Modal */}
+            <CheckInUpsellModal
+                isOpen={showUpsellModal}
+                onClose={() => setShowUpsellModal(false)}
+                onSelectPack={handleUpsellSelection}
+                purchasing={purchasing !== null}
             />
 
             {/* PDF Preview Modal */}
@@ -1412,11 +1432,11 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                             )}
                                         </button>
                                         <button
-                                            onClick={() => handlePurchase('checkin_pack', 1900)}
-                                            disabled={purchasing === 'checkin_pack'}
+                                            onClick={() => setShowUpsellModal(true)}
+                                            disabled={purchasing !== null}
                                             className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 flex items-center justify-center gap-2"
                                         >
-                                            {purchasing === 'checkin_pack' ? (
+                                            {purchasing !== null ? (
                                                 <Loader2 className="animate-spin" size={20} />
                                             ) : (
                                                 <>
