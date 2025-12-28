@@ -10,7 +10,8 @@ import {
     Copy,
     Check,
     Send,
-    Globe
+    Globe,
+    FileText
 } from 'lucide-react'
 
 interface DocumentAIPanelProps {
@@ -134,8 +135,18 @@ export function DocumentAIPanel({ contractId, contractType, providerName, label 
                             Ask about this document
                         </h4>
 
-                        {/* Suggestion chips */}
+                        {/* Quick actions row */}
                         <div className="flex flex-wrap gap-2 mb-3">
+                            {/* Summarise button */}
+                            <button
+                                onClick={() => handleAction('summarize')}
+                                disabled={loading}
+                                className="px-3 py-1.5 text-xs bg-slate-800 text-white rounded-full font-medium hover:bg-slate-700 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                            >
+                                <FileText size={12} />
+                                Summarise
+                            </button>
+                            {/* Suggestion chips */}
                             {suggestions.slice(0, 3).map((suggestion, i) => (
                                 <button
                                     key={i}

@@ -1175,7 +1175,8 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                 onClose={() => setDeleteId(null)}
                 onConfirm={handleDelete}
                 title="Delete document"
-                description="Are you sure you want to delete this document? This is a reference document only (not sealed evidence)."
+                description="This document is for reference only and is not sealed evidence. Deleting it will not affect your official records or PDFs."
+                context="reference"
             />
         </div>
     )

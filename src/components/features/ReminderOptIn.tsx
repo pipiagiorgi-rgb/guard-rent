@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Bell, Calendar, Loader2, Check, X, AlertCircle } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Bell, Calendar, Loader2, Check, X, AlertCircle, Undo2 } from 'lucide-react'
 
 interface ReminderOptInProps {
     contractId: string
@@ -34,12 +34,58 @@ export function ReminderOptIn({
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
     const [dismissed, setDismissed] = useState(false)
+    const [pendingDismiss, setPendingDismiss] = useState(false)
+    const dismissTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+    // Handle pending dismiss with 5-second undo window
+    useEffect(() => {
+        if (pendingDismiss) {
+            dismissTimerRef.current = setTimeout(() => {
+                setDismissed(true)
+                setPendingDismiss(false)
+            }, 5000)
+        }
+        return () => {
+            if (dismissTimerRef.current) {
+                clearTimeout(dismissTimerRef.current)
+            }
+        }
+    }, [pendingDismiss])
+
+    const handleDismiss = () => {
+        setPendingDismiss(true)
+    }
+
+    const handleUndo = () => {
+        if (dismissTimerRef.current) {
+            clearTimeout(dismissTimerRef.current)
+        }
+        setPendingDismiss(false)
+    }
 
     // If already has dates, show them
     const hasExistingDates = renewalDate || noticePeriodDays
 
     // Don't show if dismissed or already successful
     if (dismissed || success) return null
+
+    // Show undo toast when pending dismiss
+    if (pendingDismiss) {
+        return (
+            <div className="border-t border-slate-100 p-4 bg-slate-50">
+                <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Reminder dismissed</span>
+                    <button
+                        onClick={handleUndo}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                        <Undo2 size={12} />
+                        Undo
+                    </button>
+                </div>
+            </div>
+        )
+    }
 
     const handleExtract = async () => {
         setExtracting(true)
@@ -147,7 +193,7 @@ export function ReminderOptIn({
                                 Add reminder
                             </button>
                             <button
-                                onClick={() => setDismissed(true)}
+                                onClick={handleDismiss}
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg"
                             >
                                 <X size={12} />
@@ -179,10 +225,10 @@ export function ReminderOptIn({
                             Possible renewal date found
                             {extracted.confidence && (
                                 <span className={`text-xs ml-2 px-1.5 py-0.5 rounded ${extracted.confidence === 'high'
-                                        ? 'bg-emerald-100 text-emerald-700'
-                                        : extracted.confidence === 'medium'
-                                            ? 'bg-yellow-100 text-yellow-700'
-                                            : 'bg-slate-100 text-slate-600'
+                                    ? 'bg-emerald-100 text-emerald-700'
+                                    : extracted.confidence === 'medium'
+                                        ? 'bg-yellow-100 text-yellow-700'
+                                        : 'bg-slate-100 text-slate-600'
                                     }`}>
                                     {extracted.confidence} confidence
                                 </span>
@@ -207,7 +253,7 @@ export function ReminderOptIn({
                                 Add reminder
                             </button>
                             <button
-                                onClick={() => setDismissed(true)}
+                                onClick={handleDismiss}
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg"
                             >
                                 <X size={12} />

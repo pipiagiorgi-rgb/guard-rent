@@ -18,7 +18,7 @@ interface DeleteConfirmationModalProps {
     description?: string
     itemType?: 'photo' | 'video' | 'file' | 'room' | 'issue'
     itemName?: string
-    context?: 'move-in' | 'move-out' | 'general' | 'issues'
+    context?: 'move-in' | 'move-out' | 'general' | 'issues' | 'reference'
     customMessage?: string
 }
 
@@ -83,9 +83,16 @@ export function DeleteConfirmationModal({
                     </div>
                 </DialogHeader>
 
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 my-2">
-                    <p className="text-sm text-amber-800">
-                        <strong>Evidence warning:</strong> {getDescription()}
+                <div className={`rounded-lg p-3 my-2 ${context === 'reference'
+                        ? 'bg-slate-50 border border-slate-200'
+                        : 'bg-amber-50 border border-amber-200'
+                    }`}>
+                    <p className={`text-sm ${context === 'reference' ? 'text-slate-600' : 'text-amber-800'}`}>
+                        {context === 'reference' ? (
+                            <>{getDescription()}</>
+                        ) : (
+                            <><strong>Evidence warning:</strong> {getDescription()}</>
+                        )}
                     </p>
                 </div>
 
