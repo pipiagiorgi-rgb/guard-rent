@@ -63,7 +63,7 @@ const faqItems = [
     },
     {
         question: "What are Related Contracts?",
-        answer: "Related contracts is an optional €9 add-on that lets you track utility and service contracts (internet, electricity, parking, insurance) linked to your rental. It's a one-time purchase that lasts for the entire duration of your rental, including any extensions. Related contracts are reference-only. They are not sealed evidence and are not included in evidence reports. Only sealed evidence (check-in photos, handover records, meter readings) is included in reports to keep your evidence clear and dispute-ready."
+        answer: "Related contracts is an optional €9 add-on that lets you track utility and service contracts (internet, electricity, parking, insurance) linked to your rental. It's a one-time purchase that lasts for the entire duration of your rental, including any extensions. Related contracts are reference-only — they are not sealed evidence and are not included in evidence reports. Only sealed evidence (check-in photos, handover records, meter readings) is included in reports to keep your evidence clear and dispute-ready."
     }
 ]
 
@@ -145,7 +145,7 @@ export default function PricingPage() {
                 {/* Preview Mode Note */}
                 <div className="max-w-3xl mx-auto mb-10 flex items-center justify-center gap-3 text-sm text-slate-500">
                     <Eye size={16} className="flex-shrink-0" />
-                    <span>Preview mode is free. Data clears on refresh. Buy a pack to save permanently.</span>
+                    <span>Preview mode is free — data clears on refresh. Buy a pack to save permanently.</span>
                 </div>
 
                 {/* Pricing Cards - OUTCOME-FOCUSED BULLETS */}
@@ -286,7 +286,7 @@ export default function PricingPage() {
                 {/* Related Contracts Add-on */}
                 <div className="max-w-3xl mx-auto mt-4 flex items-center justify-center gap-2 text-sm text-slate-500">
                     <FileText size={16} />
-                    <span>Optional add-on: Related contracts tracking (reference only) - €9 one-time</span>
+                    <span>Optional add-on: Related contracts tracking (reference only) — €9 one-time</span>
                 </div>
 
                 {/* PDF Export Flow - with title for context */}
