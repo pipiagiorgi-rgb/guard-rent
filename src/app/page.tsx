@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen, AlertCircle, Lock, Clock, Globe, Home as HomeIcon, Calendar } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
+import { FAQAccordion } from '@/components/ui/FAQAccordion'
 
 export const metadata: Metadata = {
     title: 'RentVault | Protect Your Deposit With Organised Evidence',
@@ -526,6 +527,44 @@ export default function Home() {
                                     <span>Access controlled</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* FAQ Section */}
+                <section className="py-12 md:py-16 px-4 md:px-6 bg-slate-50">
+                    <div className="max-w-[800px] mx-auto">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">Common questions</h2>
+                            <p className="text-slate-600">Everything you need to know before getting started.</p>
+                        </div>
+                        <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8">
+                            <FAQAccordion items={[
+                                {
+                                    question: "Is this evidence legally admissible?",
+                                    answer: "RentVault creates timestamped, immutable records that can support your case in deposit disputes. While we don't provide legal advice, organised evidence with clear timestamps is typically more persuasive than unorganised phone photos. Many disputes are resolved before reaching formal proceedings when clear documentation exists."
+                                },
+                                {
+                                    question: "What happens to my data?",
+                                    answer: "Your data is stored securely and encrypted. You control it completely — you can download or delete your records at any time. We don't share your data with landlords, agencies, or third parties. Evidence is retained for 12 months by default, with options to extend."
+                                },
+                                {
+                                    question: "Can I use this for my current tenancy?",
+                                    answer: "Yes. While it's ideal to start at move-in, you can begin documenting at any point. Log current property condition, upload your contract, and start tracking important dates. Any evidence is better than no evidence."
+                                },
+                                {
+                                    question: "How is this different from photos on my phone?",
+                                    answer: "Phone photos can be edited, backdated, or dismissed in disputes. RentVault creates system-generated timestamps that cannot be altered. Once you seal your evidence, it becomes tamper-proof — the record shows exactly when photos were taken and uploaded."
+                                },
+                                {
+                                    question: "Do I need to pay upfront?",
+                                    answer: "No. You can document everything for free — upload photos, scan contracts, set reminders. You only pay when you need to export official PDF reports or extend storage beyond 12 months. There are no subscriptions."
+                                },
+                                {
+                                    question: "Does my landlord see my documents?",
+                                    answer: "No. RentVault is private by design. Your landlord, agency, or anyone else cannot access your vault. You choose what to share and when — typically only if you need to present evidence in a dispute."
+                                }
+                            ]} />
                         </div>
                     </div>
                 </section>
