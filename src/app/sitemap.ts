@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/guides',
         '/guides/deposit-protection',
         '/guides/move-in-photos',
+        '/guides/mid-tenancy-issues',
         '/guides/notice-periods',
         '/guides/renting-abroad',
     ]
