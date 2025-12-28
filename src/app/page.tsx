@@ -168,22 +168,22 @@ export default function Home() {
                             {/* Screenshots - Deadline first, Documents second */}
                             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="flex flex-col items-center">
-                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                                    <div className="w-[280px] h-[480px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                         <img
                                             src="/screenshots/rentvault-deadline-reminder-notice-period.jpg"
                                             alt="RentVault contract termination reminder showing lease end date, notice period, and deadline notification settings"
-                                            className="w-full h-auto"
+                                            className="w-full h-full object-cover object-top"
                                             loading="lazy"
                                         />
                                     </div>
                                     <p className="text-xs text-slate-500 mt-3 text-center">Never miss a deadline</p>
                                 </div>
                                 <div className="flex flex-col items-center">
-                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                                    <div className="w-[280px] h-[480px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                         <img
                                             src="/screenshots/rentvault-document-vault-internet-contract.jpg"
                                             alt="RentVault document vault showing internet contract with renewal date detection and reminder option"
-                                            className="w-full h-auto"
+                                            className="w-full h-full object-cover object-top"
                                             loading="lazy"
                                         />
                                     </div>
