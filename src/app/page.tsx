@@ -165,18 +165,31 @@ export default function Home() {
                                 </p>
                             </div>
 
-                            {/* PDF Preview Screenshot */}
-                            <div className="mt-8 flex justify-center">
-                                <div className="max-w-[320px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
-                                    <img
-                                        src="/screenshots/rentvault-pdf-move-in-property-record.jpg"
-                                        alt="RentVault PDF export showing Move-In Property Record with timestamps and evidence summary"
-                                        className="w-full h-auto"
-                                        loading="lazy"
-                                    />
+                            {/* Screenshots - Documents + Deadlines */}
+                            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="flex flex-col items-center">
+                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                                        <img
+                                            src="/screenshots/rentvault-related-documents-internet-contract.png"
+                                            alt="RentVault related documents showing internet contract with renewal date detection and reminder option"
+                                            className="w-full h-auto"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-3 text-center">Organise all rental documents</p>
+                                </div>
+                                <div className="flex flex-col items-center">
+                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                                        <img
+                                            src="/screenshots/rentvault-contract-termination-notice-reminder.jpg"
+                                            alt="RentVault contract termination reminder showing lease end date, notice period, and deadline notification settings"
+                                            className="w-full h-auto"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-3 text-center">Never miss a deadline</p>
                                 </div>
                             </div>
-                            <p className="text-xs text-slate-500 mt-4 text-center">Download official PDF reports with timestamps</p>
 
                             {/* CTA Button */}
                             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
