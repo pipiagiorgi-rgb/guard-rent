@@ -189,8 +189,8 @@ export function DocumentAIPanel({ contractId, contractType, providerName, label 
                                         setCustomLanguage('')
                                     }}
                                     className={`px-3 py-1.5 text-xs rounded-full transition-colors ${selectedLanguage === lang.value && !customLanguage
-                                            ? 'bg-slate-800 text-white'
-                                            : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
+                                        ? 'bg-slate-800 text-white'
+                                        : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
                                         }`}
                                 >
                                     {lang.label}
@@ -236,26 +236,24 @@ export function DocumentAIPanel({ contractId, contractType, providerName, label 
                     {/* Response */}
                     {response && (
                         <div className="bg-white border border-slate-200 rounded-lg p-4">
-                            <div className="flex items-start justify-between gap-2 mb-2">
-                                <span className="text-xs text-slate-400">AI Response</span>
+                            <div className="text-sm text-slate-700 whitespace-pre-wrap mb-3">
+                                {response}
+                            </div>
+                            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                    ℹ️ Not legal advice.
+                                </span>
                                 <button
                                     onClick={handleCopy}
-                                    className="text-slate-400 hover:text-slate-600 transition-colors"
+                                    className="text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1 text-xs"
                                     title="Copy to clipboard"
                                 >
                                     {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+                                    {copied ? 'Copied' : 'Copy'}
                                 </button>
-                            </div>
-                            <div className="text-sm text-slate-700 whitespace-pre-wrap">
-                                {response}
                             </div>
                         </div>
                     )}
-
-                    {/* Disclaimer */}
-                    <p className="text-xs text-slate-400">
-                        AI responses are for informational purposes only. Always verify important details with the original document.
-                    </p>
                 </div>
             )}
         </div>
