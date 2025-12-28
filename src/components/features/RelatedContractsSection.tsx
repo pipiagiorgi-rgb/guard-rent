@@ -179,10 +179,8 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
         }
     }
 
-    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
-
+    // Quick upload: Drop file → Upload → Analyze → Save (no modal)
+    const handleQuickUpload = async (file: File) => {
         // Validate file type
         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/heic', 'image/heif']
         if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.heic')) {
@@ -196,45 +194,110 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
             return
         }
 
+        setUploading(true)
         setUploadError(null)
-        setNewContract({ ...newContract, file })
 
-        // Quick category suggestion from filename
-        const suggested = suggestCategory(file.name)
-        setSuggestedCategory(suggested)
-        setNewContract(prev => ({ ...prev, contractType: suggested, file }))
-
-        // Try AI analysis for richer extraction (async, non-blocking)
         try {
-            const res = await fetch('/api/ai/document-analysis', {
+            const supabase = createClient()
+
+            // 1. Upload file to storage
+            const fileExt = file.name.split('.').pop()?.toLowerCase() || 'pdf'
+            const filePath = `cases/${caseId}/related/${crypto.randomUUID()}.${fileExt}`
+
+            const { error: uploadError } = await supabase.storage
+                .from('guard-rent')
+                .upload(filePath, file, {
+                    contentType: file.type,
+                    upsert: false
+                })
+
+            if (uploadError) {
+                console.error('Upload error:', uploadError)
+                setUploadError('Failed to upload file. Please try again.')
+                setUploading(false)
+                return
+            }
+
+            // 2. Analyze document for category and details
+            let category = 'other'
+            let provider = ''
+            let startDate = ''
+            let endDate = ''
+            let noticePeriodDays: number | null = null
+
+            try {
+                const res = await fetch('/api/ai/document-analysis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        fileType: file.type,
+                        storagePath: filePath
+                    })
+                })
+
+                if (res.ok) {
+                    const { analysis } = await res.json()
+                    if (analysis) {
+                        category = analysis.category || 'other'
+                        provider = analysis.provider || ''
+                        startDate = analysis.startDate || ''
+                        endDate = analysis.endDate || ''
+                        noticePeriodDays = analysis.noticePeriodDays || null
+                    }
+                }
+            } catch (err) {
+                // AI analysis failed - use filename-based detection
+                category = suggestCategory(file.name)
+            }
+
+            // 3. Save document to database
+            const res = await fetch('/api/related-contracts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    caseId,
+                    contractType: category,
+                    customType: null,
+                    providerName: provider || null,
+                    label: null,
+                    startDate: startDate || null,
+                    endDate: endDate || null,
+                    noticePeriodDays: noticePeriodDays,
+                    noticePeriodSource: noticePeriodDays ? 'ai_extracted' : null,
+                    storagePath: filePath,
                     fileName: file.name,
-                    fileType: file.type
+                    mimeType: file.type,
+                    sizeBytes: file.size
                 })
             })
 
             if (res.ok) {
-                const { analysis } = await res.json()
-                if (analysis) {
-                    setNewContract(prev => ({
-                        ...prev,
-                        contractType: analysis.category || prev.contractType,
-                        providerName: analysis.provider || prev.providerName,
-                        startDate: analysis.startDate || prev.startDate,
-                        endDate: analysis.endDate || prev.endDate,
-                        noticePeriodDays: analysis.noticePeriodDays?.toString() || prev.noticePeriodDays
-                    }))
-                    if (analysis.category) {
-                        setSuggestedCategory(analysis.category)
-                    }
-                }
+                await loadContracts()
+                // Auto-expand the category folder so user sees the new document
+                setCollapsedCategories(prev => {
+                    const next = new Set(prev)
+                    next.add(`${category}_expanded`)
+                    return next
+                })
+            } else {
+                const error = await res.json()
+                setUploadError(error.error || 'Failed to save document')
             }
         } catch (err) {
-            // AI analysis is optional - continue with filename-based suggestion
-            console.log('AI analysis unavailable, using filename detection')
+            console.error('Quick upload failed:', err)
+            setUploadError('Upload failed. Please try again.')
+        } finally {
+            setUploading(false)
         }
+    }
+
+    // File input handler
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+        e.target.value = '' // Reset input
+        await handleQuickUpload(file)
     }
 
     const handleAddContract = async () => {
@@ -415,13 +478,27 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                         </p>
                     </div>
                     {hasAccess && (
-                        <button
-                            onClick={() => setShowAddModal(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                        >
-                            <Upload size={16} />
-                            <span className="hidden sm:inline">Upload</span>
-                        </button>
+                        <label className={`flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm cursor-pointer ${uploading ? 'opacity-50 cursor-wait' : ''}`}>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".pdf,image/*"
+                                onChange={handleFileSelect}
+                                disabled={uploading}
+                                className="hidden"
+                            />
+                            {uploading ? (
+                                <>
+                                    <Loader2 size={16} className="animate-spin" />
+                                    <span className="hidden sm:inline">Uploading...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Upload size={16} />
+                                    <span className="hidden sm:inline">Upload</span>
+                                </>
+                            )}
+                        </label>
                     )}
                 </div>
 
@@ -430,6 +507,20 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                     <div className="mt-3 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg">
                         <Sparkles size={14} />
                         <span>Free during early access — pricing may apply later</span>
+                    </div>
+                )}
+
+                {/* Upload error banner */}
+                {uploadError && (
+                    <div className="mt-3 flex items-center gap-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 px-4 py-3 rounded-lg">
+                        <AlertCircle size={18} className="text-amber-500 flex-shrink-0" />
+                        <span className="flex-1">{uploadError}</span>
+                        <button
+                            onClick={() => setUploadError(null)}
+                            className="text-amber-500 hover:text-amber-700"
+                        >
+                            <X size={16} />
+                        </button>
                     </div>
                 )}
             </div>
@@ -464,25 +555,45 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                         <p className="text-xs text-slate-400 mt-2">One-time payment</p>
                     </div>
                 ) : contracts.length === 0 ? (
-                    // Empty state
-                    <div className="text-center py-8">
+                    // Empty state with drag-drop
+                    <div
+                        className={`text-center py-8 border-2 border-dashed rounded-xl transition-colors ${uploading ? 'border-blue-400 bg-blue-50' : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50/50'
+                            }`}
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }}
+                        onDrop={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            const file = e.dataTransfer.files?.[0]
+                            if (file) handleQuickUpload(file)
+                        }}
+                    >
                         <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Upload size={24} className="text-blue-500" />
+                            {uploading ? (
+                                <Loader2 size={24} className="text-blue-500 animate-spin" />
+                            ) : (
+                                <Upload size={24} className="text-blue-500" />
+                            )}
                         </div>
-                        <h3 className="font-medium text-slate-900 mb-2">Upload a document — we'll help you keep it organised</h3>
+                        <h3 className="font-medium text-slate-900 mb-2">
+                            {uploading ? 'Uploading and analysing...' : 'Drop a document here'}
+                        </h3>
                         <p className="text-sm text-slate-500 mb-1">
-                            Internet, electricity, insurance, cleaning, parking, gym, employment, or any document connected to your tenancy.
+                            Internet, electricity, insurance, or any document connected to your tenancy.
                         </p>
                         <p className="text-xs text-slate-400 mb-4">
-                            You can view, download, or delete files anytime. You stay in control.
+                            We'll detect the category and extract key details automatically.
                         </p>
-                        <button
-                            onClick={() => setShowAddModal(true)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            <Upload size={16} className="inline mr-2" />
-                            Upload your first document
-                        </button>
+                        <label className={`inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                            <input
+                                type="file"
+                                accept=".pdf,image/*"
+                                onChange={handleFileSelect}
+                                disabled={uploading}
+                                className="hidden"
+                            />
+                            <Upload size={16} />
+                            Or click to browse
+                        </label>
                     </div>
                 ) : (
                     // Contract list - grouped by category
@@ -637,6 +748,30 @@ export function RelatedContractsSection({ caseId }: RelatedContractsSectionProps
                                 )
                             })
                         })()}
+
+                        {/* Drop zone for adding more documents */}
+                        <div
+                            className={`mt-4 py-4 px-4 border-2 border-dashed rounded-lg transition-colors text-center ${uploading ? 'border-blue-400 bg-blue-50' : 'border-slate-200 hover:border-blue-300'
+                                }`}
+                            onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }}
+                            onDrop={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                const file = e.dataTransfer.files?.[0]
+                                if (file) handleQuickUpload(file)
+                            }}
+                        >
+                            {uploading ? (
+                                <span className="text-sm text-blue-600 flex items-center justify-center gap-2">
+                                    <Loader2 size={16} className="animate-spin" />
+                                    Uploading...
+                                </span>
+                            ) : (
+                                <span className="text-sm text-slate-400">
+                                    Drop another document here
+                                </span>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
