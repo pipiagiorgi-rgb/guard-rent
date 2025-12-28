@@ -424,7 +424,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
     return (
         <div className="space-y-8 max-w-3xl">
             <div>
-                <h1 className="text-2xl font-bold mb-1">Deadlines & reminders</h1>
+                <h1 className="text-2xl font-bold mb-1">Deadlines & Reminders</h1>
                 <p className="text-slate-500">Set reminders for important dates so you never miss a deadline.</p>
             </div>
 
