@@ -21,10 +21,12 @@ import {
 import { useState } from 'react'
 import { FeedbackDialog } from '@/components/features/FeedbackDialog'
 
+type PhaseStatus = 'not-started' | 'in-progress' | 'complete'
+
 interface CaseState {
     hasContract: boolean
-    checkinDone: boolean
-    handoverDone: boolean
+    checkinStatus: PhaseStatus
+    handoverStatus: PhaseStatus
 }
 
 interface CaseSidebarProps {
@@ -40,8 +42,8 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
     // Navigation items grouped by hierarchy
     const primaryItems = [
         { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
-        { href: `/vault/case/${caseId}/check-in`, label: 'Move In', icon: Camera, done: caseState?.checkinDone },
-        { href: `/vault/case/${caseId}/handover`, label: 'Move Out', icon: KeyRound, done: caseState?.handoverDone },
+        { href: `/vault/case/${caseId}/check-in`, label: 'Move In', icon: Camera, status: caseState?.checkinStatus },
+        { href: `/vault/case/${caseId}/handover`, label: 'Move Out', icon: KeyRound, status: caseState?.handoverStatus },
     ]
 
     const secondaryItems = [
@@ -64,14 +66,15 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
         return pathname?.startsWith(href)
     }
 
-    // Progress badge component
-    const Badge = ({ done }: { done?: boolean }) => {
-        if (done === undefined) return null
-        return done ? (
+    // Progress badge component - now handles tristate
+    const Badge = ({ status }: { status?: PhaseStatus }) => {
+        if (!status || status === 'not-started') return null
+        return status === 'complete' ? (
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                 <Check size={10} className="text-white" strokeWidth={3} />
             </span>
         ) : (
+            // in-progress
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
                 <Circle size={6} className="text-white fill-white" />
             </span>
@@ -122,7 +125,7 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                             >
                                 <Icon size={22} />
                                 <span className="text-center leading-tight">{item.label}</span>
-                                {!active && <Badge done={item.done} />}
+                                {!active && <Badge status={item.status} />}
                             </Link>
                         )
                     })}
@@ -144,7 +147,7 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                             >
                                 <Icon size={18} />
                                 <span className="text-center leading-tight">{item.label}</span>
-                                {!active && 'done' in item && <Badge done={(item as any).done} />}
+                                {!active && 'status' in item && <Badge status={(item as any).status} />}
                             </Link>
                         )
                     })}
@@ -197,9 +200,9 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                         >
                             <Icon size={18} />
                             {item.label}
-                            {!active && item.done !== undefined && (
+                            {!active && item.status && item.status !== 'not-started' && (
                                 <span className="ml-auto">
-                                    {item.done ? (
+                                    {item.status === 'complete' ? (
                                         <span className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
                                             <Check size={12} className="text-green-600" strokeWidth={3} />
                                         </span>

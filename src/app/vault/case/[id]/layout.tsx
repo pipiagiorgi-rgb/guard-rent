@@ -3,6 +3,16 @@ import { notFound } from 'next/navigation'
 import CaseSidebar from '@/components/layout/CaseSidebar'
 import { Footer } from '@/components/layout/Footer'
 
+// Helper to determine phase status based on evidence and completion
+function getPhaseStatus(
+    hasEvidence: boolean,
+    completedAt: string | null
+): 'not-started' | 'in-progress' | 'complete' {
+    if (completedAt && hasEvidence) return 'complete'
+    if (hasEvidence) return 'in-progress'
+    return 'not-started'
+}
+
 export default async function CaseLayout({
     children,
     params
@@ -15,7 +25,6 @@ export default async function CaseLayout({
     const supabase = await createClient()
 
     // Fetch case to verify access and get state for progress badges
-    // Using only columns that exist in the schema
     const { data: rentalCase, error } = await supabase
         .from('cases')
         .select('case_id, label, country, checkin_completed_at, handover_completed_at, contract_uploaded_at')
@@ -26,11 +35,31 @@ export default async function CaseLayout({
         notFound()
     }
 
-    // Calculate case state for sidebar badges
+    // Count check-in photos (types: 'checkin_photo' or 'photo')
+    const { count: checkinPhotoCount } = await supabase
+        .from('assets')
+        .select('*', { count: 'exact', head: true })
+        .eq('case_id', id)
+        .in('type', ['checkin_photo', 'photo'])
+
+    // Count handover photos
+    const { count: handoverPhotoCount } = await supabase
+        .from('assets')
+        .select('*', { count: 'exact', head: true })
+        .eq('case_id', id)
+        .eq('type', 'handover_photo')
+
+    // Calculate case state for sidebar badges using 3-state logic
     const caseState = {
         hasContract: !!rentalCase.contract_uploaded_at,
-        checkinDone: !!rentalCase.checkin_completed_at,
-        handoverDone: !!rentalCase.handover_completed_at,
+        checkinStatus: getPhaseStatus(
+            (checkinPhotoCount || 0) > 0,
+            rentalCase.checkin_completed_at
+        ),
+        handoverStatus: getPhaseStatus(
+            (handoverPhotoCount || 0) > 0,
+            rentalCase.handover_completed_at
+        ),
     }
 
     return (
@@ -52,3 +81,4 @@ export default async function CaseLayout({
         </div>
     )
 }
+
