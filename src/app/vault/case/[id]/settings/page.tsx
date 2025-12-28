@@ -217,68 +217,67 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
-                SECTION 1: RENTAL METADATA (Context, not action)
+                SECTION 1: RENTAL IDENTITY CARD
             ═══════════════════════════════════════════════════════════════ */}
             <div className="bg-white rounded-xl border border-slate-200 p-5">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                            <Pencil className="text-slate-600" size={18} />
-                        </div>
-                        <div>
-                            {editingName ? (
-                                <div className="flex gap-2 items-center">
-                                    <input
-                                        type="text"
-                                        value={newName}
-                                        onChange={(e) => setNewName(e.target.value)}
-                                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="Enter rental name"
-                                        autoFocus
-                                        onKeyDown={(e) => e.key === 'Enter' && handleRename()}
-                                    />
-                                    <button
-                                        onClick={handleRename}
-                                        disabled={savingName}
-                                        className="p-1.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50"
-                                    >
-                                        {savingName ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
-                                    </button>
-                                    <button
-                                        onClick={() => setEditingName(false)}
-                                        className="p-1.5 text-slate-400 hover:text-slate-600"
-                                    >
-                                        ×
-                                    </button>
-                                </div>
-                            ) : (
-                                <>
-                                    <p className="font-semibold text-slate-900">{data.rentalLabel}</p>
-                                    <p className="text-sm text-slate-500">
-                                        Created {new Date(data.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {data.photoCount} files
-                                    </p>
-                                </>
-                            )}
-                        </div>
+                <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-lg">🏠</span>
                     </div>
-                    {!editingName && (
-                        <button
-                            onClick={() => {
-                                setNewName(data.rentalLabel)
-                                setEditingName(true)
-                            }}
-                            className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1"
-                        >
-                            <Pencil size={14} />
-                            Rename
-                        </button>
-                    )}
+                    <div className="flex-1 min-w-0">
+                        {editingName ? (
+                            <div>
+                                <input
+                                    type="text"
+                                    value={newName}
+                                    onChange={(e) => setNewName(e.target.value)}
+                                    className="w-full max-w-sm px-3 py-1.5 border border-slate-200 rounded-lg text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Enter rental name"
+                                    autoFocus
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleRename()
+                                        if (e.key === 'Escape') setEditingName(false)
+                                    }}
+                                    onBlur={() => {
+                                        // Small delay to allow button clicks
+                                        setTimeout(() => {
+                                            if (editingName) handleRename()
+                                        }, 150)
+                                    }}
+                                />
+                                <p className="text-xs text-slate-400 mt-1.5">
+                                    Rename this rental for your own reference
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-lg font-bold text-slate-900 truncate">
+                                    {data.rentalLabel}
+                                </h2>
+                                <button
+                                    onClick={() => {
+                                        setNewName(data.rentalLabel)
+                                        setEditingName(true)
+                                    }}
+                                    className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors flex-shrink-0"
+                                    title="Rename rental"
+                                >
+                                    <Pencil size={14} />
+                                </button>
+                                {nameSaved && (
+                                    <span className="text-xs text-green-600 flex items-center gap-1">
+                                        <Check size={12} /> Saved
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                        {!editingName && (
+                            <p className="text-sm text-slate-500 mt-0.5">
+                                Created {new Date(data.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {data.photoCount} files
+                            </p>
+                        )}
+                    </div>
                 </div>
-                {nameSaved && (
-                    <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
-                        <Check size={12} /> Name saved
-                    </div>
-                )}
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
