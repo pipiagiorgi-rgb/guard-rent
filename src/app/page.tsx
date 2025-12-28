@@ -101,12 +101,12 @@ export default function Home() {
                             Free to explore. Pay only when you need official exports or extended retention.
                         </p>
 
-                        {/* Hero Screenshot - Dashboard Overview */}
-                        <div className="mt-10 mx-auto max-w-sm animate-fade-in-up opacity-0 delay-500">
+                        {/* Hero Screenshot - Desktop Dashboard */}
+                        <div className="mt-10 mx-auto max-w-3xl animate-fade-in-up opacity-0 delay-500">
                             <div className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
                                 <img
-                                    src="/screenshots/dashboard-overview.jpg"
-                                    alt="RentVault dashboard showing Luxembourg Apartment with full access"
+                                    src="/screenshots/dashboard-desktop.png"
+                                    alt="RentVault dashboard showing rental overview with lease details and status"
                                     className="w-full h-auto"
                                     loading="eager"
                                 />
@@ -164,33 +164,18 @@ export default function Home() {
                                 </p>
                             </div>
 
-                            {/* Screenshots - Lock Modal (Primary) + Evidence Sealed (Secondary) */}
-                            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                {/* Primary: Lock Modal - Action Moment */}
-                                <div className="flex flex-col items-center">
-                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
-                                        <img
-                                            src="/screenshots/lock-modal.png"
-                                            alt="Lock check-in evidence confirmation modal"
-                                            className="w-full h-auto"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                    <p className="text-xs text-slate-500 mt-3 text-center">Lock evidence with a single tap</p>
-                                </div>
-                                {/* Secondary: Evidence Sealed - Result */}
-                                <div className="flex flex-col items-center">
-                                    <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
-                                        <img
-                                            src="/screenshots/pdf-preview.jpg"
-                                            alt="Move-In Property Record PDF preview"
-                                            className="w-full h-auto"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                    <p className="text-xs text-slate-500 mt-3 text-center">Download a professional PDF report</p>
+                            {/* Single clean screenshot */}
+                            <div className="mt-8 flex justify-center">
+                                <div className="max-w-[320px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                                    <img
+                                        src="/screenshots/lock-modal.png"
+                                        alt="Lock check-in evidence confirmation modal"
+                                        className="w-full h-auto"
+                                        loading="lazy"
+                                    />
                                 </div>
                             </div>
+                            <p className="text-xs text-slate-500 mt-4 text-center">Seal your evidence with a single tap</p>
 
                             {/* CTA Button */}
                             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
