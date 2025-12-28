@@ -101,12 +101,12 @@ export default function Home() {
                             Free to explore. Pay only when you need official exports or extended retention.
                         </p>
 
-                        {/* Hero Screenshot - Desktop Dashboard */}
-                        <div className="mt-10 mx-auto max-w-3xl animate-fade-in-up opacity-0 delay-500">
+                        {/* Hero Screenshot - Mobile Dashboard */}
+                        <div className="mt-10 mx-auto max-w-sm animate-fade-in-up opacity-0 delay-500">
                             <div className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
                                 <img
-                                    src="/screenshots/dashboard-desktop.png"
-                                    alt="RentVault dashboard showing rental overview with lease details and status"
+                                    src="/screenshots/rentvault-mobile-dashboard-rental-overview.jpg"
+                                    alt="RentVault mobile app showing rental dashboard with move-in, move-out, contract, and deadline tracking"
                                     className="w-full h-auto"
                                     loading="eager"
                                 />
@@ -164,18 +164,18 @@ export default function Home() {
                                 </p>
                             </div>
 
-                            {/* Single clean screenshot */}
+                            {/* PDF Preview Screenshot */}
                             <div className="mt-8 flex justify-center">
                                 <div className="max-w-[320px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                     <img
-                                        src="/screenshots/lock-modal.png"
-                                        alt="Lock check-in evidence confirmation modal"
+                                        src="/screenshots/rentvault-pdf-move-in-property-record.jpg"
+                                        alt="RentVault PDF export showing Move-In Property Record with timestamps and evidence summary"
                                         className="w-full h-auto"
                                         loading="lazy"
                                     />
                                 </div>
                             </div>
-                            <p className="text-xs text-slate-500 mt-4 text-center">Seal your evidence with a single tap</p>
+                            <p className="text-xs text-slate-500 mt-4 text-center">Download official PDF reports with timestamps</p>
 
                             {/* CTA Button */}
                             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
