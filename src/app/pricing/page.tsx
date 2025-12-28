@@ -272,7 +272,7 @@ export default function PricingPage() {
                         <div className="flex flex-col items-center">
                             <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                 <img
-                                    src="/screenshots/rentvault-pdf-export-loading-preview.jpg"
+                                    src="/screenshots/rentvault-pdf-export-loading-preview.webp"
                                     alt="RentVault PDF export loading screen showing gathering photos, creating document, and finalizing steps"
                                     className="w-full h-auto"
                                     loading="lazy"
@@ -283,7 +283,7 @@ export default function PricingPage() {
                         <div className="flex flex-col items-center">
                             <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                 <img
-                                    src="/screenshots/rentvault-deposit-recovery-pack-move-out.jpg"
+                                    src="/screenshots/rentvault-deposit-recovery-pack-move-out.webp"
                                     alt="RentVault Deposit Recovery Pack showing move-out property record with evidence summary and issues documented"
                                     className="w-full h-auto"
                                     loading="lazy"

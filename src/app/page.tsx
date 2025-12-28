@@ -106,7 +106,7 @@ export default function Home() {
                         <div className="mt-10 mx-auto max-w-sm animate-fade-in-up opacity-0 delay-500">
                             <div className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
                                 <img
-                                    src="/screenshots/rentvault-mobile-dashboard-rental-overview.jpg"
+                                    src="/screenshots/rentvault-mobile-dashboard-rental-overview.webp"
                                     alt="RentVault mobile app showing rental dashboard with move-in, move-out, contract, and deadline tracking"
                                     className="w-full h-auto"
                                     loading="eager"
@@ -170,7 +170,7 @@ export default function Home() {
                                 <div className="flex flex-col items-center">
                                     <div className="w-[280px] h-[480px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                         <img
-                                            src="/screenshots/rentvault-deadline-reminder-notice-period.jpg"
+                                            src="/screenshots/rentvault-deadline-reminder-notice-period.webp"
                                             alt="RentVault contract termination reminder showing lease end date, notice period, and deadline notification settings"
                                             className="w-full h-full object-cover object-top"
                                             loading="lazy"
@@ -181,7 +181,7 @@ export default function Home() {
                                 <div className="flex flex-col items-center">
                                     <div className="w-[280px] h-[480px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
                                         <img
-                                            src="/screenshots/rentvault-document-vault-internet-contract.jpg"
+                                            src="/screenshots/rentvault-document-vault-internet-contract.webp"
                                             alt="RentVault document vault showing internet contract with renewal date detection and reminder option"
                                             className="w-full h-full object-cover object-top"
                                             loading="lazy"
