@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Shield, Camera, Lock, Hash, FileDown, Clock } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Shield, Camera, Lock, FileDown, Clock, Check } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { Logo } from '@/components/brand/Logo'
 import { ScrollToTop } from '@/components/ui/ScrollToTop'
@@ -145,13 +145,13 @@ export default function DepositProtectionGuide() {
                             </div>
                             <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
                                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <Hash size={20} className="text-blue-600" />
+                                    <Check size={20} className="text-blue-600" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-slate-900 mb-1">File integrity hashing</h3>
+                                    <h3 className="font-semibold text-slate-900 mb-1">Tamper-proof records</h3>
                                     <p className="text-sm text-slate-600">
-                                        Each file gets a unique cryptographic hash.
-                                        If anyone tries to tamper with the evidence, the hash breaks and it's immediately obvious.
+                                        Once sealed, records cannot be edited or deleted.
+                                        Evidence stays exactly as it was originally uploaded.
                                     </p>
                                 </div>
                             </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen, AlertCircle, Lock, Hash, Clock, Globe, Home as HomeIcon, Calendar } from 'lucide-react'
+import { FileText, Upload, Camera, Bell, FileDown, Users, Shield, Eye, ArrowRight, Check, BookOpen, AlertCircle, Lock, Clock, Globe, Home as HomeIcon, Calendar } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
@@ -105,7 +105,7 @@ export default function Home() {
                         <div className="mt-10 mx-auto max-w-sm animate-fade-in-up opacity-0 delay-500">
                             <div className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
                                 <img
-                                    src="/screenshots/dashboard-overview.png"
+                                    src="/screenshots/dashboard-overview.jpg"
                                     alt="RentVault dashboard showing Luxembourg Apartment with full access"
                                     className="w-full h-auto"
                                     loading="eager"
@@ -182,13 +182,13 @@ export default function Home() {
                                 <div className="flex flex-col items-center">
                                     <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
                                         <img
-                                            src="/screenshots/evidence-sealed.png"
-                                            alt="Evidence sealed confirmation showing permanently sealed status"
+                                            src="/screenshots/pdf-preview.jpg"
+                                            alt="Move-In Property Record PDF preview"
                                             className="w-full h-auto"
                                             loading="lazy"
                                         />
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-3 text-center">Receive confirmation with timestamp</p>
+                                    <p className="text-xs text-slate-500 mt-3 text-center">Download a professional PDF report</p>
                                 </div>
                             </div>
 
@@ -352,11 +352,11 @@ export default function Home() {
                             </div>
                             <div className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10">
                                 <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4">
-                                    <Hash size={24} className="text-green-400" />
+                                    <Shield size={24} className="text-green-400" />
                                 </div>
-                                <h3 className="text-xl font-bold text-white mb-2">File integrity hashing</h3>
+                                <h3 className="text-xl font-bold text-white mb-2">Tamper-proof records</h3>
                                 <p className="text-slate-400 text-sm leading-relaxed">
-                                    Each file gets a unique cryptographic hash. If anyone tampers with it, the hash breaks.
+                                    Once evidence is sealed, it cannot be edited or deleted. Records stay exactly as uploaded.
                                 </p>
                             </div>
                             <div className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10">
@@ -530,14 +530,14 @@ export default function Home() {
                             <div className="flex flex-wrap gap-4 text-sm">
                                 <div className="flex items-center gap-2 text-slate-600">
                                     <Lock size={14} className="text-slate-400" />
-                                    <span>TLS encryption</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-slate-600">
-                                    <Hash size={14} className="text-slate-400" />
-                                    <span>SHA-256 integrity</span>
+                                    <span>Encrypted storage</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-slate-600">
                                     <Shield size={14} className="text-slate-400" />
+                                    <span>Tamper-proof records</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <Check size={14} className="text-slate-400" />
                                     <span>Access controlled</span>
                                 </div>
                             </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Camera, Clock, Shield, AlertCircle, Lock, Hash, FileDown, Video } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, Clock, Shield, AlertCircle, Lock, FileDown, Video, Check } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { Logo } from '@/components/brand/Logo'
 import { ScrollToTop } from '@/components/ui/ScrollToTop'
@@ -53,9 +53,9 @@ const features = [
         description: 'Every photo and document is recorded with exact date and time.'
     },
     {
-        icon: Hash,
-        title: 'File integrity hashing',
-        description: 'Cryptographic hashes prove files have not been tampered with.'
+        icon: Check,
+        title: 'Tamper-proof records',
+        description: 'Once sealed, records cannot be edited or deleted. Evidence stays exactly as uploaded.'
     },
     {
         icon: Lock,

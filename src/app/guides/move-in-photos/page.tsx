@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Camera, Lock, Shield, Clock, Hash, FileCheck } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, Lock, Shield, Clock, FileCheck, Check } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { Logo } from '@/components/brand/Logo'
 import { ScrollToTop } from '@/components/ui/ScrollToTop'
@@ -106,7 +106,7 @@ export default function MoveInPhotosGuide() {
                         <h2 className="text-2xl font-bold text-slate-900 mb-4">How RentVault solves this</h2>
                         <p className="text-slate-700 leading-relaxed mb-6">
                             RentVault creates evidence that holds up. When you seal your check-in, your photos become immutable —
-                            timestamped, hashed, and locked so they can't be edited or backdated.
+                            timestamped and locked so they can't be edited or backdated.
                         </p>
 
                         <div className="grid md:grid-cols-2 gap-4">
@@ -124,12 +124,12 @@ export default function MoveInPhotosGuide() {
                             <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <Hash size={16} className="text-blue-600" />
+                                        <Check size={16} className="text-blue-600" />
                                     </div>
-                                    <h3 className="font-semibold text-slate-900">File integrity hashing</h3>
+                                    <h3 className="font-semibold text-slate-900">Tamper-proof records</h3>
                                 </div>
                                 <p className="text-sm text-slate-600">
-                                    Each file gets a unique cryptographic hash. If anything changes, the hash breaks.
+                                    Once sealed, records cannot be edited or deleted. Evidence stays exactly as uploaded.
                                 </p>
                             </div>
                             <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
@@ -200,7 +200,7 @@ export default function MoveInPhotosGuide() {
                         <p className="text-slate-700 leading-relaxed">
                             RentVault is the first platform built specifically to protect the entire tenant journey —
                             from signing the lease to getting your deposit back.
-                            Every piece of evidence is timestamped, hashed, and stored securely for 12 months.
+                            Every piece of evidence is timestamped and stored securely for 12 months.
                         </p>
                     </div>
 

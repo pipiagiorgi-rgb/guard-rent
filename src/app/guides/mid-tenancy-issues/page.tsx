@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, AlertCircle, Camera, Shield, Clock, FileText, Hash } from 'lucide-react'
+import { ArrowLeft, ArrowRight, AlertCircle, Camera, Shield, Clock, FileText, Check } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { Logo } from '@/components/brand/Logo'
 import { ScrollToTop } from '@/components/ui/ScrollToTop'
@@ -137,13 +137,13 @@ export default function MidTenancyIssuesGuide() {
                             </div>
                             <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex gap-4 items-start">
                                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <Hash size={20} className="text-blue-600" />
+                                    <Check size={20} className="text-blue-600" />
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-slate-900 mb-1">Tamper-proof evidence</h3>
                                     <p className="text-sm text-slate-600">
-                                        Photos are stored with cryptographic hashes.
-                                        If anyone tries to edit or backdate them, the evidence is broken.
+                                        Photos are permanently stored and cannot be edited or backdated.
+                                        Your evidence stays exactly as it was originally recorded.
                                     </p>
                                 </div>
                             </div>
