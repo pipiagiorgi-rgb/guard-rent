@@ -7,7 +7,7 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 export const metadata: Metadata = {
     metadataBase: new URL('https://rentvault.co'),
     title: 'RentVault | Rental Records, Secured',
-    description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
+    description: 'A privacy-first vault for tenants to store contracts, photos, and key dates. Protect your rental deposit with timestamped evidence.',
     keywords: 'rental deposit, tenant protection, move-in photos, rental documents, lease organiser, rent evidence, deposit dispute, tenant rights',
     icons: {
         icon: [
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     },
     openGraph: {
         title: 'RentVault | Protect Your Rental Deposit',
-        description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
+        description: 'A privacy-first vault for tenants to store contracts, photos, and key dates. Protect your rental deposit with timestamped evidence.',
         url: 'https://rentvault.co',
         siteName: 'RentVault',
         images: [
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     twitter: {
         card: 'summary_large_image',
         title: 'RentVault | Protect Your Rental Deposit',
-        description: 'A privacy-first vault for tenants to store contracts, photos, and key dates.',
+        description: 'A privacy-first vault for tenants to store contracts, photos, and key dates. Protect your rental deposit with timestamped evidence.',
         images: ['https://rentvault.co/og-image.png'],
     },
     alternates: {

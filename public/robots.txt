@@ -4,7 +4,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://rentvault.ai/sitemap.xml
+Sitemap: https://rentvault.co/sitemap.xml
 
 # Block admin and API routes
 Disallow: /api/
