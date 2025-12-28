@@ -327,40 +327,6 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Move-Out Flow Screenshots */}
-                <section className="py-8 md:py-10 px-4 md:px-6 bg-slate-50">
-                    <div className="max-w-[900px] mx-auto">
-                        <div className="text-center mb-6">
-                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">See the move-out process</h2>
-                            <p className="text-slate-600">Export your evidence when you need it.</p>
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="flex flex-col items-center">
-                                <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
-                                    <img
-                                        src="/screenshots/rentvault-pdf-export-loading-preview.jpg"
-                                        alt="RentVault PDF export loading screen showing gathering photos, creating document, and finalizing steps"
-                                        className="w-full h-auto"
-                                        loading="lazy"
-                                    />
-                                </div>
-                                <p className="text-xs text-slate-500 mt-3 text-center">Building your PDF report</p>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
-                                    <img
-                                        src="/screenshots/rentvault-deposit-recovery-pack-move-out.jpg"
-                                        alt="RentVault Deposit Recovery Pack showing move-out property record with evidence summary and issues documented"
-                                        className="w-full h-auto"
-                                        loading="lazy"
-                                    />
-                                </div>
-                                <p className="text-xs text-slate-500 mt-3 text-center">Deposit Recovery Pack ready to download</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
                 {/* Evidence Technology - First of its kind */}
                 <section className="py-10 md:py-14 px-4 md:px-6 bg-slate-900">
                     <div className="max-w-[1120px] mx-auto">

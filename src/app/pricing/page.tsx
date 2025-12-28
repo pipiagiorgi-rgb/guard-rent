@@ -295,6 +295,32 @@ export default function PricingPage() {
                     <p>No automatic renewals.</p>
                 </div>
 
+                {/* PDF Export Flow Screenshots */}
+                <div className="max-w-3xl mx-auto mt-10 grid md:grid-cols-2 gap-6">
+                    <div className="flex flex-col items-center">
+                        <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                            <img
+                                src="/screenshots/rentvault-pdf-export-loading-preview.jpg"
+                                alt="RentVault PDF export loading screen showing gathering photos, creating document, and finalizing steps"
+                                className="w-full h-auto"
+                                loading="lazy"
+                            />
+                        </div>
+                        <p className="text-xs text-slate-500 mt-3 text-center">Building your PDF report</p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
+                            <img
+                                src="/screenshots/rentvault-deposit-recovery-pack-move-out.jpg"
+                                alt="RentVault Deposit Recovery Pack showing move-out property record with evidence summary and issues documented"
+                                className="w-full h-auto"
+                                loading="lazy"
+                            />
+                        </div>
+                        <p className="text-xs text-slate-500 mt-3 text-center">Deposit Recovery Pack ready to download</p>
+                    </div>
+                </div>
+
                 {/* Feature Comparison Table */}
                 <div className="max-w-3xl mx-auto mt-12">
                     <h3 className="text-lg font-semibold mb-6 text-center text-slate-900">Preview vs Paid</h3>
