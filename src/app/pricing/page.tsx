@@ -7,63 +7,39 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Footer } from '@/components/layout/Footer'
 
-// FAQ items - updated with required questions
+// FAQ items - trimmed for conversion, 8 essential questions
 const faqItems = [
     {
         question: "What do I get for free?",
-        answer: "You can explore RentVault for free in preview mode. This includes uploading and scanning contracts, asking up to 3 questions, requesting 1 translation, and uploading up to 3 photos per rental. Preview results are temporary and cleared on refresh."
+        answer: "You can explore RentVault in preview mode — upload and scan contracts, ask up to 3 questions, request 1 translation, and upload up to 3 photos per rental. Preview data clears on refresh."
     },
     {
         question: "What changes when I buy a pack?",
-        answer: "Purchasing a pack removes all limits and saves your data permanently. You get unlimited contract questions and translations, unlimited photos, deadline reminder emails, official PDF reports, and 12 months of secure storage."
+        answer: "Purchasing a pack removes all limits and saves your data permanently. You get unlimited contract questions, translations, and photos, plus deadline reminder emails, official PDF reports, and 12 months of secure storage."
     },
     {
         question: "Is this legal advice?",
-        answer: "No. RentVault helps you understand and organise your rental documents, but it does not provide legal advice. If you need legal guidance, consult a qualified professional in your jurisdiction."
+        answer: "No. RentVault helps you understand and organise your rental documents, but does not provide legal advice. If you need legal guidance, consult a qualified professional."
     },
     {
-        question: "Are records timestamped and preserved?",
-        answer: "Yes. All uploaded files receive system-generated timestamps. Once you complete a phase (check-in or handover), records are locked and cannot be modified, preserving the state at that moment."
-    },
-    {
-        question: "Can I export a PDF to share?",
-        answer: "Yes. With a paid pack, you can generate official PDF reports that include your photos, timestamps, and lease summary. These are formatted for sharing with landlords or deposit schemes if needed."
+        question: "Are records timestamped and tamper-proof?",
+        answer: "Yes. All uploads receive system-generated timestamps. Once you complete a phase (check-in or handover), records are locked and cannot be modified."
     },
     {
         question: "How long is data stored?",
-        answer: "Your documents are stored securely for 12 months from the date of purchase. This covers most rental periods and deposit dispute timelines."
-    },
-    {
-        question: "Can I extend storage?",
-        answer: "Yes. Before your 12-month retention period ends, you'll receive a reminder. You can extend storage for another 12 months for €9, or download your files and let the data expire."
-    },
-    {
-        question: "Can I use RentVault if I'm already renting?",
-        answer: "Yes. RentVault is useful whether you're preparing to move or already renting. You can store your contract, track notice dates, set reminders, and keep everything organised so nothing important is missed later."
+        answer: "Your documents are stored securely for 12 months. You can extend for another 12 months for €9, or download your files before expiry."
     },
     {
         question: "Is RentVault a subscription?",
-        answer: "No. RentVault uses one-time payments. You pay once for the pack you need, and your data is stored securely for 12 months. No recurring charges."
+        answer: "No. You pay once for the pack you need. No recurring charges."
     },
     {
-        question: "Can I delete my data at any time?",
-        answer: "Yes. You can delete individual rentals or your entire account at any time directly from the application. We respect your right to control your data."
-    },
-    {
-        question: "How are my documents stored?",
-        answer: "Your documents are stored securely with encryption in transit and at rest. Only you can access your files. We do not share your data with third parties."
-    },
-    {
-        question: "Can I use RentVault if I'm renting abroad?",
-        answer: "Yes. RentVault is especially useful when renting in a different country or language. You can upload contracts in any language and request translations for easier reading."
-    },
-    {
-        question: "What payment methods do you accept?",
-        answer: "Payments are processed securely by Stripe. You can pay with major credit and debit cards. VAT may apply depending on your location."
+        question: "Can I delete my data?",
+        answer: "Yes. You can delete individual rentals or your entire account at any time from within the app."
     },
     {
         question: "What are Related Contracts?",
-        answer: "Related contracts is an optional €9 add-on that lets you track utility and service contracts (internet, electricity, parking, insurance) linked to your rental. It's a one-time purchase that lasts for the entire duration of your rental, including any extensions. Related contracts are reference-only — they are not sealed evidence and are not included in evidence reports. Only sealed evidence (check-in photos, handover records, meter readings) is included in reports to keep your evidence clear and dispute-ready."
+        answer: "An optional €9 add-on to track utility and service contracts (internet, electricity, parking) linked to your rental. These are reference-only and not included in evidence reports."
     }
 ]
 
@@ -196,7 +172,7 @@ export default function PricingPage() {
                             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-white mb-3">
                                 <Shield size={20} />
                             </div>
-                            <h3 className="text-xl font-bold mb-1">Full Bundle</h3>
+                            <h3 className="text-xl font-bold mb-1">Full Pack</h3>
                             <p className="text-sm text-slate-400">Complete protection</p>
                         </div>
                         <div className="mb-6">
@@ -241,8 +217,8 @@ export default function PricingPage() {
                             <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600 mb-3">
                                 <Clock size={20} />
                             </div>
-                            <h3 className="text-xl font-bold mb-1">Move-Out Pack</h3>
-                            <p className="text-sm text-slate-500">For moving out</p>
+                            <h3 className="text-xl font-bold mb-1">Handover Pack</h3>
+                            <p className="text-sm text-slate-500">For ending your tenancy</p>
                         </div>
                         <div className="mb-6">
                             <span className="text-4xl font-bold">€29</span>
@@ -250,7 +226,7 @@ export default function PricingPage() {
                         <ul className="space-y-3 mb-8 flex-1">
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span>Before/after comparison (move-in vs move-out)</span>
+                                <span>Before/after comparison (check-in vs handover)</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm">
                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
