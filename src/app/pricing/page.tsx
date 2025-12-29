@@ -329,6 +329,47 @@ export default function PricingPage() {
                     <span>Optional add-on: Related contracts tracking (reference only) — €9 one-time</span>
                 </div>
 
+                {/* Short-Stay Section */}
+                <div className="max-w-3xl mx-auto mt-16 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-8 border border-blue-100">
+                    <div className="text-center mb-6">
+                        <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full uppercase tracking-wide mb-3">For Vacation Rentals</span>
+                        <h3 className="text-2xl font-bold text-slate-900 mb-2">Short-Stay Pack</h3>
+                        <p className="text-slate-600">Perfect for Airbnb, Booking.com, or VRBO stays</p>
+                    </div>
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="flex-1">
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3 text-sm">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                    <span>Arrival & departure photo evidence</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-sm">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                    <span>Platform & reservation ID tracking</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-sm">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                    <span>30 days secure retention after check-out</span>
+                                </li>
+                                <li className="flex items-start gap-3 text-sm">
+                                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                    <span>Downloadable evidence report PDF</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div className="text-center md:text-right">
+                            <div className="text-4xl font-bold text-slate-900 mb-2">€5.99</div>
+                            <p className="text-xs text-slate-500 mb-4">One-time payment per booking</p>
+                            <button
+                                onClick={handleGetStarted}
+                                className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
+                            >
+                                Get Started
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 {/* PDF Export Flow - with title for context */}
                 <div className="max-w-3xl mx-auto mt-12">
                     <h3 className="text-lg font-semibold mb-6 text-center text-slate-900">Export official PDF reports</h3>

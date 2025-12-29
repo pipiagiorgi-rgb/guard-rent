@@ -32,6 +32,7 @@ interface EvidenceState {
     handoverCompleted: boolean
     retentionUntil: string | null
     purchasedPacks: string[]
+    stayType: 'long_term' | 'short_stay' | null
 }
 
 interface PhotoAsset {
@@ -74,7 +75,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         checkinLocked: false,
         handoverCompleted: false,
         retentionUntil: null,
-        purchasedPacks: []
+        purchasedPacks: [],
+        stayType: null
     })
     const [rentalLabel, setRentalLabel] = useState('')
     const [lockMessage, setLockMessage] = useState<string | null>(null)
@@ -289,7 +291,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
             // Fetch case data
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('label, contract_analysis, checkin_completed_at, handover_completed_at, retention_until')
+                .select('label, contract_analysis, checkin_completed_at, handover_completed_at, retention_until, stay_type, platform_name, reservation_id, check_in_date, check_out_date')
                 .eq('case_id', id)
                 .single()
 
@@ -347,7 +349,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 checkinLocked: !!caseData?.checkin_completed_at,
                 handoverCompleted: !!caseData?.handover_completed_at,
                 retentionUntil,
-                purchasedPacks
+                purchasedPacks,
+                stayType: caseData?.stay_type || 'long_term'
             })
 
             // Fetch walkthrough videos
@@ -564,9 +567,15 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         setLastGeneratedPdf(null)
 
         try {
-            const endpoint = packType === 'checkin_pack'
-                ? '/api/pdf/checkin-report'
-                : '/api/pdf/deposit-pack'
+            // Select endpoint based on pack type and stay type
+            let endpoint: string
+            if (packType === 'short_stay_pack' || evidence.stayType === 'short_stay') {
+                endpoint = '/api/pdf/short-stay'
+            } else if (packType === 'checkin_pack') {
+                endpoint = '/api/pdf/checkin-report'
+            } else {
+                endpoint = '/api/pdf/deposit-pack'
+            }
 
             // Step 1 minimum display time (500ms) for trust signaling
             await new Promise(resolve => setTimeout(resolve, 500))
@@ -680,6 +689,8 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const canUnlockDeposit = evidence.checkinPhotos > 0 && evidence.handoverPhotos > 0 && evidence.handoverCompleted
     const hasCheckinPack = evidence.purchasedPacks.includes('checkin_pack')
     const hasDepositPack = evidence.purchasedPacks.includes('deposit_pack')
+    const hasShortStayPack = evidence.purchasedPacks.includes('short_stay')
+    const isShortStay = evidence.stayType === 'short_stay'
 
     if (loading) {
         return (
