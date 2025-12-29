@@ -4,7 +4,45 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getAllCountryOptions } from '@/lib/countries'
-import { Home, Plane } from 'lucide-react'
+import { Home, Plane, Sparkles } from 'lucide-react'
+
+// Parse reservation link to extract platform/dates
+function parseReservationLink(url: string) {
+    try {
+        const u = new URL(url)
+
+        if (u.hostname.includes('airbnb')) {
+            return {
+                platform: 'Airbnb',
+                checkIn: u.searchParams.get('check_in'),
+                checkOut: u.searchParams.get('check_out'),
+                reservationId: u.pathname.split('/').filter(Boolean).pop() || null
+            }
+        }
+
+        if (u.hostname.includes('booking')) {
+            return {
+                platform: 'Booking',
+                checkIn: u.searchParams.get('checkin'),
+                checkOut: u.searchParams.get('checkout'),
+                reservationId: u.searchParams.get('reservation') || null
+            }
+        }
+
+        if (u.hostname.includes('vrbo')) {
+            return {
+                platform: 'VRBO',
+                checkIn: u.searchParams.get('arrival'),
+                checkOut: u.searchParams.get('departure'),
+                reservationId: null
+            }
+        }
+
+        return null
+    } catch {
+        return null
+    }
+}
 
 type StayType = 'long_term' | 'short_stay' | null
 
@@ -20,6 +58,26 @@ export default function NewCasePage() {
     const [reservationId, setReservationId] = useState('')
     const [checkInDate, setCheckInDate] = useState('')
     const [checkOutDate, setCheckOutDate] = useState('')
+
+    // Reservation link auto-detection
+    const [reservationLink, setReservationLink] = useState('')
+    const [autoDetected, setAutoDetected] = useState(false)
+
+    // Handle reservation link paste/blur
+    const handleLinkChange = (value: string) => {
+        setReservationLink(value)
+        const parsed = parseReservationLink(value)
+
+        if (parsed) {
+            setAutoDetected(true)
+            if (parsed.platform) setPlatformName(parsed.platform)
+            if (parsed.checkIn) setCheckInDate(parsed.checkIn)
+            if (parsed.checkOut) setCheckOutDate(parsed.checkOut)
+            if (parsed.reservationId) setReservationId(parsed.reservationId)
+        } else {
+            setAutoDetected(false)
+        }
+    }
 
     const countryOptions = getAllCountryOptions()
 
@@ -236,6 +294,34 @@ export default function NewCasePage() {
                     {/* SHORT-STAY SPECIFIC FIELDS */}
                     {stayType === 'short_stay' && (
                         <>
+                            {/* Reservation link auto-detect */}
+                            <div>
+                                <label htmlFor="reservation_link" className="block text-sm font-medium text-slate-700 mb-2">
+                                    Reservation link <span className="text-slate-400">(optional)</span>
+                                </label>
+                                <input
+                                    type="url"
+                                    id="reservation_link"
+                                    value={reservationLink}
+                                    onChange={(e) => handleLinkChange(e.target.value)}
+                                    placeholder="Paste Airbnb, Booking, or VRBO link"
+                                    className="w-full p-3.5 rounded-xl border-2 border-slate-200 focus:border-slate-900 transition-colors outline-none"
+                                />
+                                <p className="text-xs text-slate-400 mt-1.5">
+                                    We'll try to fill in dates automatically.
+                                </p>
+                            </div>
+
+                            {/* Auto-detected banner */}
+                            {autoDetected && (
+                                <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                                    <Sparkles className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                    <p className="text-sm text-blue-800">
+                                        We found some details from your link — please review.
+                                    </p>
+                                </div>
+                            )}
+
                             <div>
                                 <label htmlFor="platform" className="block text-sm font-medium text-slate-700 mb-2">
                                     Platform <span className="text-slate-400">(optional)</span>
