@@ -133,7 +133,7 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                     if (termData) {
                         setTermination({
                             enabled: true,
-                            date: termData.due_date ? new Date(termData.due_date).toISOString().split('T')[0] : undefined,
+                            date: termData.date ? new Date(termData.date).toISOString().split('T')[0] : undefined,
                             offsets: termData.preferences?.offsets || [30],
                             saved: true
                         })
@@ -150,9 +150,9 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
 
                     if (customData.length > 0) {
                         setCustomReminders(customData.map(d => ({
-                            id: d.id,
+                            id: d.deadline_id,
                             label: d.preferences?.label || 'Custom reminder',
-                            date: d.due_date ? new Date(d.due_date).toISOString().split('T')[0] : '',
+                            date: d.date ? new Date(d.date).toISOString().split('T')[0] : '',
                             offsets: d.preferences?.offsets || [7],
                             saved: true
                         })))
