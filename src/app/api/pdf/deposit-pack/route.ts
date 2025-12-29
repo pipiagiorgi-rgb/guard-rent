@@ -238,6 +238,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Rental not found' }, { status: 404 })
         }
 
+        // GUARD: Only allow long_term cases (short-stay uses /api/pdf/short-stay)
+        if (rentalCase.stay_type === 'short_stay') {
+            return NextResponse.json({ error: 'Use /api/pdf/short-stay for short-stay cases' }, { status: 400 })
+        }
+
         // Check if pack is purchased - admin users bypass this check, previews allowed
         let hasPurchased = false
         if (!isAdmin) {
