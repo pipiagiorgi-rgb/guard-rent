@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Check, FileText, Shield, Clock, Eye, ChevronDown, Video } from 'lucide-react'
+import { Check, FileText, Shield, Clock, Eye, ChevronDown, Video, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -67,6 +67,8 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 export default function PricingPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [userCases, setUserCases] = useState<{ case_id: string; label: string }[]>([])
+    const [purchasing, setPurchasing] = useState<string | null>(null)
     const router = useRouter()
 
     useEffect(() => {
@@ -74,6 +76,22 @@ export default function PricingPage() {
             const supabase = createClient()
             const { data: { user } } = await supabase.auth.getUser()
             setIsLoggedIn(!!user)
+
+            // If logged in, fetch user's cases
+            if (user) {
+                const { data: cases } = await supabase
+                    .from('cases')
+                    .select('case_id, label, address')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false })
+
+                if (cases && cases.length > 0) {
+                    setUserCases(cases.map(c => ({
+                        case_id: c.case_id,
+                        label: c.label || c.address || 'Untitled rental'
+                    })))
+                }
+            }
         }
         checkAuth()
     }, [])
@@ -85,6 +103,49 @@ export default function PricingPage() {
             router.push('/vault')
         }
     }
+
+    // Handle pack selection - initiate checkout for logged-in users
+    const handleSelectPack = async (packType: string, amount: number) => {
+        if (!isLoggedIn) {
+            // Not logged in - send to login with redirect back
+            router.push('/login?redirect=/pricing')
+            return
+        }
+
+        // If user has no cases, send them to create one first
+        if (userCases.length === 0) {
+            router.push('/vault/new')
+            return
+        }
+
+        // Use most recent case for checkout
+        const caseId = userCases[0].case_id
+        setPurchasing(packType)
+
+        try {
+            const res = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    caseId,
+                    packType: packType === 'bundle' ? 'bundle' : packType === 'checkin' ? 'checkin_pack' : 'deposit_pack',
+                    amount
+                })
+            })
+
+            const data = await res.json()
+            if (data.url) {
+                window.location.href = data.url
+            } else {
+                console.error('No checkout URL returned')
+                setPurchasing(null)
+            }
+        } catch (err) {
+            console.error('Failed to start checkout:', err)
+            setPurchasing(null)
+        }
+    }
+
     // Generate FAQ Schema for SEO
     const faqSchema = {
         '@context': 'https://schema.org',
@@ -153,10 +214,11 @@ export default function PricingPage() {
                             </li>
                         </ul>
                         <button
-                            onClick={handleGetStarted}
-                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
+                            onClick={() => handleSelectPack('checkin', 1900)}
+                            disabled={purchasing !== null}
+                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            Select
+                            {purchasing === 'checkin' ? <Loader2 className="animate-spin" size={18} /> : 'Select'}
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
@@ -201,10 +263,11 @@ export default function PricingPage() {
                             </li>
                         </ul>
                         <button
-                            onClick={handleGetStarted}
-                            className="w-full py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all"
+                            onClick={() => handleSelectPack('bundle', 3900)}
+                            disabled={purchasing !== null}
+                            className="w-full py-3 bg-white text-slate-900 rounded-xl font-semibold hover:bg-slate-100 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            Select
+                            {purchasing === 'bundle' ? <Loader2 className="animate-spin" size={18} /> : 'Select'}
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.
@@ -242,10 +305,11 @@ export default function PricingPage() {
                             </li>
                         </ul>
                         <button
-                            onClick={handleGetStarted}
-                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all"
+                            onClick={() => handleSelectPack('moveout', 2900)}
+                            disabled={purchasing !== null}
+                            className="w-full py-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            Select
+                            {purchasing === 'moveout' ? <Loader2 className="animate-spin" size={18} /> : 'Select'}
                         </button>
                         <p className="text-xs text-slate-400 text-center mt-3">
                             Extend storage if needed for €9/year.

@@ -73,11 +73,11 @@ function emailTemplate({
         <tr>
             <td align="center" style="padding: 60px 0;">
                 <table role="presentation" class="email-container" width="560" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);">
-                    <!-- Brand Section (Text Only) -->
+                    <!-- Brand Section (Logo Image) -->
                     <tr>
                         <td align="center" style="padding: 48px 48px 0 48px;">
-                            <a href="https://rentvault.co" target="_blank" style="text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 800; color: #011246; letter-spacing: -0.02em;">
-                                RentVault
+                            <a href="https://rentvault.co" target="_blank" style="text-decoration: none;">
+                                <img src="https://rentvault.co/logo.png" alt="RentVault" width="180" height="auto" style="display: block; max-width: 180px; height: auto;" />
                             </a>
                         </td>
                     </tr>
