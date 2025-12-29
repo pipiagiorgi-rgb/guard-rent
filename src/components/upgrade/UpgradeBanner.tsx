@@ -7,12 +7,13 @@ interface UpgradeBannerProps {
     caseId: string
     currentPack?: string | null
     isAdmin?: boolean  // Admin users get full access
+    stayType?: 'long_term' | 'short_stay' | null  // Determines which packs to show
 }
 
-export function UpgradeBanner({ caseId, currentPack, isAdmin = false }: UpgradeBannerProps) {
+export function UpgradeBanner({ caseId, currentPack, isAdmin = false, stayType = 'long_term' }: UpgradeBannerProps) {
     const [loading, setLoading] = useState<string | null>(null)
 
-    const handlePurchase = async (packType: 'checkin' | 'bundle' | 'moveout') => {
+    const handlePurchase = async (packType: 'checkin' | 'bundle' | 'moveout' | 'short_stay') => {
         setLoading(packType)
         try {
             const res = await fetch('/api/checkout', {
@@ -116,6 +117,53 @@ export function UpgradeBanner({ caseId, currentPack, isAdmin = false }: UpgradeB
                         <p className="text-sm text-green-700">
                             You have full access to move-out and deposit recovery features.
                         </p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // CASE 3.5: Short-Stay pack purchased - Show success banner
+    if (currentPack === 'short_stay') {
+        return (
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0">
+                        <CheckCircle size={20} />
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-green-900">Short-Stay Pack Active</h3>
+                        <p className="text-sm text-green-700">
+                            Your arrival and departure evidence is protected for 30 days after check-out.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // CASE 3.6: Short-stay case with no pack - Show short-stay specific upsell
+    if (stayType === 'short_stay' && !currentPack) {
+        return (
+            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
+                <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
+                        <Shield size={24} />
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="font-semibold text-lg mb-1 text-slate-900">Protect your short-stay evidence</h3>
+                        <p className="text-sm text-slate-600 mb-4">
+                            Save your arrival and departure photos with timestamps. Stored for 30 days after check-out.
+                        </p>
+                        <button
+                            onClick={() => handlePurchase('short_stay')}
+                            disabled={loading === 'short_stay'}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-2"
+                        >
+                            {loading === 'short_stay' ? 'Loading...' : (
+                                <>Short-Stay Pack €5.99 <ArrowRight size={16} /></>
+                            )}
+                        </button>
                     </div>
                 </div>
             </div>

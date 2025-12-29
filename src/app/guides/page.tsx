@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Camera, Clock, Shield, AlertCircle, Lock, FileDown, Video, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, Clock, Shield, AlertCircle, Lock, FileDown, Video, Check, Home } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { Logo } from '@/components/brand/Logo'
 import { ScrollToTop } from '@/components/ui/ScrollToTop'
@@ -42,6 +42,13 @@ const guides = [
         description: 'Document problems as they happen. Build a timeline that protects you at move-out.',
         slug: 'mid-tenancy-issues',
         color: 'red'
+    },
+    {
+        icon: Home,
+        title: 'Short-stay & vacation rentals',
+        description: 'Protect yourself at Airbnb, Booking.com, or VRBO stays from unfair damage claims.',
+        slug: 'short-stay',
+        color: 'blue'
     }
 ]
 

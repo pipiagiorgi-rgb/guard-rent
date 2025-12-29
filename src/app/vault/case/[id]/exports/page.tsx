@@ -931,6 +931,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                 caseId={caseId}
                 currentPack={evidence.purchasedPacks.length > 0 ? evidence.purchasedPacks[0] : null}
                 isAdmin={isAdmin}
+                stayType={evidence.stayType}
             />
 
             {/* Purchase Success Banner */}

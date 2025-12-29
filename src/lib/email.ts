@@ -221,7 +221,7 @@ export async function sendEmail({ to, subject, text, html, tags }: SendEmailOpti
 // ============================================================
 interface PackPurchaseEmailProps {
     to: string
-    packType: 'checkin' | 'moveout' | 'bundle'
+    packType: 'checkin' | 'moveout' | 'bundle' | 'short_stay'
     rentalLabel: string
     retentionUntil: string
     caseId: string
@@ -271,6 +271,15 @@ export async function sendPackPurchaseEmail({
                 'Unlimited contract questions and translations',
                 '12 months secure storage',
                 'Full access to all features'
+            ]
+        },
+        short_stay: {
+            name: 'Short-Stay Pack',
+            unlocks: [
+                'Arrival and departure evidence sealed',
+                'Short-stay evidence report PDF',
+                'Platform and reservation tracking',
+                '30 days secure storage after check-out'
             ]
         }
     }

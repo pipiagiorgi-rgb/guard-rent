@@ -6,8 +6,8 @@ import { FAQAccordion } from '@/components/ui/FAQAccordion'
 
 export const metadata: Metadata = {
     title: 'RentVault | Protect Your Deposit With Organised Evidence',
-    description: 'Organise rental documents, photos, and key dates in one secure vault. Built for tenants to protect deposits before disputes arise.',
-    keywords: 'rental deposit protection, tenant documentation, move-in photos, rental contract storage, deposit dispute evidence, tenancy organiser, expat rental, property condition report, notice period reminders',
+    description: 'Organise rental documents, photos, and key dates in one secure vault. Built for tenants to protect deposits before disputes arise. Works for long-term rentals and Airbnb/vacation stays.',
+    keywords: 'rental deposit protection, tenant documentation, move-in photos, rental contract storage, deposit dispute evidence, tenancy organiser, expat rental, property condition report, notice period reminders, airbnb damage protection, vacation rental evidence, short stay documentation, booking.com guest protection, vrbo deposit evidence',
     icons: {
         icon: '/favicon.png',
         apple: '/apple-icon.png',
