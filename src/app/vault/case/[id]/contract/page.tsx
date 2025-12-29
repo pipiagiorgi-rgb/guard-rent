@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Lock, Info } from 'lucide-react'
 import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { isAdminEmail } from '@/lib/admin'
+import { redirect } from 'next/navigation'
 
 export default async function ContractPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
@@ -14,9 +15,14 @@ export default async function ContractPage({ params }: { params: { id: string } 
 
     const { data: rentalCase } = await supabase
         .from('cases')
-        .select('purchase_type')
+        .select('purchase_type, stay_type')
         .eq('case_id', params.id)
         .single()
+
+    // GUARD: Redirect short-stay cases to their dedicated page
+    if (rentalCase?.stay_type === 'short_stay') {
+        redirect(`/vault/case/${params.id}/short-stay`)
+    }
 
     // Check if user has purchased a pack OR is admin
     const isAdmin = isAdminEmail(userEmail)

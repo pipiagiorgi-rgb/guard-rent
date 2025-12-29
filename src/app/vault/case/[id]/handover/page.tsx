@@ -105,9 +105,15 @@ export default function HandoverPage({ params }: { params: Promise<{ id: string 
             // Fetch case handover data and purchase status
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('handover_notes, handover_completed_at, keys_returned_at, meter_readings, purchase_type')
+                .select('handover_notes, handover_completed_at, keys_returned_at, meter_readings, purchase_type, stay_type')
                 .eq('case_id', id)
                 .single()
+
+            // GUARD: Redirect short-stay cases to their dedicated page
+            if (caseData?.stay_type === 'short_stay') {
+                window.location.href = `/vault/case/${id}/short-stay`
+                return
+            }
 
 
             if (caseData) {

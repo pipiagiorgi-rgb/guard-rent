@@ -192,7 +192,8 @@ export async function POST(req: Request) {
 
                 console.log(`Added related_contracts pack to case ${caseId}`)
             } else {
-                // Standard evidence pack handling (checkin, moveout, bundle)
+                // Standard evidence pack handling (checkin, moveout, bundle, short_stay)
+                const { stayType } = session.metadata || {}
 
                 // Idempotency check - prevent duplicate purchases on webhook retry
                 const { data: existingPack } = await supabaseAdmin
@@ -207,10 +208,45 @@ export async function POST(req: Request) {
                     return NextResponse.json({ received: true })
                 }
 
-                // Calculate Retention: Now + 12 months
+                // Verify stay_type matches case (guard against misapplied packs)
+                const { data: caseCheck } = await supabaseAdmin
+                    .from('cases')
+                    .select('stay_type, check_out_date')
+                    .eq('case_id', caseId)
+                    .single()
+
+                const caseStayType = caseCheck?.stay_type || 'long_term'
+
+                // Guard: short_stay pack can only be applied to short_stay cases
+                if (packType === 'short_stay' && caseStayType !== 'short_stay') {
+                    console.error(`Mismatch: short_stay pack attempted on long_term case ${caseId}`)
+                    return NextResponse.json({ error: 'Pack type mismatch' }, { status: 400 })
+                }
+
+                // Guard: long-term packs can only be applied to long_term cases
+                if (['checkin', 'moveout', 'bundle'].includes(packType) && caseStayType === 'short_stay') {
+                    console.error(`Mismatch: long-term pack ${packType} attempted on short_stay case ${caseId}`)
+                    return NextResponse.json({ error: 'Pack type mismatch' }, { status: 400 })
+                }
+
+                // Calculate Retention based on stay type
                 const purchaseDate = new Date()
-                const retentionDate = new Date(purchaseDate)
-                retentionDate.setMonth(retentionDate.getMonth() + 12)
+                let retentionDate: Date
+
+                if (packType === 'short_stay') {
+                    // Short-stay: 30 days after check_out_date (or purchase if no date)
+                    if (caseCheck?.check_out_date) {
+                        retentionDate = new Date(caseCheck.check_out_date)
+                        retentionDate.setDate(retentionDate.getDate() + 30)
+                    } else {
+                        retentionDate = new Date(purchaseDate)
+                        retentionDate.setDate(retentionDate.getDate() + 30)
+                    }
+                } else {
+                    // Long-term: 12 months from purchase
+                    retentionDate = new Date(purchaseDate)
+                    retentionDate.setMonth(retentionDate.getMonth() + 12)
+                }
 
                 // Get amount from session
                 const amountCents = session.amount_total || 0

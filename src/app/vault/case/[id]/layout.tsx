@@ -27,7 +27,7 @@ export default async function CaseLayout({
     // Fetch case to verify access and get state for progress badges
     const { data: rentalCase, error } = await supabase
         .from('cases')
-        .select('case_id, label, country, checkin_completed_at, handover_completed_at, contract_uploaded_at')
+        .select('case_id, label, country, stay_type, checkin_completed_at, handover_completed_at, contract_uploaded_at')
         .eq('case_id', id)
         .single()
 
@@ -51,6 +51,7 @@ export default async function CaseLayout({
 
     // Calculate case state for sidebar badges using 3-state logic
     const caseState = {
+        stayType: (rentalCase.stay_type || 'long_term') as 'long_term' | 'short_stay',
         hasContract: !!rentalCase.contract_uploaded_at,
         checkinStatus: getPhaseStatus(
             (checkinPhotoCount || 0) > 0,

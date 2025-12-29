@@ -101,9 +101,15 @@ export default function CheckInPage({ params }: { params: Promise<{ id: string }
             // Fetch case data (meter readings and purchase status)
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('checkin_meter_readings, purchase_type, checkin_completed_at')
+                .select('checkin_meter_readings, purchase_type, checkin_completed_at, stay_type')
                 .eq('case_id', id)
                 .single()
+
+            // GUARD: Redirect short-stay cases to their dedicated page
+            if (caseData?.stay_type === 'short_stay') {
+                window.location.href = `/vault/case/${id}/short-stay`
+                return
+            }
 
             // Check if user has purchased a pack (or is admin)
             if (caseData) {

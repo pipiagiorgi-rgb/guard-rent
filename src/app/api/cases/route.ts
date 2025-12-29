@@ -11,15 +11,39 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json()
-        const { label, country, lease_start, lease_end } = body
+        const {
+            label,
+            country,
+            stay_type,
+            // Long-term fields
+            lease_start,
+            lease_end,
+            // Short-stay fields
+            platform_name,
+            reservation_id,
+            check_in_date,
+            check_out_date
+        } = body
 
         if (!label || !country) {
             return NextResponse.json({ error: 'Label and country are required' }, { status: 400 })
         }
 
-        // Calculate default retention_until (12 months from now)
-        const retentionUntil = new Date()
-        retentionUntil.setMonth(retentionUntil.getMonth() + 12)
+        // Calculate retention_until based on stay type
+        let retentionUntil: Date
+        if (stay_type === 'short_stay' && check_out_date) {
+            // Short-stay: 30 days after check-out
+            retentionUntil = new Date(check_out_date)
+            retentionUntil.setDate(retentionUntil.getDate() + 30)
+        } else if (stay_type === 'short_stay') {
+            // Short-stay without check-out date: 30 days from now
+            retentionUntil = new Date()
+            retentionUntil.setDate(retentionUntil.getDate() + 30)
+        } else {
+            // Long-term: 12 months from now
+            retentionUntil = new Date()
+            retentionUntil.setMonth(retentionUntil.getMonth() + 12)
+        }
 
         const { data: newCase, error: insertError } = await supabase
             .from('cases')
@@ -27,8 +51,16 @@ export async function POST(request: Request) {
                 user_id: user.id,
                 label,
                 country,
+                stay_type: stay_type || 'long_term',
+                // Long-term fields
                 lease_start: lease_start || null,
                 lease_end: lease_end || null,
+                // Short-stay fields
+                platform_name: platform_name || null,
+                reservation_id: reservation_id || null,
+                check_in_date: check_in_date || null,
+                check_out_date: check_out_date || null,
+                // Common
                 retention_until: retentionUntil.toISOString(),
                 status: 'active',
                 deletion_status: 'active'

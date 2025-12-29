@@ -16,7 +16,8 @@ import {
     AlertTriangle,
     Check,
     Circle,
-    FolderOpen
+    FolderOpen,
+    Plane
 } from 'lucide-react'
 import { useState } from 'react'
 import { FeedbackDialog } from '@/components/features/FeedbackDialog'
@@ -24,6 +25,7 @@ import { FeedbackDialog } from '@/components/features/FeedbackDialog'
 type PhaseStatus = 'not-started' | 'in-progress' | 'complete'
 
 interface CaseState {
+    stayType?: 'long_term' | 'short_stay'
     hasContract: boolean
     checkinStatus: PhaseStatus
     handoverStatus: PhaseStatus
@@ -39,19 +41,30 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
     const pathname = usePathname()
     const [feedbackOpen, setFeedbackOpen] = useState(false)
 
-    // Navigation items grouped by hierarchy
-    const primaryItems = [
-        { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
-        { href: `/vault/case/${caseId}/check-in`, label: 'Move In', icon: Camera, status: caseState?.checkinStatus },
-        { href: `/vault/case/${caseId}/handover`, label: 'Move Out', icon: KeyRound, status: caseState?.handoverStatus },
-    ]
+    const isShortStay = caseState?.stayType === 'short_stay'
 
-    const secondaryItems = [
-        { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText },
-        { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
-        { href: `/vault/case/${caseId}/issues`, label: 'Condition', icon: FileText },
-        { href: `/vault/case/${caseId}/documents`, label: 'Documents', icon: FolderOpen },
-    ]
+    // Navigation items grouped by hierarchy - different for short-stay vs long-term
+    const primaryItems = isShortStay
+        ? [
+            { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
+            { href: `/vault/case/${caseId}/short-stay`, label: 'Evidence', icon: Plane, status: caseState?.checkinStatus },
+        ]
+        : [
+            { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
+            { href: `/vault/case/${caseId}/check-in`, label: 'Move In', icon: Camera, status: caseState?.checkinStatus },
+            { href: `/vault/case/${caseId}/handover`, label: 'Move Out', icon: KeyRound, status: caseState?.handoverStatus },
+        ]
+
+    const secondaryItems = isShortStay
+        ? [
+            { href: `/vault/case/${caseId}/documents`, label: 'Documents', icon: FolderOpen },
+        ]
+        : [
+            { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText },
+            { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
+            { href: `/vault/case/${caseId}/issues`, label: 'Condition', icon: FileText },
+            { href: `/vault/case/${caseId}/documents`, label: 'Documents', icon: FolderOpen },
+        ]
 
     const tertiaryItems = [
         { href: `/vault/case/${caseId}/exports`, label: 'Exports', icon: Download },

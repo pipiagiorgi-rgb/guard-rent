@@ -91,9 +91,15 @@ export default function DeadlinesPage({ params }: { params: Promise<{ id: string
                 // 1. Get Case & Contract Data
                 const { data: caseData } = await supabase
                     .from('cases')
-                    .select('label, contract_analysis, lease_end')
+                    .select('label, contract_analysis, lease_end, stay_type')
                     .eq('case_id', id)
                     .single()
+
+                // GUARD: Redirect short-stay cases to their dedicated page
+                if (caseData?.stay_type === 'short_stay') {
+                    window.location.href = `/vault/case/${id}/short-stay`
+                    return
+                }
 
                 if (caseData) {
                     setRentalLabel(caseData.label || 'Your rental')

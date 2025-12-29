@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json()
-        const { caseId, packType } = body // packType: 'checkin' | 'moveout' | 'bundle'
+        const { caseId, packType } = body // packType: 'checkin' | 'moveout' | 'bundle' | 'short_stay'
 
         if (!packType) {
             return NextResponse.json({ error: 'Missing pack type' }, { status: 400 })
@@ -18,12 +18,24 @@ export async function POST(request: Request) {
         const packPricing: Record<string, { price: number, type: string, name: string, description: string }> = {
             'checkin': { price: 1900, type: 'checkin', name: 'Check-In Pack', description: 'Check-in documentation · Includes 1 year secure storage' },
             'moveout': { price: 2900, type: 'moveout', name: 'Handover Pack', description: 'Handover & deposit recovery · Includes 1 year secure storage' },
-            'bundle': { price: 3900, type: 'bundle', name: 'Full Pack', description: 'Complete rental protection · Includes 1 year secure storage' }
+            'bundle': { price: 3900, type: 'bundle', name: 'Full Pack', description: 'Complete rental protection · Includes 1 year secure storage' },
+            'short_stay': { price: 599, type: 'short_stay', name: 'Short-Stay Pack', description: 'Arrival & departure evidence · 30-day secure storage' }
         }
 
         const pack = packPricing[packType]
         if (!pack) {
             return NextResponse.json({ error: 'Invalid pack type' }, { status: 400 })
+        }
+
+        // Fetch case stay_type for metadata (required for webhook verification)
+        let stayType: string = 'long_term'
+        if (caseId) {
+            const { data: caseData } = await supabase
+                .from('cases')
+                .select('stay_type')
+                .eq('case_id', caseId)
+                .single()
+            stayType = caseData?.stay_type || 'long_term'
         }
 
         // Get site URL
@@ -64,6 +76,7 @@ export async function POST(request: Request) {
             cancel_url: cancelUrl,
             metadata: {
                 packType: pack.type,
+                stayType,  // Required for webhook verification
                 ...(caseId && { caseId }),
                 ...(user?.id && { userId: user.id }),
             },
