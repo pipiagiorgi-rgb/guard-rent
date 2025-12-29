@@ -56,9 +56,7 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
         ]
 
     const secondaryItems = isShortStay
-        ? [
-            { href: `/vault/case/${caseId}/documents`, label: 'Documents', icon: FolderOpen },
-        ]
+        ? [] // No secondary items for short-stay (no Documents, no Contract, etc.)
         : [
             { href: `/vault/case/${caseId}/contract`, label: 'Contract', icon: FileText },
             { href: `/vault/case/${caseId}/deadlines`, label: 'Deadlines', icon: Clock },
