@@ -1299,3 +1299,111 @@ ${dashboardUrl}
     })
 }
 
+// ============================================================
+// ADMIN NOTIFICATIONS (sent to support@rentvault.co)
+// ============================================================
+const ADMIN_NOTIFICATION_EMAIL = 'support@rentvault.co'
+
+/**
+ * Notify admin when a user logs in or registers
+ */
+export async function sendAdminLoginNotification({
+    userEmail,
+    isNewUser
+}: {
+    userEmail: string
+    isNewUser: boolean
+}): Promise<{ success: boolean; error?: string }> {
+    const action = isNewUser ? 'New Registration' : 'Login'
+    const subject = `[RentVault] ${action}: ${userEmail}`
+    const timestamp = new Date().toLocaleString('en-GB', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'Europe/Luxembourg'
+    })
+
+    const text = `${action}\n\nUser: ${userEmail}\nTime: ${timestamp}`
+
+    const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px;">
+            <h2 style="color: ${isNewUser ? '#16a34a' : '#0f172a'}; margin: 0 0 16px 0;">
+                ${isNewUser ? '🎉 New Registration' : '👤 User Login'}
+            </h2>
+            <p style="margin: 0 0 8px 0;"><strong>Email:</strong> ${userEmail}</p>
+            <p style="margin: 0; color: #64748b; font-size: 14px;"><strong>Time:</strong> ${timestamp}</p>
+        </div>
+    `
+
+    return sendEmail({
+        to: ADMIN_NOTIFICATION_EMAIL,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'admin_notification' }]
+    })
+}
+
+/**
+ * Notify admin when a payment is made
+ */
+export async function sendAdminPaymentNotification({
+    userEmail,
+    packType,
+    amount,
+    rentalLabel,
+    caseId
+}: {
+    userEmail: string
+    packType: string
+    amount: number
+    rentalLabel: string
+    caseId: string
+}): Promise<{ success: boolean; error?: string }> {
+    const packNames: Record<string, string> = {
+        checkin: 'Check-In Pack',
+        checkin_pack: 'Check-In Pack',
+        moveout: 'Move-Out Pack',
+        deposit_pack: 'Deposit Pack',
+        bundle: 'Full Bundle',
+        storage_1: '+1 Year Storage',
+        storage_2: '+2 Years Storage',
+        storage_3: '+3 Years Storage',
+        related_contracts: 'Related Contracts'
+    }
+
+    const packName = packNames[packType] || packType
+    const formattedAmount = `€${(amount / 100).toFixed(2)}`
+    const timestamp = new Date().toLocaleString('en-GB', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'Europe/Luxembourg'
+    })
+
+    const subject = `[RentVault] 💰 Payment: ${formattedAmount} - ${packName}`
+
+    const text = `Payment Received\n\nPack: ${packName}\nAmount: ${formattedAmount}\nUser: ${userEmail}\nRental: ${rentalLabel}\nTime: ${timestamp}`
+
+    const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px;">
+            <h2 style="color: #16a34a; margin: 0 0 16px 0;">💰 Payment Received</h2>
+            <table style="border-collapse: collapse;">
+                <tr><td style="padding: 4px 16px 4px 0; color: #64748b;">Pack:</td><td style="padding: 4px 0; font-weight: 600;">${packName}</td></tr>
+                <tr><td style="padding: 4px 16px 4px 0; color: #64748b;">Amount:</td><td style="padding: 4px 0; font-weight: 700; color: #16a34a;">${formattedAmount}</td></tr>
+                <tr><td style="padding: 4px 16px 4px 0; color: #64748b;">User:</td><td style="padding: 4px 0;">${userEmail}</td></tr>
+                <tr><td style="padding: 4px 16px 4px 0; color: #64748b;">Rental:</td><td style="padding: 4px 0;">${rentalLabel}</td></tr>
+                <tr><td style="padding: 4px 16px 4px 0; color: #64748b;">Time:</td><td style="padding: 4px 0;">${timestamp}</td></tr>
+            </table>
+            <p style="margin: 16px 0 0 0;">
+                <a href="https://rentvault.co/vault/case/${caseId}" style="color: #0f172a;">View in Dashboard →</a>
+            </p>
+        </div>
+    `
+
+    return sendEmail({
+        to: ADMIN_NOTIFICATION_EMAIL,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'admin_notification' }]
+    })
+}

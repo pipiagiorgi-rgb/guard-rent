@@ -3,7 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { headers } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
-import { sendRelatedContractsPurchaseEmail, sendPackPurchaseEmail } from '@/lib/email'
+import { sendRelatedContractsPurchaseEmail, sendPackPurchaseEmail, sendAdminPaymentNotification } from '@/lib/email'
 
 export async function POST(req: Request) {
     const body = await req.text()
@@ -100,6 +100,15 @@ export async function POST(req: Request) {
                             caseId
                         })
 
+                        // Notify admin of payment
+                        await sendAdminPaymentNotification({
+                            userEmail,
+                            packType: `storage_${yearsToAdd}`,
+                            amount: session.amount_total || 0,
+                            rentalLabel,
+                            caseId
+                        })
+
                         console.log(`Sent storage extension email to ${userEmail}`)
                     }
                 }
@@ -164,6 +173,16 @@ export async function POST(req: Request) {
                             rentalLabel,
                             dashboardUrl: `${siteUrl}/vault/case/${caseId}`
                         })
+
+                        // Notify admin of payment
+                        await sendAdminPaymentNotification({
+                            userEmail: userData.email,
+                            packType: 'related_contracts',
+                            amount: amountCents,
+                            rentalLabel,
+                            caseId
+                        })
+
                         console.log(`Sent related_contracts purchase email to ${userData.email}`)
                     }
                 } catch (emailError) {
@@ -256,6 +275,16 @@ export async function POST(req: Request) {
                             retentionUntil: retentionDate.toISOString(),
                             caseId
                         })
+
+                        // Notify admin of payment
+                        await sendAdminPaymentNotification({
+                            userEmail: userData.email,
+                            packType,
+                            amount: amountCents,
+                            rentalLabel,
+                            caseId
+                        })
+
                         console.log(`Sent pack purchase confirmation email to ${userData.email}`)
                     }
                 } catch (emailError) {

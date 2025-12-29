@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { sendAdminLoginNotification } from '@/lib/email'
 
 // Use service role for server-side operations
 const supabaseAdmin = createClient(
@@ -50,11 +51,13 @@ export async function POST(request: Request) {
         const existingUser = existingUsers?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase())
 
         let userId: string
+        let isNewUser = false
 
         if (existingUser) {
             userId = existingUser.id
         } else {
             // Create new user
+            isNewUser = true
             const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
                 email: email.toLowerCase(),
                 email_confirm: true
@@ -81,6 +84,11 @@ export async function POST(request: Request) {
             console.error('Failed to generate link:', linkError)
             return NextResponse.json({ error: 'Failed to authenticate' }, { status: 500 })
         }
+
+        // Notify admin of login/registration (non-blocking)
+        sendAdminLoginNotification({ userEmail: email, isNewUser }).catch(err => {
+            console.error('Failed to send admin login notification:', err)
+        })
 
         // The action_link contains the token - we need to redirect the user to this URL
         // to properly set the auth cookies
