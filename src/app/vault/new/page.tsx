@@ -87,11 +87,15 @@ export default function NewCasePage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Long-term rental card */}
+                    {/* Long-term rental card - PRIMARY PATH */}
                     <button
                         onClick={() => setStayType('long_term')}
-                        className="p-6 bg-white rounded-xl border-2 border-slate-200 hover:border-slate-900 transition-colors text-left group"
+                        className="p-6 bg-white rounded-xl border-2 border-slate-300 hover:border-slate-900 hover:shadow-lg hover:-translate-y-1 transition-all text-left group relative"
                     >
+                        {/* Most common badge */}
+                        <span className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-slate-900 text-white text-xs font-medium rounded-full">
+                            Most common
+                        </span>
                         <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-200 transition-colors">
                             <Home className="w-6 h-6 text-amber-700" />
                         </div>
@@ -103,26 +107,43 @@ export default function NewCasePage() {
                             <span className="px-2 py-1 bg-slate-100 rounded">€19-39</span>
                             <span>12 months storage</span>
                         </div>
+                        {/* Hover arrow */}
+                        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-slate-400 text-sm">Continue →</span>
+                        </div>
                     </button>
 
                     {/* Short-stay card */}
                     <button
                         onClick={() => setStayType('short_stay')}
-                        className="p-6 bg-white rounded-xl border-2 border-slate-200 hover:border-blue-600 transition-colors text-left group"
+                        className="p-6 bg-white rounded-xl border-2 border-slate-200 hover:border-blue-600 hover:shadow-lg hover:-translate-y-1 transition-all text-left group relative"
                     >
                         <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
                             <Plane className="w-6 h-6 text-blue-700" />
                         </div>
                         <h3 className="font-semibold text-lg mb-1">Short Stay</h3>
-                        <p className="text-slate-600 text-sm mb-3">
+                        <p className="text-slate-600 text-sm mb-1">
                             Airbnb, Booking, vacation rentals
+                        </p>
+                        {/* Clarification for guests */}
+                        <p className="text-slate-400 text-xs mb-3">
+                            For guests documenting arrival & departure condition
                         </p>
                         <div className="flex items-center gap-2 text-xs text-slate-500">
                             <span className="px-2 py-1 bg-blue-100 rounded text-blue-700 font-medium">€5.99</span>
-                            <span>30 days storage</span>
+                            <span>30 days after checkout</span>
+                        </div>
+                        {/* Hover arrow */}
+                        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-slate-400 text-sm">Continue →</span>
                         </div>
                     </button>
                 </div>
+
+                {/* Reassurance footer */}
+                <p className="text-center text-slate-400 text-sm mt-6">
+                    You can't break anything—this just sets up the right workflow.
+                </p>
 
                 <div className="mt-6">
                     <Link
