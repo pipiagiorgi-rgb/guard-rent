@@ -77,7 +77,7 @@ function emailTemplate({
                     <tr>
                         <td align="center" style="padding: 48px 48px 0 48px;">
                             <a href="https://rentvault.co" target="_blank" style="text-decoration: none;">
-                                <img src="https://rentvault.co/logo.png" alt="RentVault" width="180" height="auto" style="display: block; max-width: 180px; height: auto;" />
+                                <img src="https://rentvault.co/logo-email.png" alt="RentVault" width="180" height="auto" style="display: block; max-width: 180px; height: auto;" />
                             </a>
                         </td>
                     </tr>
