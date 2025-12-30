@@ -15,6 +15,7 @@ import { UpgradeBanner } from '@/components/upgrade/UpgradeBanner'
 import { Footer } from '@/components/layout/Footer'
 import { isAdminEmail } from '@/lib/admin'
 import { CheckInUpsellModal } from '@/components/ui/CheckInUpsellModal'
+import ShortStayExports from '@/components/exports/ShortStayExports'
 
 interface Issue {
     issue_id: string
@@ -692,12 +693,21 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
     const hasShortStayPack = evidence.purchasedPacks.includes('short_stay')
     const isShortStay = evidence.stayType === 'short_stay'
 
+    // Unified access flags: admin OR purchased (single source of truth)
+    const hasCheckinAccess = isAdmin || hasCheckinPack
+    const hasDepositAccess = isAdmin || hasDepositPack
+
     if (loading) {
         return (
             <div className="flex justify-center py-12">
                 <Loader2 className="animate-spin text-slate-400" size={32} />
             </div>
         )
+    }
+
+    // Render dedicated short-stay exports component
+    if (isShortStay) {
+        return <ShortStayExports caseId={caseId} stayType="short_stay" />
     }
 
     return (
@@ -1209,7 +1219,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         <p className="text-slate-500">Timestamped Move-In record showing the property's initial condition</p>
                                     </div>
                                 </div>
-                                <span className="text-xl font-bold">€19</span>
+                                {/* Only show price if not purchased and not admin */}
+                                {!hasCheckinAccess && (
+                                    <span className="text-xl font-bold">€19</span>
+                                )}
                             </div>
 
                             <p className="text-sm text-slate-600 mb-4">Includes:</p>
@@ -1371,7 +1384,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                             )}
 
                             {/* Action Buttons */}
-                            {hasCheckinPack ? (
+                            {hasCheckinAccess ? (
                                 <>
                                     <div className="flex gap-3">
                                         <button
@@ -1486,7 +1499,10 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                                         <p className="text-slate-500">Complete Move-In / Move-Out comparison prepared for deposit disputes</p>
                                     </div>
                                 </div>
-                                <span className="text-xl font-bold">€29</span>
+                                {/* Only show price if not purchased and not admin */}
+                                {!hasDepositAccess && (
+                                    <span className="text-xl font-bold">€29</span>
+                                )}
                             </div>
 
                             <p className="text-sm text-slate-600 mb-4">Includes:</p>
@@ -1648,7 +1664,7 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
                             )}
 
                             {/* Action Buttons */}
-                            {hasDepositPack ? (
+                            {hasDepositAccess ? (
                                 <div className="flex gap-3">
                                     <button
                                         onClick={() => handlePreview('deposit_pack')}

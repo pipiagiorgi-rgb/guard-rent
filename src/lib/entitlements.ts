@@ -6,8 +6,12 @@
  */
 
 import { createClient } from '@/lib/supabase/server'
+import { isAdminEmail } from '@/lib/admin'
 
 export interface CaseEntitlements {
+    // Admin status (runtime-only, never persisted)
+    isAdmin: boolean
+
     // Stay type
     stayType: 'long_term' | 'short_stay'
 
@@ -72,9 +76,11 @@ interface Purchase {
 
 export async function getCaseEntitlements(
     caseId: string,
-    userId: string
+    userId: string,
+    userEmail?: string | null
 ): Promise<CaseEntitlements | null> {
     const supabase = await createClient()
+    const isAdmin = isAdminEmail(userEmail)
 
     // 1. Fetch case data
     const { data: caseData, error: caseError } = await supabase
@@ -144,6 +150,7 @@ export async function getCaseEntitlements(
     }
 
     return {
+        isAdmin,
         stayType,
 
         // Long-term phases
