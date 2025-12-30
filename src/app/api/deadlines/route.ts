@@ -8,13 +8,19 @@ import { sendReminderConfirmationEmail } from '@/lib/email'
 export async function POST(request: Request) {
     try {
         const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError) {
+            console.error('Deadline auth error:', authError)
+            return NextResponse.json({ error: 'Authentication failed.' }, { status: 401 })
+        }
 
         if (!user) {
             return NextResponse.json({ error: 'Please sign in.' }, { status: 401 })
         }
 
         const body = await request.json()
+        console.log('Deadline API body:', JSON.stringify(body, null, 2))
         const { caseId, type, date, dueDay, offsets, rentalLabel, noticeMethod, label } = body
 
         if (!caseId || !type) {
@@ -22,12 +28,17 @@ export async function POST(request: Request) {
         }
 
         // Verify case ownership and get contract data for email
-        const { data: rentalCase } = await supabase
+        const { data: rentalCase, error: caseError } = await supabase
             .from('cases')
             .select('case_id, user_id, contract_analysis, lease_end')
             .eq('case_id', caseId)
             .eq('user_id', user.id)
             .single()
+
+        if (caseError) {
+            console.error('Case query error:', caseError)
+            return NextResponse.json({ error: 'Case not found.' }, { status: 404 })
+        }
 
         if (!rentalCase) {
             return NextResponse.json({ error: 'Case not found.' }, { status: 404 })
@@ -57,61 +68,90 @@ export async function POST(request: Request) {
 
         let reminderId: string | undefined
 
-        // For custom reminders, always insert new (no upsert)
+        // Validate date is present for non-rent types
+        if (!deadlineDate && type !== 'rent_payment') {
+            console.error('Missing date for deadline type:', type)
+            return NextResponse.json({ error: 'Please provide a valid date.' }, { status: 400 })
+        }
+
+        // For custom reminders, delete any existing with same label first (workaround for unique constraint)
         if (type === 'custom') {
+            console.log('Creating custom deadline:', { caseId, type, date: deadlineDate, preferences })
+
+            // Delete existing custom reminder with same label to allow re-setting
+            if (label) {
+                await supabase
+                    .from('deadlines')
+                    .delete()
+                    .eq('case_id', caseId)
+                    .eq('type', 'custom')
+                    .contains('preferences', { label })
+            }
+
             const { data: newReminder, error: insertError } = await supabase
                 .from('deadlines')
                 .insert({
                     case_id: caseId,
                     type,
-                    date: deadlineDate,  // Column is 'date', not 'due_date'
+                    date: deadlineDate,
                     preferences,
                     created_at: new Date().toISOString()
                 })
-                .select('deadline_id')  // Column is 'deadline_id', not 'id'
+                .select('deadline_id')
                 .single()
 
             if (insertError) {
-                console.error('Custom deadline insert error:', insertError)
-                return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
+                console.error('Custom deadline insert error:', JSON.stringify(insertError, null, 2))
+                return NextResponse.json({
+                    error: `Failed to save reminder: ${insertError.message || insertError.code || 'Unknown error'}`
+                }, { status: 500 })
             }
 
             reminderId = newReminder?.deadline_id
+            console.log('Custom deadline created:', reminderId)
         } else {
-            // For standard reminders, upsert (replace if exists)
-            const { error: upsertError } = await supabase
+            // For standard reminders, check if exists first then update or insert
+            const { data: existing } = await supabase
                 .from('deadlines')
-                .upsert({
-                    case_id: caseId,
-                    type,
-                    date: deadlineDate,  // Column is 'date', not 'due_date'
-                    preferences,
-                    created_at: new Date().toISOString()
-                }, {
-                    onConflict: 'case_id,type'
-                })
+                .select('deadline_id')
+                .eq('case_id', caseId)
+                .eq('type', type)
+                .single()
 
-            if (upsertError) {
-                console.error('Deadline upsert error:', upsertError)
+            if (existing) {
+                // Update existing reminder
+                const { error: updateError } = await supabase
+                    .from('deadlines')
+                    .update({
+                        date: deadlineDate,
+                        preferences
+                    })
+                    .eq('deadline_id', existing.deadline_id)
 
-                // If unique constraint error, try update instead
-                if (upsertError.code === '23505' || upsertError.code === '42P10') {
-                    const { error: updateError } = await supabase
-                        .from('deadlines')
-                        .update({
-                            date: deadlineDate,
-                            preferences
-                        })
-                        .eq('case_id', caseId)
-                        .eq('type', type)
-
-                    if (updateError) {
-                        console.error('Deadline update error:', updateError)
-                        return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
-                    }
-                } else {
+                if (updateError) {
+                    console.error('Deadline update error:', updateError)
                     return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
                 }
+                reminderId = existing.deadline_id
+            } else {
+                // Insert new reminder
+                const { data: newReminder, error: insertError } = await supabase
+                    .from('deadlines')
+                    .insert({
+                        case_id: caseId,
+                        type,
+                        date: deadlineDate,
+                        preferences,
+                        created_at: new Date().toISOString()
+                    })
+                    .select('deadline_id')
+                    .single()
+
+                if (insertError) {
+                    console.error('Deadline insert error:', insertError)
+                    return NextResponse.json({ error: 'Failed to save reminder.' }, { status: 500 })
+                }
+                reminderId = newReminder?.deadline_id
             }
         }
 

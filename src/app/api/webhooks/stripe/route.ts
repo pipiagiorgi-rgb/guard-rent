@@ -301,12 +301,12 @@ export async function POST(req: Request) {
                         .eq('user_id', userId)
                         .single()
 
-                    if (userData?.email && (packType === 'checkin' || packType === 'moveout' || packType === 'bundle')) {
+                    if (userData?.email && (packType === 'checkin' || packType === 'moveout' || packType === 'bundle' || packType === 'short_stay')) {
                         const rentalLabel = rentalCase?.label || rentalCase?.address || 'Your rental'
 
                         await sendPackPurchaseEmail({
                             to: userData.email,
-                            packType: packType as 'checkin' | 'moveout' | 'bundle',
+                            packType: packType as 'checkin' | 'moveout' | 'bundle' | 'short_stay',
                             rentalLabel,
                             retentionUntil: retentionDate.toISOString(),
                             caseId

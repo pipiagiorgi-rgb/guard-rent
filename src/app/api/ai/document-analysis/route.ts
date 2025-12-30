@@ -2,20 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { extractText } from 'unpdf'
-
-// ============================================================
-// SYSTEM PROMPT FOR UTILITY/SERVICE DOCUMENTS
-// ============================================================
-const SYSTEM_PROMPT = `You are a document classification and extraction assistant specializing in utility contracts, service agreements, and related documents.
-
-RULES:
-1. Extract ONLY what is explicitly stated in the document
-2. Never infer or guess missing information
-3. ALWAYS translate extracted values to English
-4. Return null if information is not found
-5. Be precise with dates (use YYYY-MM-DD format)
-
-Return ONLY valid JSON. No markdown, no explanations.`
+import { DOCUMENT_CLASSIFICATION_PROMPT } from '@/lib/ai-prompts'
 
 const USER_PROMPT = `Analyze this document and extract key information.
 
@@ -223,7 +210,7 @@ export async function POST(request: Request) {
                                     const response = await openai.chat.completions.create({
                                         model: 'gpt-4o-mini',
                                         messages: [
-                                            { role: 'system', content: SYSTEM_PROMPT },
+                                            { role: 'system', content: DOCUMENT_CLASSIFICATION_PROMPT },
                                             { role: 'user', content: USER_PROMPT + textForAnalysis }
                                         ],
                                         response_format: { type: 'json_object' },

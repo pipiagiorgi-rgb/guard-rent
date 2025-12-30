@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
     Shield, Trash2, AlertTriangle, Lock,
-    Clock, FileText, Loader2, Check, Pencil
+    Clock, FileText, Loader2, Check, Pencil, Plane
 } from 'lucide-react'
 import { Footer } from '@/components/layout/Footer'
 import { useRouter } from 'next/navigation'
@@ -16,6 +16,12 @@ interface DataState {
     createdAt: string
     purchaseType: string | null
     storageYears: number
+    stayType: 'long_term' | 'short_stay'
+    checkInDate: string | null
+    checkOutDate: string | null
+    platformName: string | null
+    arrivalSealed: boolean
+    departureSealed: boolean
 }
 
 export default function DataRetentionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -30,7 +36,13 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
         retentionUntil: null,
         createdAt: '',
         purchaseType: null,
-        storageYears: 0
+        storageYears: 0,
+        stayType: 'long_term',
+        checkInDate: null,
+        checkOutDate: null,
+        platformName: null,
+        arrivalSealed: false,
+        departureSealed: false
     })
     const [editingName, setEditingName] = useState(false)
     const [newName, setNewName] = useState('')
@@ -54,7 +66,7 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
 
             const { data: caseData } = await supabase
                 .from('cases')
-                .select('label, retention_until, created_at, purchase_type, storage_years_purchased, storage_expires_at')
+                .select('label, retention_until, created_at, purchase_type, storage_years_purchased, storage_expires_at, stay_type, check_in_date, check_out_date, platform_name, checkin_completed_at, handover_completed_at')
                 .eq('case_id', id)
                 .single()
 
@@ -70,7 +82,13 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
                     retentionUntil: caseData.storage_expires_at || caseData.retention_until,
                     createdAt: caseData.created_at,
                     purchaseType: caseData.purchase_type,
-                    storageYears: caseData.storage_years_purchased || 0
+                    storageYears: caseData.storage_years_purchased || 0,
+                    stayType: (caseData.stay_type || 'long_term') as 'long_term' | 'short_stay',
+                    checkInDate: caseData.check_in_date,
+                    checkOutDate: caseData.check_out_date,
+                    platformName: caseData.platform_name,
+                    arrivalSealed: !!caseData.checkin_completed_at,
+                    departureSealed: !!caseData.handover_completed_at
                 })
             }
         } catch (err) {
@@ -282,68 +300,167 @@ export default function DataRetentionPage({ params }: { params: Promise<{ id: st
 
             {/* ═══════════════════════════════════════════════════════════════
                 SECTION 2: RETENTION STATUS (Primary focus)
+                Branches by stay_type
             ═══════════════════════════════════════════════════════════════ */}
-            <div className="bg-white rounded-xl border border-slate-200 p-5">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${data.purchaseType ? 'bg-blue-50' : 'bg-slate-100'}`}>
-                        <Clock className={data.purchaseType ? 'text-blue-600' : 'text-slate-500'} size={20} />
+            {data.stayType === 'short_stay' ? (
+                /* ═══════════════════════════════════════
+                   SHORT-STAY RETENTION CARD
+                ═══════════════════════════════════════ */
+                <div className="bg-white rounded-xl border border-slate-200 p-5">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${data.purchaseType ? 'bg-blue-50' : 'bg-slate-100'}`}>
+                            <Plane className={data.purchaseType ? 'text-blue-600' : 'text-slate-500'} size={20} />
+                        </div>
+                        <div>
+                            <h2 className="font-semibold text-lg">Short-Stay Evidence Retention</h2>
+                            {data.platformName && (
+                                <p className="text-sm text-slate-500">{data.platformName}</p>
+                            )}
+                        </div>
                     </div>
-                    <h2 className="font-semibold text-lg">Retention status</h2>
-                </div>
 
-                {(() => {
-                    const now = new Date()
-                    const retentionExpiry = data.retentionUntil ? new Date(data.retentionUntil) : null
-                    const formatDate = (date: Date) => date.toLocaleDateString('en-GB', {
-                        day: 'numeric', month: 'long', year: 'numeric'
-                    })
-
-                    // STATE A: Preview (no pack purchased)
-                    if (!data.purchaseType) {
-                        return (
-                            <div className="bg-slate-50 border border-slate-100 rounded-lg p-4">
-                                <p className="font-medium text-slate-700 mb-1">Preview mode</p>
-                                <p className="text-sm text-slate-600">
-                                    Your records are stored temporarily while you explore RentVault.
-                                </p>
-                                <p className="text-sm text-slate-500 mt-2">
-                                    Purchase a pack in Exports to unlock 12-month secure retention.
-                                </p>
-                            </div>
-                        )
-                    }
-
-                    // STATE D: Expired
-                    if (retentionExpiry && retentionExpiry < now) {
-                        return (
-                            <div className="bg-amber-50 border border-amber-100 rounded-lg p-4">
-                                <p className="font-medium text-amber-800 mb-1">Retention expired</p>
-                                <p className="text-sm text-amber-700">
-                                    Your retention period ended on {formatDate(retentionExpiry)}.
-                                    Download any remaining files or extend storage.
-                                </p>
-                            </div>
-                        )
-                    }
-
-                    // STATE B: Active
-                    return (
-                        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                            <p className="font-medium text-blue-800 mb-1">Storage active</p>
-                            <p className="text-sm text-blue-700">
-                                Stored securely until{' '}
-                                <span className="font-medium">
-                                    {retentionExpiry ? formatDate(retentionExpiry) : 'your retention period ends'}
-                                </span>.
-                                {data.storageYears > 1 && ` (${data.storageYears} years total)`}
+                    {!data.purchaseType ? (
+                        /* Unpurchased state */
+                        <div className="bg-slate-50 border border-slate-100 rounded-lg p-4">
+                            <p className="font-medium text-slate-700 mb-2">Preview mode</p>
+                            <p className="text-sm text-slate-600 mb-3">
+                                Your arrival and departure photos are saved temporarily.
                             </p>
-                            <p className="text-xs text-blue-600 mt-2">
-                                You'll be notified in advance if any action is needed.
+                            <p className="text-sm text-slate-500 mb-4">
+                                Purchase is required to seal evidence and generate the PDF report.
+                            </p>
+                            <a
+                                href={`/vault/case/${caseId}/exports`}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Unlock Short-Stay Evidence · €5.99
+                            </a>
+                        </div>
+                    ) : (
+                        /* Purchased state */
+                        <div className="space-y-4">
+                            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                                <p className="font-medium text-blue-800 mb-1">Evidence protected</p>
+                                <p className="text-sm text-blue-700">
+                                    Your arrival and departure evidence is stored securely for 30 days after check-out.
+                                    Evidence is sealed and cannot be changed.
+                                </p>
+                                {data.retentionUntil && (
+                                    <p className="text-sm text-blue-600 mt-2">
+                                        <strong>Expires:</strong> {new Date(data.retentionUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Sealing status */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className={`flex items-center gap-2 p-3 rounded-lg border ${data.arrivalSealed ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-slate-200'}`}>
+                                    {data.arrivalSealed ? (
+                                        <Check size={16} className="text-green-600" />
+                                    ) : (
+                                        <div className="w-4 h-4 border-2 border-slate-300 rounded-full" />
+                                    )}
+                                    <span className={`text-sm font-medium ${data.arrivalSealed ? 'text-green-800' : 'text-slate-600'}`}>
+                                        Arrival {data.arrivalSealed ? 'sealed' : 'pending'}
+                                    </span>
+                                </div>
+                                <div className={`flex items-center gap-2 p-3 rounded-lg border ${data.departureSealed ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-slate-200'}`}>
+                                    {data.departureSealed ? (
+                                        <Check size={16} className="text-green-600" />
+                                    ) : (
+                                        <div className="w-4 h-4 border-2 border-slate-300 rounded-full" />
+                                    )}
+                                    <span className={`text-sm font-medium ${data.departureSealed ? 'text-green-800' : 'text-slate-600'}`}>
+                                        Departure {data.departureSealed ? 'sealed' : 'pending'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Stay dates */}
+                            {(data.checkInDate || data.checkOutDate) && (
+                                <div className="text-sm text-slate-500 pt-2 border-t border-slate-100">
+                                    {data.checkInDate && (
+                                        <span>Check-in: {new Date(data.checkInDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                    )}
+                                    {data.checkInDate && data.checkOutDate && ' — '}
+                                    {data.checkOutDate && (
+                                        <span>Check-out: {new Date(data.checkOutDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                    )}
+                                </div>
+                            )}
+
+                            <p className="text-xs text-slate-400">
+                                Files are deleted automatically after expiry.
                             </p>
                         </div>
-                    )
-                })()}
-            </div>
+                    )}
+                </div>
+            ) : (
+                /* ═══════════════════════════════════════
+                   LONG-TERM RETENTION CARD (unchanged)
+                ═══════════════════════════════════════ */
+                <div className="bg-white rounded-xl border border-slate-200 p-5">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${data.purchaseType ? 'bg-blue-50' : 'bg-slate-100'}`}>
+                            <Clock className={data.purchaseType ? 'text-blue-600' : 'text-slate-500'} size={20} />
+                        </div>
+                        <h2 className="font-semibold text-lg">Retention status</h2>
+                    </div>
+
+                    {(() => {
+                        const now = new Date()
+                        const retentionExpiry = data.retentionUntil ? new Date(data.retentionUntil) : null
+                        const formatDate = (date: Date) => date.toLocaleDateString('en-GB', {
+                            day: 'numeric', month: 'long', year: 'numeric'
+                        })
+
+                        // STATE A: Preview (no pack purchased)
+                        if (!data.purchaseType) {
+                            return (
+                                <div className="bg-slate-50 border border-slate-100 rounded-lg p-4">
+                                    <p className="font-medium text-slate-700 mb-1">Preview mode</p>
+                                    <p className="text-sm text-slate-600">
+                                        Your records are stored temporarily while you explore RentVault.
+                                    </p>
+                                    <p className="text-sm text-slate-500 mt-2">
+                                        Purchase a pack in Exports to unlock 12-month secure retention.
+                                    </p>
+                                </div>
+                            )
+                        }
+
+                        // STATE D: Expired
+                        if (retentionExpiry && retentionExpiry < now) {
+                            return (
+                                <div className="bg-amber-50 border border-amber-100 rounded-lg p-4">
+                                    <p className="font-medium text-amber-800 mb-1">Retention expired</p>
+                                    <p className="text-sm text-amber-700">
+                                        Your retention period ended on {formatDate(retentionExpiry)}.
+                                        Download any remaining files or extend storage.
+                                    </p>
+                                </div>
+                            )
+                        }
+
+                        // STATE B: Active
+                        return (
+                            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                                <p className="font-medium text-blue-800 mb-1">Storage active</p>
+                                <p className="text-sm text-blue-700">
+                                    Stored securely until{' '}
+                                    <span className="font-medium">
+                                        {retentionExpiry ? formatDate(retentionExpiry) : 'your retention period ends'}
+                                    </span>.
+                                    {data.storageYears > 1 && ` (${data.storageYears} years total)`}
+                                </p>
+                                <p className="text-xs text-blue-600 mt-2">
+                                    You'll be notified in advance if any action is needed.
+                                </p>
+                            </div>
+                        )
+                    })()}
+                </div>
+            )}
 
             {/* ═══════════════════════════════════════════════════════════════
                 SECTION 3: STORAGE & SECURITY (Collapsible, informational)

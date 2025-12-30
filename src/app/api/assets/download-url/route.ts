@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { trackMetric } from '@/lib/metrics'
+import { isAdminEmail } from '@/lib/admin'
 
 export async function POST(request: Request) {
     const supabase = await createClient()
@@ -9,6 +11,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const isAdmin = isAdminEmail(user.email)
+
     try {
         const body = await request.json()
         const { assetId, forceDownload, fileName } = body
@@ -17,10 +21,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing assetId' }, { status: 400 })
         }
 
-        // Verify ownership and get path
+        // Verify ownership and get path + case info
         const { data: asset } = await supabase
             .from('assets')
-            .select('storage_path, user_id, type')
+            .select('storage_path, user_id, type, case_id, phase')
             .eq('asset_id', assetId)
             .single()
 
@@ -47,8 +51,32 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to generate download link' }, { status: 500 })
         }
 
+        // Track video download metric (only for forceDownload which is actual download intent)
+        if (forceDownload && asset.type === 'walkthrough_video' && asset.case_id) {
+            // Get case stay_type for metrics
+            const { data: caseData } = await supabase
+                .from('cases')
+                .select('stay_type')
+                .eq('case_id', asset.case_id)
+                .single()
+
+            await trackMetric({
+                event: 'video_downloaded',
+                case_id: asset.case_id,
+                user_id: user.id,
+                stay_type: caseData?.stay_type || 'long_term',
+                asset_type: 'walkthrough_video',
+                phase: asset.phase || undefined,
+                is_admin: isAdmin,
+            })
+        }
+
         return NextResponse.json({
             signedUrl: sigData.signedUrl
+        }, {
+            headers: {
+                'Cache-Control': 'private, max-age=55' // Cache for duration of signed URL minus buffer
+            }
         })
 
     } catch (err) {

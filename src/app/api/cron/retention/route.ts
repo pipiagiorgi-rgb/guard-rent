@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     try {
         const { data: activeCases } = await supabase
             .from('cases')
-            .select('case_id, user_id, label, retention_until, retention_reminder_level')
+            .select('case_id, user_id, label, retention_until, retention_reminder_level, stay_type')
             .eq('deletion_status', 'active')
             .not('retention_until', 'is', null)
         // Filter in JS for complex date math or use a custom query range if dataset is huge.
@@ -64,7 +64,8 @@ export async function GET(request: Request) {
                                 to: email,
                                 daysRemaining,
                                 caseLabel: c.label || 'Rental Case',
-                                renewalLink
+                                renewalLink,
+                                stayType: c.stay_type as 'long_term' | 'short_stay' | undefined
                             })
 
                             // Update reminder level
@@ -155,8 +156,16 @@ export async function GET(request: Request) {
 
                 results.hard_deleted++
 
-                // Optional: Log audit
-                /* await supabase.from('deletion_audit').insert({ ... }) */
+                // Log deletion audit for traceability (non-blocking)
+                try {
+                    await supabase.from('deletion_audit').insert({
+                        case_id: c.case_id,
+                        reason: 'retention_expired',
+                        deleted_at: new Date().toISOString()
+                    })
+                } catch (auditErr) {
+                    console.error('Deletion audit error:', auditErr)
+                }
             }
         }
     } catch (err: any) {

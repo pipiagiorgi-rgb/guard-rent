@@ -5,6 +5,7 @@ import { formatCountryWithCode } from '@/lib/countries'
 import { UnpaidRentalBanner } from '@/components/upgrade/UnpaidRentalBanner'
 import { Footer } from '@/components/layout/Footer'
 import { isAdminEmail } from '@/lib/admin'
+import { StayTypeBadge } from '@/components/ui/StayTypeBadge'
 
 // Helper to format country for display (handles custom countries)
 function formatCountry(code: string | null): string {
@@ -92,8 +93,9 @@ export default async function MyRentalsPage() {
                                                 {rental.status}
                                             </span>
                                         </div>
-                                        <p className="text-slate-500 text-sm">
-                                            {formatCountry(rental.country)} · <span className="text-slate-400">Created {new Date(rental.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                        <p className="text-slate-500 text-sm flex items-center gap-2 flex-wrap">
+                                            <StayTypeBadge stayType={rental.stay_type} size="sm" />
+                                            <span>{formatCountry(rental.country)} · <span className="text-slate-400">Created {new Date(rental.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span></span>
                                         </p>
                                     </div>
                                     <ChevronRight className="text-slate-400 group-hover:text-slate-600 transition-colors flex-shrink-0" size={20} />

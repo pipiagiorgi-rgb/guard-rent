@@ -174,24 +174,27 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
                         </DialogFooter>
                     </>
                 ) : (
-                    <div className="py-8 flex flex-col items-center justify-center text-center">
-                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                            <Check className="w-5 h-5 text-slate-600" />
+                    <div className="py-6 px-4 flex flex-col items-center justify-center text-center">
+                        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                            <Check className="w-6 h-6 text-slate-600" />
                         </div>
-                        <h3 className="text-base font-semibold text-slate-900 mb-2">
-                            Thank you — we've received your message
+                        <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                            Thank you!
                         </h3>
-                        <p className="text-sm text-slate-500 mb-2 max-w-[280px]">
+                        <p className="text-sm text-slate-600 mb-1">
+                            We've received your message.
+                        </p>
+                        <p className="text-sm text-slate-500 mb-4">
                             Your feedback has been sent to our support team and will be reviewed by a real person.
                         </p>
-                        <p className="text-xs text-slate-400 mb-6 max-w-[280px]">
+                        <p className="text-xs text-slate-400 mb-6">
                             If this is urgent, contact us directly at{' '}
                             <span className="font-medium">support@rentvault.co</span>
                         </p>
                         <Button
                             onClick={handleClose}
                             variant="outline"
-                            className="px-6"
+                            className="px-8"
                         >
                             Close
                         </Button>

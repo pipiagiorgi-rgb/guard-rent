@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { PDFDocument, StandardFonts, rgb, PDFPage, degrees } from 'pdf-lib'
 import { v4 as uuidv4 } from 'uuid'
 import { isAdminEmail } from '@/lib/admin'
+import { drawPhotoGrid } from '@/lib/pdf-images'
+import { trackMetric } from '@/lib/metrics'
 
 // Extend function timeout for PDF generation
 export const maxDuration = 60
@@ -112,6 +114,23 @@ export async function POST(request: Request) {
             .eq('type', 'handover_photo')
             .order('created_at')
 
+        // Fetch walkthrough videos
+        const { data: arrivalVideo } = await supabase
+            .from('assets')
+            .select('asset_id, storage_path, created_at, duration_seconds')
+            .eq('case_id', caseId)
+            .eq('type', 'walkthrough_video')
+            .eq('phase', 'check-in')
+            .single()
+
+        const { data: departureVideo } = await supabase
+            .from('assets')
+            .select('asset_id, storage_path, created_at, duration_seconds')
+            .eq('case_id', caseId)
+            .eq('type', 'walkthrough_video')
+            .eq('phase', 'handover')
+            .single()
+
         // Create PDF
         const pdfDoc = await PDFDocument.create()
         const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman)
@@ -213,7 +232,9 @@ export async function POST(request: Request) {
 
         const summary = [
             ['Arrival photos', `${arrivalPhotos?.length || 0} photos`],
+            ['Arrival video', arrivalVideo ? 'Recorded (timestamped)' : 'Not recorded'],
             ['Departure photos', `${departurePhotos?.length || 0} photos`],
+            ['Departure video', departureVideo ? 'Recorded (timestamped)' : 'Not recorded'],
         ]
 
         for (const [label, value] of summary) {
@@ -230,6 +251,49 @@ export async function POST(request: Request) {
                 font: helvetica,
             })
             yPos -= 18
+        }
+
+        // Video reference note (if any videos exist)
+        if (arrivalVideo || departureVideo) {
+            yPos -= 10
+            coverPage.drawText('Walkthrough Videos', {
+                x: MARGIN,
+                y: yPos,
+                size: 12,
+                font: helveticaBold,
+                color: rgb(0.3, 0.3, 0.3),
+            })
+            yPos -= 16
+
+            if (arrivalVideo) {
+                coverPage.drawText('• Arrival walkthrough video recorded', {
+                    x: MARGIN,
+                    y: yPos,
+                    size: 10,
+                    font: helvetica,
+                    color: rgb(0.3, 0.3, 0.3),
+                })
+                yPos -= 14
+            }
+            if (departureVideo) {
+                coverPage.drawText('• Departure walkthrough video recorded', {
+                    x: MARGIN,
+                    y: yPos,
+                    size: 10,
+                    font: helvetica,
+                    color: rgb(0.3, 0.3, 0.3),
+                })
+                yPos -= 14
+            }
+
+            coverPage.drawText('Videos are available as downloadable files and are not embedded in this PDF.', {
+                x: MARGIN,
+                y: yPos,
+                size: 9,
+                font: helvetica,
+                color: rgb(0.5, 0.5, 0.5),
+            })
+            yPos -= 14
         }
 
         // Explanation
@@ -290,29 +354,24 @@ export async function POST(request: Request) {
                 font: helveticaBold,
                 color: rgb(0.12, 0.14, 0.17),
             })
-            pageY -= 25
-
-            arrivalPage.drawText(`${arrivalPhotos.length} photos uploaded at check-in`, {
-                x: MARGIN,
-                y: pageY,
-                size: 10,
-                font: helvetica,
-                color: rgb(0.4, 0.4, 0.4),
-            })
             pageY -= 30
 
-            // List photo timestamps
-            for (const photo of arrivalPhotos.slice(0, 20)) {
-                const timestamp = new Date(photo.created_at).toLocaleString('en-GB')
-                arrivalPage.drawText(`• Photo uploaded: ${timestamp}`, {
-                    x: MARGIN,
-                    y: pageY,
-                    size: 9,
-                    font: helvetica,
-                })
-                pageY -= 14
-                if (pageY < 80) break
-            }
+            // Draw photo grid with embedded images
+            pageY = await drawPhotoGrid(
+                pdfDoc,
+                arrivalPage,
+                arrivalPhotos.map(p => ({
+                    asset_id: p.asset_id,
+                    storage_path: p.storage_path,
+                    room_id: null,
+                    type: 'checkin_photo',
+                    created_at: p.created_at
+                })),
+                pageY,
+                arrivalPage.getWidth(),
+                `${arrivalPhotos.length} photos uploaded at check-in`,
+                helvetica
+            )
 
             arrivalPage.drawText(FOOTER_TEXT, {
                 x: MARGIN,
@@ -344,28 +403,24 @@ export async function POST(request: Request) {
                 font: helveticaBold,
                 color: rgb(0.12, 0.14, 0.17),
             })
-            pageY -= 25
-
-            departurePage.drawText(`${departurePhotos.length} photos uploaded at check-out`, {
-                x: MARGIN,
-                y: pageY,
-                size: 10,
-                font: helvetica,
-                color: rgb(0.4, 0.4, 0.4),
-            })
             pageY -= 30
 
-            for (const photo of departurePhotos.slice(0, 20)) {
-                const timestamp = new Date(photo.created_at).toLocaleString('en-GB')
-                departurePage.drawText(`• Photo uploaded: ${timestamp}`, {
-                    x: MARGIN,
-                    y: pageY,
-                    size: 9,
-                    font: helvetica,
-                })
-                pageY -= 14
-                if (pageY < 80) break
-            }
+            // Draw photo grid with embedded images
+            pageY = await drawPhotoGrid(
+                pdfDoc,
+                departurePage,
+                departurePhotos.map(p => ({
+                    asset_id: p.asset_id,
+                    storage_path: p.storage_path,
+                    room_id: null,
+                    type: 'handover_photo',
+                    created_at: p.created_at
+                })),
+                pageY,
+                departurePage.getWidth(),
+                `${departurePhotos.length} photos uploaded at check-out`,
+                helvetica
+            )
 
             departurePage.drawText(FOOTER_TEXT, {
                 x: MARGIN,
@@ -428,6 +483,19 @@ export async function POST(request: Request) {
             .storage
             .from('guard-rent')
             .createSignedUrl(storagePath, 3600, downloadFileName ? { download: downloadFileName } : {})
+
+        // Track download metric (only for final downloads, not previews)
+        if (!forPreview) {
+            await trackMetric({
+                event: 'pdf_downloaded',
+                case_id: caseId,
+                user_id: user.id,
+                stay_type: 'short_stay',
+                pdf_type: 'short_stay',
+                is_admin: isAdmin,
+                is_preview: false,
+            })
+        }
 
         return NextResponse.json({ url: signData?.signedUrl })
 

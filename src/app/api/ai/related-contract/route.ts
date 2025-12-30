@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import OpenAI from 'openai'
+import { extractText } from 'unpdf'
+import { DOCUMENT_VAULT_PROMPT } from '@/lib/ai-prompts'
 
 /**
  * POST /api/ai/related-contract
@@ -9,6 +11,20 @@ import OpenAI from 'openai'
  * This is document-scoped AI - only context from the specific related contract is used.
  * Related contracts are reference-only documents (NOT sealed evidence).
  */
+
+// Helper to extract text from PDF
+async function extractTextFromPDF(buffer: ArrayBuffer): Promise<string> {
+    try {
+        const uint8Array = new Uint8Array(buffer)
+        const { text } = await extractText(uint8Array)
+        const fullText = Array.isArray(text) ? text.join('\n\n') : String(text || '')
+        return fullText.trim()
+    } catch (error: any) {
+        console.error('PDF extraction error:', error.message)
+        return ''
+    }
+}
+
 export async function POST(request: Request) {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -52,6 +68,27 @@ export async function POST(request: Request) {
             documentContext += `\nExtracted Information:\n${JSON.stringify(contract.extracted_data, null, 2)}\n`
         }
 
+        // For Q&A questions, fetch actual PDF content to provide better answers
+        let pdfContent = ''
+        if (action === 'question' && contract.storage_path) {
+            try {
+                const { data: signedData } = await supabase.storage
+                    .from('guard-rent')
+                    .createSignedUrl(contract.storage_path, 120)
+
+                if (signedData?.signedUrl) {
+                    const pdfResponse = await fetch(signedData.signedUrl)
+                    if (pdfResponse.ok) {
+                        const pdfBuffer = await pdfResponse.arrayBuffer()
+                        pdfContent = await extractTextFromPDF(pdfBuffer)
+                        console.log('PDF content extracted for Q&A, length:', pdfContent.length)
+                    }
+                }
+            } catch (pdfError: any) {
+                console.error('Could not fetch PDF for Q&A:', pdfError.message)
+            }
+        }
+
         // Check for API key
         const apiKey = process.env.OPENAI_API_KEY
         if (!apiKey) {
@@ -60,20 +97,15 @@ export async function POST(request: Request) {
 
         const openai = new OpenAI({ apiKey })
 
-        let systemPrompt = ''
         let userPrompt = ''
 
         switch (action) {
             case 'summarize':
-                systemPrompt = `You are a helpful assistant that summarizes service contracts clearly and concisely. 
-Focus on key information: what the service is, who provides it, the term, renewal conditions, and any notice requirements.
-Keep your summary to 3-5 bullet points. Be factual and neutral.`
-                userPrompt = `Summarize this service contract:\n\n${documentContext}`
+                userPrompt = `Summarize this service contract in a few short paragraphs:\n\n${documentContext}`
                 break
 
             case 'translate':
                 const lang = targetLanguage || 'English'
-                systemPrompt = `You are a professional translator. Translate the contract details accurately while maintaining legal meaning.`
                 userPrompt = `Translate the following contract information to ${lang}:\n\n${documentContext}`
                 break
 
@@ -81,18 +113,15 @@ Keep your summary to 3-5 bullet points. Be factual and neutral.`
                 if (!question) {
                     return NextResponse.json({ error: 'Missing question' }, { status: 400 })
                 }
-                systemPrompt = `You are a helpful assistant answering questions about service contracts.
-Only answer based on the information provided. If you don't have enough information, say so clearly.
-Be concise and factual. Do not make assumptions or provide legal advice.`
-                userPrompt = `Based on this contract information:\n\n${documentContext}\n\nQuestion: ${question}`
+                // Include PDF content if available for better answers
+                const fullContext = pdfContent
+                    ? `${documentContext}\n\n--- Document Content ---\n${pdfContent.substring(0, 6000)}`
+                    : documentContext
+                userPrompt = `Based on this contract information:\n\n${fullContext}\n\nQuestion: ${question}`
                 break
 
             case 'draft_notice':
-                systemPrompt = `You are a helpful assistant that drafts professional cancellation or notice emails.
-Write a polite, professional email that can be sent to terminate or give notice on a service contract.
-Include placeholder [YOUR NAME] and [YOUR ADDRESS] where personal details should go.
-Keep it brief and to the point.`
-                userPrompt = `Draft a cancellation notice email for this service contract:\n\n${documentContext}\n\nThe email should notify the provider of the intent to cancel/not renew the service.`
+                userPrompt = `Draft a polite, professional cancellation notice for this service contract. Include placeholder [YOUR NAME] and [YOUR ADDRESS] where personal details should go:\n\n${documentContext}`
                 break
 
             default:
@@ -102,7 +131,7 @@ Keep it brief and to the point.`
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [
-                { role: 'system', content: systemPrompt },
+                { role: 'system', content: DOCUMENT_VAULT_PROMPT },
                 { role: 'user', content: userPrompt }
             ],
             max_tokens: 1000,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendRetentionWarningEmail } from '@/lib/email'
+import { sendRetentionWarningEmail, sendShortStayExpiryReminderEmail } from '@/lib/email'
 
 /**
  * RETENTION NOTICES CRON JOB
@@ -44,6 +44,7 @@ export async function GET(req: Request) {
                 label,
                 retention_until,
                 user_id,
+                stay_type,
                 profiles!inner(email)
             `)
             .gt('retention_until', today.toISOString())
@@ -77,6 +78,7 @@ export async function GET(req: Request) {
                 label,
                 retention_until,
                 user_id,
+                stay_type,
                 profiles!inner(email)
             `)
             .gt('retention_until', oneDayFromNow.toISOString())
@@ -123,13 +125,31 @@ async function sendWarningEmail(
         return { success: false }
     }
 
-    const result = await sendRetentionWarningEmail({
-        to: userEmail,
-        rentalLabel: rentalCase.label || 'Your rental',
-        caseId: rentalCase.case_id,
-        expiryDate: rentalCase.retention_until,
-        daysUntil
-    })
+    // Branch based on stay type
+    let result
+    if (rentalCase.stay_type === 'short_stay') {
+        // Short-stay: Use specific email with 30-day language
+        result = await sendShortStayExpiryReminderEmail({
+            to: userEmail,
+            propertyName: rentalCase.label || 'Your rental',
+            expiryDate: new Date(rentalCase.retention_until).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }),
+            daysUntil,
+            caseId: rentalCase.case_id
+        })
+    } else {
+        // Long-term: Use standard retention email with 12-month language
+        result = await sendRetentionWarningEmail({
+            to: userEmail,
+            rentalLabel: rentalCase.label || 'Your rental',
+            caseId: rentalCase.case_id,
+            expiryDate: rentalCase.retention_until,
+            daysUntil
+        })
+    }
 
     if (result.success) {
         const warningType = notifiedColumn === 'final_expiry_notified_at' ? 'FINAL' : '30-day'

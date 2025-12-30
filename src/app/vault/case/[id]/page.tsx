@@ -43,8 +43,9 @@ export default async function CaseOverviewPage({ params }: { params: { id: strin
 
     return (
         <div className="space-y-6">
+            {/* Page header - minimal on mobile since name is in sidebar */}
             <div>
-                <h1 className="text-2xl font-bold mb-1">{rental.label}</h1>
+                <h1 className="text-2xl font-bold mb-1 hidden lg:block">{rental.label}</h1>
                 <p className="text-slate-500 text-sm">Overview</p>
             </div>
 

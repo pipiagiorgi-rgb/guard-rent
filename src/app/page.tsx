@@ -69,16 +69,16 @@ export default function Home() {
 
                         {/* Headline */}
                         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1] animate-fade-in-up opacity-0 delay-100">
-                            Protect your rental deposit.
+                            Protect your rental from day one.
                             <br />
                             <span className="bg-gradient-to-r from-slate-600 to-slate-400 bg-clip-text text-transparent">
-                                Never miss an important deadline.
+                                Document everything.
                             </span>
                         </h1>
 
-                        {/* Subheadline - IMPROVED: Outcome-focused, no hype */}
+                        {/* Subheadline - IMPROVED: Covers both long-term and short-stay */}
                         <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed px-4 animate-fade-in-up opacity-0 delay-200">
-                            A secure, private vault for tenants to organise rental documents, move-in and move-out photos, and key notice dates, before disputes arise.
+                            A secure vault to document your rental condition — whether it's a 12-month lease or a weekend Airbnb. Organise photos and key dates before disputes arise.
                         </p>
 
                         {/* CTA Buttons */}
@@ -115,12 +115,18 @@ export default function Home() {
                         </div>
 
                         {/* Trust Strip */}
-                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-10 pt-6 animate-fade-in-up opacity-0 delay-500">
+                        <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 mt-10 pt-6 animate-fade-in-up opacity-0 delay-500">
                             <div className="trust-badge">
                                 <div className="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-50 rounded-xl flex items-center justify-center">
                                     <Users size={18} className="text-slate-600" />
                                 </div>
                                 <span className="text-sm font-medium text-slate-700">For tenants only</span>
+                            </div>
+                            <div className="trust-badge">
+                                <div className="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-50 rounded-xl flex items-center justify-center">
+                                    <Calendar size={18} className="text-slate-600" />
+                                </div>
+                                <span className="text-sm font-medium text-slate-700">Long-term & short stays</span>
                             </div>
                             <div className="trust-badge">
                                 <div className="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-50 rounded-xl flex items-center justify-center">
@@ -460,7 +466,7 @@ export default function Home() {
                                 Especially useful when renting abroad or in a second language.
                             </p>
                         </div>
-                        <div className="grid md:grid-cols-3 gap-4">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="bg-slate-50 rounded-xl p-5 text-center">
                                 <div className="w-10 h-10 bg-white rounded-lg border border-slate-200 flex items-center justify-center mx-auto mb-3">
                                     <Globe size={18} className="text-slate-600" />
@@ -481,6 +487,13 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-semibold text-slate-900 mb-1">Busy schedule</h3>
                                 <p className="text-sm text-slate-500">Get deadline reminders so nothing slips</p>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 text-center">
+                                <div className="w-10 h-10 bg-white rounded-lg border border-slate-200 flex items-center justify-center mx-auto mb-3">
+                                    <HomeIcon size={18} className="text-slate-600" />
+                                </div>
+                                <h3 className="font-semibold text-slate-900 mb-1">Airbnb & vacation stays</h3>
+                                <p className="text-sm text-slate-500">Document arrival and departure for disputes</p>
                             </div>
                         </div>
                     </div>
@@ -560,6 +573,10 @@ export default function Home() {
                                 {
                                     question: "Is this evidence legally admissible?",
                                     answer: "RentVault creates timestamped, immutable records that can support your case in deposit disputes. While we don't provide legal advice, organised evidence with clear timestamps is typically more persuasive than unorganised phone photos. Many disputes are resolved before reaching formal proceedings when clear documentation exists."
+                                },
+                                {
+                                    question: "Can I use this for Airbnb or vacation rentals?",
+                                    answer: "Yes! RentVault works for short stays too. Document property condition at arrival and departure with timestamped photos. If a host makes a false damage claim, you'll have evidence to dispute it on Airbnb, Booking.com, or any platform."
                                 },
                                 {
                                     question: "What happens to my data?",

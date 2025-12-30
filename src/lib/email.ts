@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { createClient } from '@supabase/supabase-js'
 
 // Lazy initialization of Resend client (only when API key is available)
 function getResendClient(): Resend | null {
@@ -7,6 +8,17 @@ function getResendClient(): Resend | null {
         return null
     }
     return new Resend(process.env.RESEND_API_KEY)
+}
+
+// Get admin Supabase client for logging (bypasses RLS)
+function getSupabaseAdmin() {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        return null
+    }
+    return createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
 }
 
 // Email sender address - MUST be from a verified Resend domain for production
@@ -24,6 +36,39 @@ function logEmailConfig() {
     })
     if (!process.env.FROM_EMAIL) {
         console.warn('[Email] Using default sandbox FROM_EMAIL - only verified emails can receive! Set FROM_EMAIL to a verified domain.')
+    }
+}
+
+// ============================================================
+// LOG EMAIL SEND (for admin health tracking)
+// ============================================================
+async function logEmailSend({
+    emailType,
+    caseId,
+    userId,
+    success,
+    errorMessage
+}: {
+    emailType: string
+    caseId?: string
+    userId?: string
+    success: boolean
+    errorMessage?: string
+}) {
+    try {
+        const supabaseAdmin = getSupabaseAdmin()
+        if (!supabaseAdmin) return // Silently skip if no admin client
+
+        await supabaseAdmin.from('email_logs').insert({
+            email_type: emailType,
+            case_id: caseId || null,
+            user_id: userId || null,
+            success,
+            error_message: errorMessage || null
+        })
+    } catch (err) {
+        // Never fail the main request due to logging
+        console.error('[Email] Failed to log email send:', err)
     }
 }
 
@@ -174,11 +219,16 @@ interface SendEmailOptions {
     text: string
     html?: string
     tags?: { name: string; value: string }[]
+    // For logging
+    emailType?: string
+    caseId?: string
+    userId?: string
 }
 
-export async function sendEmail({ to, subject, text, html, tags }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
+export async function sendEmail({ to, subject, text, html, tags, emailType, caseId, userId }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
     logEmailConfig() // Log config on first email
     const resend = getResendClient()
+    const type = emailType || tags?.find(t => t.name === 'type')?.value || 'unknown'
 
     // If no API key, log to console (development mode)
     if (!resend) {
@@ -188,6 +238,8 @@ export async function sendEmail({ to, subject, text, html, tags }: SendEmailOpti
         console.log('Tags:', tags)
         console.log('Body:', text)
         console.log('======================================')
+        // Still log to DB in dev mode
+        await logEmailSend({ emailType: type, caseId, userId, success: true })
         return { success: true }
     }
 
@@ -205,13 +257,16 @@ export async function sendEmail({ to, subject, text, html, tags }: SendEmailOpti
 
         if (error) {
             console.error('[Email] Resend error:', error)
+            await logEmailSend({ emailType: type, caseId, userId, success: false, errorMessage: error.message })
             return { success: false, error: error.message }
         }
 
         console.log('[Email] Sent successfully:', data?.id)
+        await logEmailSend({ emailType: type, caseId, userId, success: true })
         return { success: true }
     } catch (err: any) {
         console.error('[Email] Send error:', err)
+        await logEmailSend({ emailType: type, caseId, userId, success: false, errorMessage: err.message })
         return { success: false, error: err.message || 'Failed to send email' }
     }
 }
@@ -666,20 +721,29 @@ function getOrdinalSuffix(n: number): string {
 
 // ============================================================
 // RETENTION WARNING EMAIL (30 days before data expiry)
+// LONG-TERM ONLY - Short-stay cases should use sendShortStayExpiryReminderEmail
 // ============================================================
 export async function sendRetentionWarningEmail({
     to,
     rentalLabel,
     caseId,
     expiryDate,
-    daysUntil
+    daysUntil,
+    stayType
 }: {
     to: string
     rentalLabel: string
     caseId: string
     expiryDate: string
     daysUntil: number
+    stayType?: string // Optional safety guard
 }): Promise<{ success: boolean; error?: string }> {
+    // Safety guard: Prevent sending long-term email to short-stay cases
+    if (stayType === 'short_stay') {
+        console.error('[Email Guard] Long-term retention email called for short-stay case:', caseId)
+        return { success: false, error: 'Wrong email function for short-stay case' }
+    }
+
     const formattedDate = new Date(expiryDate).toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'long',
@@ -830,41 +894,72 @@ interface StorageReminderProps {
     daysRemaining: number
     caseLabel: string
     renewalLink: string
+    stayType?: 'long_term' | 'short_stay'
 }
 
-export async function sendStorageReminderEmail({ to, daysRemaining, caseLabel, renewalLink }: StorageReminderProps) {
+export async function sendStorageReminderEmail({ to, daysRemaining, caseLabel, renewalLink, stayType }: StorageReminderProps) {
     if (daysRemaining <= 0) return
 
-    const subject = `Action Required: Storage for "${caseLabel}" expires in ${daysRemaining} days`
+    // Branch content based on stay type
+    const isShortStay = stayType === 'short_stay'
+
+    const subject = isShortStay
+        ? `Your short-stay evidence expires in ${daysRemaining} days`
+        : `Action Required: Storage for "${caseLabel}" expires in ${daysRemaining} days`
 
     // Determine urgency color
     const color = daysRemaining <= 7 ? '#ef4444' : daysRemaining <= 30 ? '#f59e0b' : '#3b82f6'
 
+    const bodyContent = isShortStay
+        ? `
+            <p style="color: #475569; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                Your evidence for <strong>${caseLabel}</strong> will expire in <span style="color: ${color}; font-weight: bold;">${daysRemaining} days</span>.
+            </p>
+
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <p style="margin: 0; color: #64748b; font-size: 14px;">
+                    <strong>What happens next?</strong><br>
+                    After expiry, your photos and report will be <strong>permanently deleted</strong>.
+                </p>
+            </div>
+
+            <p style="color: #94a3b8; font-size: 14px; text-align: center;">
+                <a href="${renewalLink}" style="color: #475569;">Download your evidence</a> before it's gone.
+            </p>
+        `
+        : `
+            <p style="color: #475569; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                The secure storage for your rental <strong>${caseLabel}</strong> will expire in <span style="color: ${color}; font-weight: bold;">${daysRemaining} days</span>.
+            </p>
+
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <p style="margin: 0; color: #64748b; font-size: 14px;">
+                    <strong>What happens next?</strong><br>
+                    After expiry, your documents will be held for a 30-day grace period before being <strong>permanently deleted</strong>. You will lose access to all photos, contracts, and evidence.
+                </p>
+            </div>
+
+            <p style="color: #94a3b8; font-size: 14px; text-align: center;">
+                or <a href="${renewalLink}" style="color: #475569;">download your data</a> before it's gone.
+            </p>
+        `
+
+    const ctaText = isShortStay ? 'Download Evidence' : 'Extend Storage'
+
     await sendEmail({
         to,
         subject,
-        text: `Urgent: Storage for "${caseLabel}" expires in ${daysRemaining} days. Renew now: ${renewalLink}`,
+        text: isShortStay
+            ? `Your evidence for "${caseLabel}" expires in ${daysRemaining} days. Download now: ${renewalLink}`
+            : `Urgent: Storage for "${caseLabel}" expires in ${daysRemaining} days. Renew now: ${renewalLink}`,
         html: `
             ${emailTemplate({
-            title: 'Storage Expiry Warning',
-            previewText: `Storage for "${caseLabel}" expires in ${daysRemaining} days`,
-            bodyContent: `
-                <p style="color: #475569; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
-                    The secure storage for your rental <strong>${caseLabel}</strong> will expire in <span style="color: ${color}; font-weight: bold;">${daysRemaining} days</span>.
-                </p>
-
-                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-                    <p style="margin: 0; color: #64748b; font-size: 14px;">
-                        <strong>What happens next?</strong><br>
-                        After expiry, your documents will be held for a 30-day grace period before being <strong>permanently deleted</strong>. You will lose access to all photos, contracts, and evidence.
-                    </p>
-                </div>
-
-                <p style="color: #94a3b8; font-size: 14px; text-align: center;">
-                    or <a href="${renewalLink}" style="color: #475569;">download your data</a> before it's gone.
-                </p>
-                `,
-            ctaText: 'Extend Storage',
+            title: isShortStay ? 'Evidence Expiring Soon' : 'Storage Expiry Warning',
+            previewText: isShortStay
+                ? `Evidence for "${caseLabel}" expires in ${daysRemaining} days`
+                : `Storage for "${caseLabel}" expires in ${daysRemaining} days`,
+            bodyContent,
+            ctaText,
             ctaUrl: renewalLink
         })}
         `,
@@ -1414,5 +1509,240 @@ export async function sendAdminPaymentNotification({
         text,
         html,
         tags: [{ name: 'type', value: 'admin_notification' }]
+    })
+}
+
+// ============================================================
+// SHORT-STAY: ARRIVAL SEALED EMAIL
+// ============================================================
+interface ShortStayArrivalSealedProps {
+    to: string
+    propertyName: string
+    checkInDate: string
+    caseId: string
+}
+
+export async function sendShortStayArrivalSealedEmail({
+    to,
+    propertyName,
+    checkInDate,
+    caseId
+}: ShortStayArrivalSealedProps): Promise<{ success: boolean; error?: string }> {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
+    const evidenceUrl = `${siteUrl}/vault/case/${caseId}/short-stay`
+
+    const subject = 'Arrival evidence sealed — timestamps locked'
+
+    const text = `
+Arrival Evidence Sealed
+
+Your arrival photos for "${propertyName}" have been sealed and timestamped.
+
+What this means:
+• Photos cannot be edited or deleted
+• Timestamps are immutably recorded
+• Evidence is ready for any dispute
+
+Check-in date: ${checkInDate}
+
+Next step: Take departure photos before you leave.
+
+View your evidence: ${evidenceUrl}
+
+© RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.
+`.trim()
+
+    const html = emailTemplate({
+        title: 'Arrival evidence sealed',
+        previewText: `Your arrival photos for "${propertyName}" are now protected`,
+        bodyContent: `
+            <p style="color: #1e293b; font-size: 15px; line-height: 24px; margin-bottom: 16px;">
+                Your arrival photos for <strong>"${propertyName}"</strong> have been sealed and timestamped.
+            </p>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <p style="color: #166534; font-size: 14px; line-height: 22px; margin: 0;">
+                    <strong>✓ Evidence locked</strong><br>
+                    Photos cannot be edited or deleted. Timestamps are immutably recorded.
+                </p>
+            </div>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 22px; margin-bottom: 8px;">
+                <strong>Check-in date:</strong> ${checkInDate}
+            </p>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 22px;">
+                <strong>Next step:</strong> Take departure photos before you leave to complete your evidence package.
+            </p>
+        `,
+        ctaText: 'View Your Evidence',
+        ctaUrl: evidenceUrl
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'short_stay_arrival_sealed' }]
+    })
+}
+
+// ============================================================
+// SHORT-STAY: REPORT READY EMAIL
+// ============================================================
+interface ShortStayReportReadyProps {
+    to: string
+    propertyName: string
+    checkInDate: string
+    checkOutDate: string
+    retentionUntil: string
+    caseId: string
+}
+
+export async function sendShortStayReportReadyEmail({
+    to,
+    propertyName,
+    checkInDate,
+    checkOutDate,
+    retentionUntil,
+    caseId
+}: ShortStayReportReadyProps): Promise<{ success: boolean; error?: string }> {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
+    const exportsUrl = `${siteUrl}/vault/case/${caseId}/exports`
+
+    const formattedExpiry = new Date(retentionUntil).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    })
+
+    const subject = 'Your short-stay evidence report is ready'
+
+    const text = `
+Short-Stay Evidence Report Ready
+
+Your evidence package for "${propertyName}" is complete.
+
+Arrival photos: Sealed ✓
+Departure photos: Sealed ✓
+
+Check-in: ${checkInDate}
+Check-out: ${checkOutDate}
+
+Your report is dispute-ready and can be downloaded anytime before ${formattedExpiry}.
+
+Download your report: ${exportsUrl}
+
+© RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.
+`.trim()
+
+    const html = emailTemplate({
+        title: 'Your evidence report is ready',
+        previewText: `Short-stay evidence for "${propertyName}" is complete`,
+        bodyContent: `
+            <p style="color: #1e293b; font-size: 15px; line-height: 24px; margin-bottom: 16px;">
+                Your evidence package for <strong>"${propertyName}"</strong> is complete.
+            </p>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <p style="color: #166534; font-size: 14px; line-height: 22px; margin: 0;">
+                    <strong>✓ Arrival photos sealed</strong><br>
+                    <strong>✓ Departure photos sealed</strong>
+                </p>
+            </div>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 22px; margin-bottom: 8px;">
+                <strong>Stay dates:</strong> ${checkInDate} — ${checkOutDate}
+            </p>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 22px; margin-bottom: 16px;">
+                Your report is <strong>dispute-ready</strong> and can be downloaded anytime before <strong>${formattedExpiry}</strong>.
+            </p>
+
+            <p style="color: #94a3b8; font-size: 13px; line-height: 20px;">
+                Submit this report to Airbnb, Booking.com, or VRBO if a damage claim is raised against you.
+            </p>
+        `,
+        ctaText: 'Download Report',
+        ctaUrl: exportsUrl
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'short_stay_report_ready' }]
+    })
+}
+
+// ============================================================
+// SHORT-STAY: EXPIRY REMINDER EMAIL
+// ============================================================
+interface ShortStayExpiryReminderProps {
+    to: string
+    propertyName: string
+    expiryDate: string
+    daysUntil: number
+    caseId: string
+}
+
+export async function sendShortStayExpiryReminderEmail({
+    to,
+    propertyName,
+    expiryDate,
+    daysUntil,
+    caseId
+}: ShortStayExpiryReminderProps): Promise<{ success: boolean; error?: string }> {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentvault.co'
+    const exportsUrl = `${siteUrl}/vault/case/${caseId}/exports`
+    const storageUrl = `${siteUrl}/vault/case/${caseId}/storage`
+
+    const subject = `Your short-stay evidence expires in ${daysUntil} days`
+
+    const text = `
+Short-Stay Evidence Expiring Soon
+
+Your evidence for "${propertyName}" will expire on ${expiryDate}.
+
+After this date, your photos and report will be permanently deleted.
+
+Download your evidence now: ${exportsUrl}
+
+Or extend your storage: ${storageUrl}
+
+© RentVault 2025 · Securely stores and organises your rental documents. Not legal advice.
+`.trim()
+
+    const html = emailTemplate({
+        title: 'Evidence expiring soon',
+        previewText: `Your evidence for "${propertyName}" expires in ${daysUntil} days`,
+        bodyContent: `
+            <p style="color: #1e293b; font-size: 15px; line-height: 24px; margin-bottom: 16px;">
+                Your evidence for <strong>"${propertyName}"</strong> will expire on <strong>${expiryDate}</strong>.
+            </p>
+
+            <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <p style="color: #92400e; font-size: 14px; line-height: 22px; margin: 0;">
+                    <strong>⚠️ ${daysUntil} days remaining</strong><br>
+                    After expiry, photos and reports will be permanently deleted.
+                </p>
+            </div>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 22px;">
+                Download your evidence now, or extend your storage if you need to keep records longer.
+            </p>
+        `,
+        ctaText: 'Download Evidence',
+        ctaUrl: exportsUrl
+    })
+
+    return sendEmail({
+        to,
+        subject,
+        text,
+        html,
+        tags: [{ name: 'type', value: 'short_stay_expiry_reminder' }]
     })
 }

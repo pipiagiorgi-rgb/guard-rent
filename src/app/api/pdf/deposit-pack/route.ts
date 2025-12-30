@@ -4,6 +4,7 @@ import { PDFDocument, StandardFonts, rgb, PDFPage, degrees } from 'pdf-lib'
 import { v4 as uuidv4 } from 'uuid'
 import { isAdminEmail } from '@/lib/admin'
 import { getPhotosGroupedByRoom, drawComparisonGrid, drawPhotoGrid, drawHashAppendix } from '@/lib/pdf-images'
+import { trackMetric } from '@/lib/metrics'
 
 // Extend function timeout for PDF generation (requires Pro plan for >10s)
 export const maxDuration = 60
@@ -776,6 +777,19 @@ export async function POST(request: Request) {
             .storage
             .from('guard-rent')
             .createSignedUrl(storagePath, 3600, downloadFileName ? { download: downloadFileName } : {})
+
+        // Track download metric (only for final downloads, not previews)
+        if (!forPreview) {
+            await trackMetric({
+                event: 'pdf_downloaded',
+                case_id: caseId,
+                user_id: user.id,
+                stay_type: 'long_term',
+                pdf_type: 'deposit_pack',
+                is_admin: isAdmin,
+                is_preview: false,
+            })
+        }
 
         return NextResponse.json({ url: signData?.signedUrl })
 

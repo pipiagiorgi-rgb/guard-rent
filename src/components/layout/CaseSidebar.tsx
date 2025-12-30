@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { FeedbackDialog } from '@/components/features/FeedbackDialog'
+import { StayTypeBadge } from '@/components/ui/StayTypeBadge'
 
 type PhaseStatus = 'not-started' | 'in-progress' | 'complete'
 
@@ -29,6 +30,7 @@ interface CaseState {
     hasContract: boolean
     checkinStatus: PhaseStatus
     handoverStatus: PhaseStatus
+    shortStayEvidenceStatus?: PhaseStatus
 }
 
 interface CaseSidebarProps {
@@ -47,13 +49,14 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
     const primaryItems = isShortStay
         ? [
             { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
-            { href: `/vault/case/${caseId}/short-stay`, label: 'Evidence', icon: Plane, status: caseState?.checkinStatus },
+            { href: `/vault/case/${caseId}/short-stay`, label: 'Evidence', icon: Plane, status: caseState?.shortStayEvidenceStatus },
         ]
         : [
             { href: `/vault/case/${caseId}`, label: 'Overview', icon: LayoutDashboard },
             { href: `/vault/case/${caseId}/check-in`, label: 'Move In', icon: Camera, status: caseState?.checkinStatus },
             { href: `/vault/case/${caseId}/handover`, label: 'Move Out', icon: KeyRound, status: caseState?.handoverStatus },
         ]
+
 
     const secondaryItems = isShortStay
         ? [] // No secondary items for short-stay (no Documents, no Contract, etc.)
@@ -64,11 +67,18 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
             { href: `/vault/case/${caseId}/documents`, label: 'Documents', icon: FolderOpen },
         ]
 
-    const tertiaryItems = [
-        { href: `/vault/case/${caseId}/exports`, label: 'Exports', icon: Download },
-        { href: `/vault/case/${caseId}/storage`, label: 'Storage', icon: HardDrive },
-        { href: `/vault/case/${caseId}/settings`, label: 'Data', icon: Database },
-    ]
+    // Tertiary items - conditional based on stay type
+    const tertiaryItems = isShortStay
+        ? [
+            // Short-stay: No Storage page (retention shown in Data)
+            { href: `/vault/case/${caseId}/exports`, label: 'Exports', icon: Download },
+            { href: `/vault/case/${caseId}/settings`, label: 'Data', icon: Database },
+        ]
+        : [
+            { href: `/vault/case/${caseId}/exports`, label: 'Exports', icon: Download },
+            { href: `/vault/case/${caseId}/storage`, label: 'Storage', icon: HardDrive },
+            { href: `/vault/case/${caseId}/settings`, label: 'Data', icon: Database },
+        ]
 
     const isActive = (href: string) => {
         if (href === `/vault/case/${caseId}`) {
@@ -95,15 +105,18 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
     return (
         <aside className="w-full lg:w-auto flex-shrink-0 mb-6 lg:mb-0">
             {/* Mobile: Back link and title */}
-            <div className="lg:hidden mb-4 flex items-center justify-between">
+            <div className="lg:hidden mb-3 flex items-center justify-between">
                 <Link
                     href="/vault"
-                    className="inline-flex items-center gap-2 text-base font-semibold text-slate-700 hover:text-slate-900 transition-colors py-2"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
                 >
-                    <ChevronLeft size={20} />
+                    <ChevronLeft size={18} />
                     All rentals
                 </Link>
-                <span className="font-semibold text-slate-900 truncate max-w-[180px]">{caseLabel}</span>
+                <div className="flex items-center gap-2">
+                    <StayTypeBadge stayType={caseState?.stayType} size="sm" showLabel={false} />
+                    <span className="font-semibold text-slate-900 truncate max-w-[140px] text-sm">{caseLabel}</span>
+                </div>
             </div>
 
             {/* Desktop: Back and Title */}
@@ -116,12 +129,15 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                     All rentals
                 </Link>
                 <h2 className="font-semibold text-slate-900 truncate">{caseLabel}</h2>
+                <div className="mt-1">
+                    <StayTypeBadge stayType={caseState?.stayType} size="sm" />
+                </div>
             </div>
 
             {/* Mobile Navigation: Grid with visual hierarchy */}
-            <nav className="lg:hidden space-y-3 mb-2">
-                {/* Primary row - larger */}
-                <div className="grid grid-cols-3 gap-2">
+            <nav className="lg:hidden space-y-2 mb-2">
+                {/* Primary row - auto-fit columns based on item count */}
+                <div className={`grid gap-2 ${primaryItems.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                     {primaryItems.map(item => {
                         const Icon = item.icon
                         const active = isActive(item.href)
@@ -129,12 +145,12 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`relative flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-medium transition-colors min-h-[68px] justify-center ${active
+                                className={`relative flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl text-xs font-medium transition-colors ${active
                                     ? 'bg-slate-900 text-white'
                                     : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                                     }`}
                             >
-                                <Icon size={22} />
+                                <Icon size={20} />
                                 <span className="text-center leading-tight">{item.label}</span>
                                 {!active && <Badge status={item.status} />}
                             </Link>
@@ -164,8 +180,8 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                     })}
                 </div>
 
-                {/* Tertiary row - smaller, lighter */}
-                <div className="grid grid-cols-4 gap-2">
+                {/* Tertiary row - dynamic columns */}
+                <div className={`grid gap-2 ${tertiaryItems.length <= 2 ? 'grid-cols-3' : 'grid-cols-4'}`}>
                     {tertiaryItems.map(item => {
                         const Icon = item.icon
                         const active = isActive(item.href)
@@ -173,7 +189,7 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex flex-col items-center gap-0.5 px-1 py-2 rounded-lg text-[10px] font-medium transition-colors ${active
+                                className={`flex flex-col items-center gap-0.5 px-1 py-2 rounded-lg text-[11px] font-medium transition-colors ${active
                                     ? 'bg-slate-900 text-white'
                                     : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
                                     }`}
@@ -183,10 +199,10 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                             </Link>
                         )
                     })}
-                    {/* Feedback button fits in tertiary row */}
+                    {/* Feedback button */}
                     <button
                         onClick={() => setFeedbackOpen(true)}
-                        className="flex flex-col items-center gap-0.5 px-1 py-2 rounded-lg text-[10px] font-medium bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors"
+                        className="flex flex-col items-center gap-0.5 px-1 py-2 rounded-lg text-[11px] font-medium bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors"
                     >
                         <MessageSquarePlus size={16} />
                         <span>Feedback</span>
@@ -226,35 +242,38 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                             )}
                         </Link>
                     )
-                })}
+                })
+                }
 
-                {/* Secondary - with divider */}
-                <div className="border-t border-slate-100 my-2 pt-2">
-                    {secondaryItems.map(item => {
-                        const Icon = item.icon
-                        const active = isActive(item.href)
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${active
-                                    ? 'bg-slate-900 text-white'
-                                    : 'text-slate-500 hover:bg-slate-100'
-                                    }`}
-                            >
-                                <Icon size={16} />
-                                {item.label}
-                                {'done' in item && (item as any).done !== undefined && (
-                                    <span className="ml-auto">
-                                        {(item as any).done ? (
-                                            <Check size={14} className="text-green-500" strokeWidth={2.5} />
-                                        ) : null}
-                                    </span>
-                                )}
-                            </Link>
-                        )
-                    })}
-                </div>
+                {/* Secondary - with divider (only show if items exist) */}
+                {secondaryItems.length > 0 && (
+                    <div className="border-t border-slate-100 my-2 pt-2">
+                        {secondaryItems.map(item => {
+                            const Icon = item.icon
+                            const active = isActive(item.href)
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${active
+                                        ? 'bg-slate-900 text-white'
+                                        : 'text-slate-500 hover:bg-slate-100'
+                                        }`}
+                                >
+                                    <Icon size={16} />
+                                    {item.label}
+                                    {'done' in item && (item as any).done !== undefined && (
+                                        <span className="ml-auto">
+                                            {(item as any).done ? (
+                                                <Check size={14} className="text-green-500" strokeWidth={2.5} />
+                                            ) : null}
+                                        </span>
+                                    )}
+                                </Link>
+                            )
+                        })}
+                    </div>
+                )}
 
                 {/* Tertiary - with divider */}
                 <div className="border-t border-slate-100 my-2 pt-2">
@@ -286,9 +305,9 @@ export default function CaseSidebar({ caseId, caseLabel, caseState }: CaseSideba
                         Give Feedback
                     </button>
                 </div>
-            </nav>
+            </nav >
 
             <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
-        </aside>
+        </aside >
     )
 }

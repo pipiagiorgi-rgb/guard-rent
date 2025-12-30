@@ -50,17 +50,29 @@ export default async function CaseLayout({
         .eq('type', 'handover_photo')
 
     // Calculate case state for sidebar badges using 3-state logic
+    const checkinStatus = getPhaseStatus(
+        (checkinPhotoCount || 0) > 0,
+        rentalCase.checkin_completed_at
+    )
+    const handoverStatus = getPhaseStatus(
+        (handoverPhotoCount || 0) > 0,
+        rentalCase.handover_completed_at
+    )
+
+    // For short-stay Evidence badge: only complete when BOTH phases are sealed
+    const shortStayEvidenceStatus: 'not-started' | 'in-progress' | 'complete' =
+        (checkinStatus === 'complete' && handoverStatus === 'complete')
+            ? 'complete'
+            : (checkinStatus !== 'not-started' || handoverStatus !== 'not-started')
+                ? 'in-progress'
+                : 'not-started'
+
     const caseState = {
         stayType: (rentalCase.stay_type || 'long_term') as 'long_term' | 'short_stay',
         hasContract: !!rentalCase.contract_uploaded_at,
-        checkinStatus: getPhaseStatus(
-            (checkinPhotoCount || 0) > 0,
-            rentalCase.checkin_completed_at
-        ),
-        handoverStatus: getPhaseStatus(
-            (handoverPhotoCount || 0) > 0,
-            rentalCase.handover_completed_at
-        ),
+        checkinStatus,
+        handoverStatus,
+        shortStayEvidenceStatus,
     }
 
     return (

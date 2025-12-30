@@ -26,6 +26,7 @@ export default function StoragePage() {
     const [rentalLabel, setRentalLabel] = useState('')
     const [purchasing, setPurchasing] = useState<string | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
+    const [isShortStay, setIsShortStay] = useState(false)
 
     useEffect(() => {
         loadStorageInfo()
@@ -42,7 +43,7 @@ export default function StoragePage() {
 
         const { data, error } = await supabase
             .from('cases')
-            .select('label, address, purchase_type, storage_years_purchased, storage_expires_at')
+            .select('label, address, purchase_type, storage_years_purchased, storage_expires_at, stay_type')
             .eq('case_id', caseId)
             .single()
 
@@ -53,9 +54,10 @@ export default function StoragePage() {
         }
 
         setRentalLabel(data.label || data.address || 'Untitled rental')
+        setIsShortStay(data.stay_type === 'short_stay')
 
-        // Determine if user has purchased ANY pack
-        const hasPack = !!(data.purchase_type && ['checkin', 'moveout', 'bundle'].includes(data.purchase_type))
+        // Determine if user has purchased ANY pack (including short_stay)
+        const hasPack = !!(data.purchase_type && ['checkin', 'moveout', 'bundle', 'short_stay'].includes(data.purchase_type))
 
         const expiresAt = data.storage_expires_at ? new Date(data.storage_expires_at) : null
         const now = new Date()
@@ -200,8 +202,11 @@ export default function StoragePage() {
                                         Files visible, not yet secured
                                     </p>
                                     <p className="text-sm text-slate-500">
-                                        Your files are saved while you explore. Purchase a pack to seal your evidence with
-                                        immutable timestamps and unlock <strong>12-month secure storage</strong>.
+                                        {isShortStay ? (
+                                            <>Your files are saved while you explore. Purchase the Short-Stay Pack to seal your evidence with immutable timestamps and unlock <strong>30-day secure storage</strong> after checkout.</>
+                                        ) : (
+                                            <>Your files are saved while you explore. Purchase a pack to seal your evidence with immutable timestamps and unlock <strong>12-month secure storage</strong>.</>
+                                        )}
                                     </p>
                                 </div>
                             </div>
@@ -211,57 +216,79 @@ export default function StoragePage() {
                         <div className="bg-white rounded-2xl border border-slate-200 p-6">
                             <h3 className="text-lg font-semibold text-slate-900 mb-2">Secure Your Evidence</h3>
                             <p className="text-slate-600 mb-6">
-                                Choose a pack to seal your records and unlock 12-month storage.
+                                {isShortStay
+                                    ? 'Seal your arrival and departure photos for dispute protection.'
+                                    : 'Choose a pack to seal your records and unlock 12-month storage.'}
                             </p>
 
                             <div className="grid gap-3">
-                                <button
-                                    onClick={() => handlePurchasePack('checkin', 1900)}
-                                    disabled={purchasing !== null}
-                                    className="flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-all disabled:opacity-50"
-                                >
-                                    <div className="text-left">
-                                        <span className="font-semibold text-slate-900">Check-In Pack</span>
-                                        <p className="text-sm text-slate-500">Move-in evidence + 12mo storage</p>
-                                    </div>
-                                    <span className="text-lg font-bold text-slate-900">
-                                        {purchasing === 'checkin' ? <Loader2 className="animate-spin" size={20} /> : '€19'}
-                                    </span>
-                                </button>
-
-                                <button
-                                    onClick={() => handlePurchasePack('moveout', 2900)}
-                                    disabled={purchasing !== null}
-                                    className="flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-all disabled:opacity-50"
-                                >
-                                    <div className="text-left">
-                                        <span className="font-semibold text-slate-900">Move-Out Pack</span>
-                                        <p className="text-sm text-slate-500">Handover evidence + 12mo storage</p>
-                                    </div>
-                                    <span className="text-lg font-bold text-slate-900">
-                                        {purchasing === 'moveout' ? <Loader2 className="animate-spin" size={20} /> : '€29'}
-                                    </span>
-                                </button>
-
-                                <button
-                                    onClick={() => handlePurchasePack('bundle', 3900)}
-                                    disabled={purchasing !== null}
-                                    className="flex items-center justify-between p-4 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50 relative"
-                                >
-                                    <span className="absolute -top-2 left-4 px-2 py-0.5 bg-blue-600 text-white text-xs font-semibold rounded-full">
-                                        BEST VALUE
-                                    </span>
-                                    <div className="text-left">
-                                        <span className="font-semibold text-slate-900">Full Bundle</span>
-                                        <p className="text-sm text-slate-500">Everything + Deposit Recovery</p>
-                                    </div>
-                                    <div className="text-right">
+                                {isShortStay ? (
+                                    /* SHORT-STAY: Single €5.99 pack */
+                                    <button
+                                        onClick={() => handlePurchasePack('short_stay', 599)}
+                                        disabled={purchasing !== null}
+                                        className="flex items-center justify-between p-4 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50"
+                                    >
+                                        <div className="text-left">
+                                            <span className="font-semibold text-slate-900">Short-Stay Pack</span>
+                                            <p className="text-sm text-slate-500">Arrival + departure evidence · 30-day storage</p>
+                                        </div>
                                         <span className="text-lg font-bold text-blue-600">
-                                            {purchasing === 'bundle' ? <Loader2 className="animate-spin" size={20} /> : '€39'}
+                                            {purchasing === 'short_stay' ? <Loader2 className="animate-spin" size={20} /> : '€5.99'}
                                         </span>
-                                        <p className="text-xs text-slate-500">Save €9</p>
-                                    </div>
-                                </button>
+                                    </button>
+                                ) : (
+                                    /* LONG-TERM: Three pack options */
+                                    <>
+                                        <button
+                                            onClick={() => handlePurchasePack('checkin', 1900)}
+                                            disabled={purchasing !== null}
+                                            className="flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-all disabled:opacity-50"
+                                        >
+                                            <div className="text-left">
+                                                <span className="font-semibold text-slate-900">Check-In Pack</span>
+                                                <p className="text-sm text-slate-500">Move-in evidence + 12mo storage</p>
+                                            </div>
+                                            <span className="text-lg font-bold text-slate-900">
+                                                {purchasing === 'checkin' ? <Loader2 className="animate-spin" size={20} /> : '€19'}
+                                            </span>
+                                        </button>
+
+                                        <button
+                                            onClick={() => handlePurchasePack('moveout', 2900)}
+                                            disabled={purchasing !== null}
+                                            className="flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-all disabled:opacity-50"
+                                        >
+                                            <div className="text-left">
+                                                <span className="font-semibold text-slate-900">Move-Out Pack</span>
+                                                <p className="text-sm text-slate-500">Handover evidence + 12mo storage</p>
+                                            </div>
+                                            <span className="text-lg font-bold text-slate-900">
+                                                {purchasing === 'moveout' ? <Loader2 className="animate-spin" size={20} /> : '€29'}
+                                            </span>
+                                        </button>
+
+                                        <button
+                                            onClick={() => handlePurchasePack('bundle', 3900)}
+                                            disabled={purchasing !== null}
+                                            className="flex items-center justify-between p-4 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50 relative"
+                                        >
+                                            <span className="absolute -top-2 left-4 px-2 py-0.5 bg-blue-600 text-white text-xs font-semibold rounded-full">
+                                                BEST VALUE
+                                            </span>
+                                            <div className="text-left">
+                                                <span className="font-semibold text-slate-900">Full Bundle</span>
+                                                <p className="text-sm text-slate-500">Everything + Deposit Recovery</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-lg font-bold text-blue-600">
+                                                    {purchasing === 'bundle' ? <Loader2 className="animate-spin" size={20} /> : '€39'}
+                                                </span>
+                                                <p className="text-xs text-slate-500">Save €9</p>
+                                            </div>
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </>
@@ -274,15 +301,15 @@ export default function StoragePage() {
                     <>
                         {/* Current Status Card */}
                         <div className={`bg-white rounded-2xl border p-6 mb-6 ${storageInfo.status === 'expired' ? 'border-red-200 bg-red-50' :
-                                storageInfo.status === 'critical' ? 'border-red-200' :
-                                    storageInfo.status === 'warning' ? 'border-amber-200' :
-                                        'border-slate-200'
+                            storageInfo.status === 'critical' ? 'border-red-200' :
+                                storageInfo.status === 'warning' ? 'border-amber-200' :
+                                    'border-slate-200'
                             }`}>
                             <div className="flex items-start gap-4">
                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${storageInfo.status === 'expired' ? 'bg-red-100' :
-                                        storageInfo.status === 'critical' ? 'bg-red-100' :
-                                            storageInfo.status === 'warning' ? 'bg-amber-100' :
-                                                'bg-green-100'
+                                    storageInfo.status === 'critical' ? 'bg-red-100' :
+                                        storageInfo.status === 'warning' ? 'bg-amber-100' :
+                                            'bg-green-100'
                                     }`}>
                                     {storageInfo.status === 'expired' || storageInfo.status === 'critical' ? (
                                         <AlertTriangle className="text-red-600" size={24} />
@@ -324,8 +351,8 @@ export default function StoragePage() {
                                         <div className="w-full bg-slate-100 rounded-full h-2 mb-3">
                                             <div
                                                 className={`h-2 rounded-full transition-all ${storageInfo.status === 'critical' ? 'bg-red-500' :
-                                                        storageInfo.status === 'warning' ? 'bg-amber-500' :
-                                                            'bg-green-500'
+                                                    storageInfo.status === 'warning' ? 'bg-amber-500' :
+                                                        'bg-green-500'
                                                     }`}
                                                 style={{ width: `${Math.min(100, Math.max(5, (storageInfo.daysRemaining / 365) * 100))}%` }}
                                             />
