@@ -22,13 +22,6 @@ export default function ShortStayDepositProtectionPage() {
         url: 'https://rentvault.co/short-stay-deposit-protection'
     }
 
-    const platforms = [
-        { name: 'Airbnb', icon: '🏠' },
-        { name: 'Booking.com', icon: '🛎️' },
-        { name: 'VRBO', icon: '🏡' },
-        { name: 'Holiday rentals', icon: '🌴' },
-    ]
-
     return (
         <div className="min-h-screen bg-white">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
@@ -85,18 +78,16 @@ export default function ShortStayDepositProtectionPage() {
                 </div>
             </section>
 
-            {/* Platform logos */}
+            {/* Platform strip */}
             <section className="py-8 px-4 md:px-6 border-b border-slate-100">
-                <div className="max-w-[800px] mx-auto">
-                    <p className="text-center text-sm text-slate-500 mb-4">Works for guests on any platform</p>
-                    <div className="flex justify-center gap-8 flex-wrap">
-                        {platforms.map((platform, index) => (
-                            <div key={index} className="flex items-center gap-2 text-slate-600">
-                                <span className="text-2xl">{platform.icon}</span>
-                                <span className="font-medium">{platform.name}</span>
-                            </div>
-                        ))}
-                    </div>
+                <div className="max-w-[800px] mx-auto text-center">
+                    <p className="text-sm text-slate-500 mb-3">Works for guests on any platform</p>
+                    <p className="text-slate-600 font-medium">
+                        Airbnb · Booking.com · VRBO · Holiday rentals
+                    </p>
+                    <p className="text-xs text-slate-400 mt-4">
+                        RentVault is an independent tool and is not affiliated with Airbnb, Booking.com, or VRBO.
+                    </p>
                 </div>
             </section>
 
