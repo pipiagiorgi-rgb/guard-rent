@@ -504,30 +504,49 @@ export default function Home() {
                     <div className="max-w-[900px] mx-auto">
                         <div className="bg-slate-50 rounded-2xl p-8 md:p-10 text-center">
                             <h2 className="text-xl md:text-2xl font-bold mb-3">Simple pricing</h2>
-                            <p className="text-slate-600 mb-6 max-w-lg mx-auto">
-                                One-time payment. No subscriptions. Choose what fits your needs.
+                            <p className="text-slate-600 mb-8 max-w-lg mx-auto">
+                                One-time payment. No subscriptions. Choose based on your rental type.
                             </p>
-                            <div className="flex flex-wrap justify-center gap-4 mb-6">
-                                <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer select-none">
+
+                            {/* Short-Stay */}
+                            <div className="mb-6">
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Vacation rentals</p>
+                                <Link href="/short-stay-deposit-protection" className="inline-flex bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer select-none">
                                     <span className="text-2xl font-bold">€5.99</span>
-                                    <span className="text-slate-500 text-sm ml-1">Short stay</span>
-                                </Link>
-                                <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer select-none">
-                                    <span className="text-2xl font-bold">€19</span>
-                                    <span className="text-slate-500 text-sm ml-1">Check-in</span>
-                                </Link>
-                                <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer select-none">
-                                    <span className="text-2xl font-bold">€29</span>
-                                    <span className="text-slate-500 text-sm ml-1">Move-out</span>
-                                </Link>
-                                <Link href="/pricing" className="bg-slate-900 text-white rounded-xl px-5 py-3 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer select-none">
-                                    <span className="text-2xl font-bold">€39</span>
-                                    <span className="text-slate-300 text-sm ml-1">Full bundle</span>
+                                    <span className="text-slate-500 text-sm ml-2 self-center">Short stay · 30 days</span>
                                 </Link>
                             </div>
+
+                            {/* Divider */}
+                            <div className="flex items-center gap-4 my-6 max-w-xs mx-auto">
+                                <div className="flex-1 h-px bg-slate-200"></div>
+                                <span className="text-xs text-slate-400">or</span>
+                                <div className="flex-1 h-px bg-slate-200"></div>
+                            </div>
+
+                            {/* Long-Term */}
+                            <div>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Long-term rentals</p>
+                                <div className="flex flex-wrap justify-center gap-4">
+                                    <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer select-none">
+                                        <span className="text-2xl font-bold">€19</span>
+                                        <span className="text-slate-500 text-sm ml-1">Check-in</span>
+                                    </Link>
+                                    <Link href="/pricing" className="bg-white rounded-xl px-5 py-3 border border-slate-200 hover:border-slate-300 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer select-none">
+                                        <span className="text-2xl font-bold">€29</span>
+                                        <span className="text-slate-500 text-sm ml-1">Move-out</span>
+                                    </Link>
+                                    <Link href="/pricing" className="bg-slate-900 text-white rounded-xl px-5 py-3 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer select-none">
+                                        <span className="text-2xl font-bold">€39</span>
+                                        <span className="text-slate-300 text-sm ml-1">Full bundle</span>
+                                    </Link>
+                                </div>
+                                <p className="text-xs text-slate-400 mt-3">12 months retention · Includes both phases</p>
+                            </div>
+
                             <Link
                                 href="/pricing"
-                                className="text-sm text-slate-600 hover:text-slate-900 underline underline-offset-2"
+                                className="inline-block mt-6 text-sm text-slate-600 hover:text-slate-900 underline underline-offset-2"
                             >
                                 See full pricing details →
                             </Link>
