@@ -16,6 +16,27 @@ export const metadata: Metadata = {
 // Guide topics with links
 const guides = [
     {
+        icon: AlertCircle,
+        title: 'Landlord not returning your deposit',
+        description: 'Evidence and timing matter. Learn what tenants can do when facing a deposit dispute.',
+        slug: 'landlord-not-returning-deposit',
+        color: 'red'
+    },
+    {
+        icon: Camera,
+        title: 'Move-in checklist for tenants',
+        description: 'What to photograph and record on day one to protect yourself later.',
+        slug: 'move-in-checklist-tenant',
+        color: 'green'
+    },
+    {
+        icon: Shield,
+        title: 'Move-out checklist',
+        description: 'What to document before handing back the keys. Timing is everything.',
+        slug: 'move-out-checklist',
+        color: 'purple'
+    },
+    {
         icon: Camera,
         title: 'Why move-in photos matter',
         description: 'Without timestamped evidence, landlords can blame you for damage that was already there.',
@@ -90,7 +111,8 @@ const colorClasses: Record<string, { bg: string; text: string; hoverText: string
     green: { bg: 'bg-green-100', text: 'text-green-600', hoverText: 'group-hover:text-green-600' },
     amber: { bg: 'bg-amber-100', text: 'text-amber-600', hoverText: 'group-hover:text-amber-600' },
     blue: { bg: 'bg-blue-100', text: 'text-blue-600', hoverText: 'group-hover:text-blue-600' },
-    red: { bg: 'bg-red-100', text: 'text-red-600', hoverText: 'group-hover:text-red-600' }
+    red: { bg: 'bg-red-100', text: 'text-red-600', hoverText: 'group-hover:text-red-600' },
+    purple: { bg: 'bg-purple-100', text: 'text-purple-600', hoverText: 'group-hover:text-purple-600' }
 }
 
 export default function GuidesPage() {
