@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { sendRelatedContractsPurchaseEmail, sendPackPurchaseEmail, sendAdminPaymentNotification } from '@/lib/email'
+import { sendPurchaseEvent } from '@/lib/ga4'
 
 export async function POST(req: Request) {
     const body = await req.text()
@@ -109,6 +110,17 @@ export async function POST(req: Request) {
                             caseId
                         })
 
+                        // Send GA4 purchase event for storage extension
+                        await sendPurchaseEvent({
+                            transactionId: session.id,
+                            value: (session.amount_total || 0) / 100,
+                            currency: session.currency?.toUpperCase() || 'EUR',
+                            packType: `storage_${yearsToAdd}`,
+                            stayType: 'long_term',
+                            caseId,
+                            userId: currentCase.user_id
+                        })
+
                         console.log(`Sent storage extension email to ${userEmail}`)
                     }
                 }
@@ -184,6 +196,17 @@ export async function POST(req: Request) {
                         })
 
                         console.log(`Sent related_contracts purchase email to ${userData.email}`)
+
+                        // Send GA4 purchase event for related_contracts
+                        await sendPurchaseEvent({
+                            transactionId: session.id,
+                            value: (session.amount_total || 0) / 100,
+                            currency: session.currency?.toUpperCase() || 'EUR',
+                            packType: 'related_contracts',
+                            stayType: 'long_term',
+                            caseId,
+                            userId
+                        })
                     }
                 } catch (emailError) {
                     console.error('Failed to send related_contracts email (non-critical):', emailError)
@@ -322,6 +345,17 @@ export async function POST(req: Request) {
                         })
 
                         console.log(`Sent pack purchase confirmation email to ${userData.email}`)
+
+                        // Send GA4 purchase event for evidence pack
+                        await sendPurchaseEvent({
+                            transactionId: session.id,
+                            value: (session.amount_total || 0) / 100,
+                            currency: session.currency?.toUpperCase() || 'EUR',
+                            packType,
+                            stayType: stayType || caseStayType || 'long_term',
+                            caseId,
+                            userId
+                        })
                     }
                 } catch (emailError) {
                     console.error('Failed to send pack purchase email (non-critical):', emailError)

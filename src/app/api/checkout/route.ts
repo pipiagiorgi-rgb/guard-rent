@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
+import { sendBeginCheckoutEvent } from '@/lib/ga4'
 
 export async function POST(request: Request) {
     const supabase = await createClient()
@@ -88,6 +89,16 @@ export async function POST(request: Request) {
         }
 
         const session = await stripe.checkout.sessions.create(sessionConfig)
+
+        // Send GA4 begin_checkout event (non-blocking)
+        sendBeginCheckoutEvent({
+            packType: pack.type,
+            stayType,
+            caseId,
+            value: pack.price / 100,
+            currency: 'EUR',
+            userId: user?.id
+        }).catch(err => console.error('[GA4] begin_checkout error:', err))
 
         return NextResponse.json({ url: session.url })
 
