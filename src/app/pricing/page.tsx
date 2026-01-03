@@ -39,7 +39,7 @@ const faqItems = [
     },
     {
         question: "What are Related Contracts?",
-        answer: "An optional €9 add-on to track utility and service contracts (internet, electricity, parking) linked to your rental. These are reference-only and not included in evidence reports."
+        answer: "A free feature included with any long-term pack to track utility and service contracts (internet, electricity, parking) linked to your rental. These are reference-only and not included in evidence reports."
     }
 ]
 
@@ -323,10 +323,10 @@ export default function PricingPage() {
                     <span>Optional walkthrough video evidence can be uploaded and referenced in exports.</span>
                 </div>
 
-                {/* Related Contracts Add-on */}
+                {/* Related Contracts Note */}
                 <div className="max-w-3xl mx-auto mt-4 flex items-center justify-center gap-2 text-sm text-slate-500">
                     <FileText size={16} />
-                    <span>Optional add-on: Related contracts tracking (reference only) — €9 one-time</span>
+                    <span>Related contracts tracking (utilities, parking, etc.) included free with any pack</span>
                 </div>
 
                 {/* Short-Stay Section */}

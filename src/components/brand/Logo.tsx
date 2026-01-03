@@ -5,46 +5,35 @@ import Image from 'next/image'
 
 interface LogoProps {
     className?: string
-    height?: number | string
+    height?: number
     size?: 'sm' | 'md' | 'lg'
 }
 
-// Size presets - 1.7x scaling for premium feel
+// Size presets for consistent sizing
 const SIZE_MAP = {
-    sm: 48,   // Was 28
-    md: 54,   // Was 32 (1.7x = 54.4)
-    lg: 68    // Was 40
+    sm: 28,   // Compact for mobile headers
+    md: 32,   // Default
+    lg: 40    // Large displays
 }
+
+// Logo aspect ratio (width / height from actual logo.png dimensions)
+const ASPECT_RATIO = 192 / 71 // ~2.7
 
 export function Logo({ className = '', height, size = 'md' }: LogoProps) {
     // Use explicit height if provided, otherwise use size preset
-    const h = height ? (typeof height === 'number' ? `${height}px` : height) : `${SIZE_MAP[size]}px`
+    const h = height || SIZE_MAP[size]
+    const w = Math.round(h * ASPECT_RATIO)
 
-    /**
-     * PRECISION ALIGNMENT LOGIC:
-     * To achieve perfect visual centering without CSS hacks (margins/transforms),
-     * we wrap the logo in an SVG and "correct the viewBox".
-     * 
-     * Content: 192x71
-     * Corrected ViewBox: 192x90 (Adds 19px of "optical padding" at the bottom)
-     * When flexbox centers this 90px-relative box, the 71px content sits slightly higher,
-     * perfectly matching the visual midline of the navigation text.
-     */
     return (
-        <svg
-            viewBox="0 0 192 90"
-            style={{ height: h, width: 'auto' }}
-            className={`inline-block fill-none ${className}`}
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <image
-                href="/logo.png"
-                x="0"
-                y="0"
-                width="192"
-                height="71"
-            />
-        </svg>
+        <Image
+            src="/logo.png"
+            alt="RentVault"
+            width={w}
+            height={h}
+            priority
+            className={`object-contain ${className}`}
+            style={{ width: 'auto', height: h }}
+        />
     )
 }
 
@@ -54,3 +43,4 @@ export function LogoText({ className = '' }: { className?: string }) {
 }
 
 export default Logo
+
