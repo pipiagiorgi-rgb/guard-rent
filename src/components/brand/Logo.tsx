@@ -9,11 +9,11 @@ interface LogoProps {
     size?: 'sm' | 'md' | 'lg'
 }
 
-// Size presets for consistent sizing
+// Size presets - premium sizing for visual impact
 const SIZE_MAP = {
-    sm: 28,   // Compact for mobile headers
-    md: 32,   // Default
-    lg: 40    // Large displays
+    sm: 36,   // Mobile headers, compact areas
+    md: 44,   // Default navigation
+    lg: 56    // Large displays, hero sections
 }
 
 // Logo aspect ratio (width / height from actual logo.png dimensions)
