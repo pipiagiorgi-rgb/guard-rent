@@ -31,8 +31,8 @@ export function Logo({ className = '', height, size = 'md' }: LogoProps) {
             width={w}
             height={h}
             priority
-            className={`object-contain ${className}`}
-            style={{ width: 'auto', height: h }}
+            className={`object-contain block ${className}`}
+            style={{ width: 'auto', height: h, transform: 'translateY(-2px)' }}
         />
     )
 }
