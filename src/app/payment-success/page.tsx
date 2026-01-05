@@ -12,22 +12,6 @@ function PaymentSuccessContent() {
     const pack = searchParams.get('pack')
 
     useEffect(() => {
-        // Fire GA4 purchase conversion event for Google Ads
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-            const value = pack === 'Year' ? 29 : pack === 'Three-Year' ? 39 : 19;
-            (window as any).gtag('event', 'purchase', {
-                currency: 'EUR',
-                value: value,
-                transaction_id: caseId || `rv_${Date.now()}`,
-                items: [{
-                    item_id: pack?.toLowerCase() || 'starter',
-                    item_name: `RentVault ${pack || 'Starter'} Pack`,
-                    price: value,
-                    quantity: 1
-                }]
-            });
-        }
-
         // Redirect to vault after 3 seconds
         const timer = setTimeout(() => {
             if (caseId) {
@@ -38,7 +22,7 @@ function PaymentSuccessContent() {
         }, 3000)
 
         return () => clearTimeout(timer)
-    }, [caseId, pack, router])
+    }, [caseId, router])
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">

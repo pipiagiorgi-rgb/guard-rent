@@ -16,6 +16,7 @@ import { Footer } from '@/components/layout/Footer'
 import { isAdminEmail } from '@/lib/admin'
 import { CheckInUpsellModal } from '@/components/ui/CheckInUpsellModal'
 import ShortStayExports from '@/components/exports/ShortStayExports'
+import { trackBeginCheckout, trackPurchase } from '@/lib/analytics'
 
 interface Issue {
     issue_id: string
@@ -166,6 +167,21 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
         const packParam = searchParams.get('pack')
 
         if (purchaseParam === 'success' && packParam) {
+            // Track purchase conversion for Google Ads
+            const packPrices: Record<string, number> = {
+                checkin_pack: 19,
+                deposit_pack: 29,
+                bundle: 39,
+                short_stay: 9
+            }
+            trackPurchase({
+                transactionId: `${caseId}_${packParam}_${Date.now()}`,
+                packType: packParam,
+                stayType: evidence.stayType || 'long_term',
+                value: packPrices[packParam] || 19,
+                caseId: caseId
+            })
+
             // Show success banner
             setPurchaseSuccess(packParam)
 
@@ -522,6 +538,14 @@ export default function ExportsPage({ params }: { params: Promise<{ id: string }
 
     const handlePurchase = async (packType: string, amount: number) => {
         setPurchasing(packType)
+
+        // Track begin_checkout for Google Ads conversion tracking
+        trackBeginCheckout({
+            packType,
+            stayType: evidence.stayType || 'long_term',
+            value: amount / 100, // Convert cents to euros
+            caseId: caseId
+        })
         try {
             const res = await fetch('/api/checkout', {
                 method: 'POST',
